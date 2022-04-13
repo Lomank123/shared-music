@@ -1,0 +1,13 @@
+Django
+channels
+channels_redis
+flake8
+django-cors-headers
+django-cleanup
+python-dotenv
+psycopg2
+gunicorn
+django-crispy-forms
+whitenoise
+dj-database-url
+easy-thumbnails
