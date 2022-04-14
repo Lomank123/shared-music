@@ -1,14 +1,18 @@
 import os
-
-import django
-from channels.http import AsgiHandler
-from channels.routing import ProtocolTypeRouter
+from django.core.asgi import get_asgi_application
+from channels.auth import AuthMiddlewareStack
+from channels.routing import ProtocolTypeRouter, URLRouter
+import main.routing
 
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'sharedmusic.settings.settings')
-django.setup()
 
+# application = get_asgi_application()
 application = ProtocolTypeRouter({
-    "http": AsgiHandler(),
-    ## IMPORTANT::Just HTTP for now. (We can add other protocols later.)
+    "http": get_asgi_application(),
+    "websocket": AuthMiddlewareStack(
+        URLRouter(
+            main.routing.websocket_urlpatterns
+        )
+    ),
 })
