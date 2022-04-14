@@ -1,0 +1,27 @@
+{% extends "layout/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Sign in{% endblock %}
+
+{% block content %}
+  <h2>Sign in</h2>
+  <hr />
+
+  {% if user.is_authenticated %}
+    <p>Already logged in</p>
+  {% else %}
+    <p class="welcome-msg">
+      Welcome to Shared Music! Please create an account or log in before using our service.
+    </p>
+    <p>
+      <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input type="hidden" name="next" value="{{ next }}" />
+        <input class="btn btn-primary" type="submit" value="Log in" />
+      </form>
+    </p>
+    <p><a href="{% url 'signup' %}">Sign up</a></p>
+  {% endif %}
+
+{% endblock content %}

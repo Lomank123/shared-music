@@ -1,0 +1,12 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Room{% endblock title %}
+
+{% block content %}
+  <h1>Room</h1>
+  <hr />
+
+  <h6>Greetings, {{ user.username }}</h6>
+  <p>Room name: {{ room.code }}</p>
+
+{% endblock content %}
