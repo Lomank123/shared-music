@@ -1,36 +1,42 @@
-var roomCode = $("#room").attr("room_code");
-var connectionString = 'ws://' + window.location.host + '/ws/room/' + roomCode + '/';
-var roomSocket = new WebSocket(connectionString);
-var username = $("#user").attr("username");
+const roomCode = $("#room").attr("room_code");
+const connectionString =
+    "ws://" + window.location.host + "/ws/room/" + roomCode + "/";
+const roomSocket = new WebSocket(connectionString);
+const username = $("#user").attr("username");
 let users = [];
 
-
 function connect() {
-  roomSocket.onopen = () => {
-    console.log("WebSocket connection created.");
-    roomSocket.send(JSON.stringify({
-      event: "CONNECT",
-      message: username,
-    }));
-  }
+    roomSocket.onopen = () => {
+        console.log("WebSocket connection created.");
+        roomSocket.send(
+            JSON.stringify({
+                event: "CONNECT",
+                message: username,
+            })
+        );
+    };
 
-  roomSocket.onclose = (e) => {
-    console.log('Socket is closed. Reconnect will be attempted in 10 seconds.', e.reason);
-  }
+    roomSocket.onclose = (e) => {
+        console.log(
+            "Socket is closed. Reconnect will be attempted in 10 seconds.",
+            e.reason
+        );
+    };
 
-  roomSocket.onmessage = (e) => {
-    let data = JSON.parse(e.data);
-    data = data["payload"];
-    console.log(data);
-    if (data.event == "CONNECT" || data.event == "DISCONNECT") {
-      console.log(data.message);
-      document.getElementById("users-count").innerHTML = data.count.toString();
+    roomSocket.onmessage = (e) => {
+        let data = JSON.parse(e.data);
+        data = data["payload"];
+        console.log(data);
+        if (data.event == "CONNECT" || data.event == "DISCONNECT") {
+            console.log(data.message);
+            document.getElementById("users-count").innerHTML =
+                data.count.toString();
+        }
+    };
+    console.log(roomSocket.readyState);
+    if (roomSocket.readyState == WebSocket.OPEN) {
+        roomSocket.onopen();
     }
-  }
-  console.log(roomSocket.readyState);
-  if (roomSocket.readyState == WebSocket.OPEN) {
-    roomSocket.onopen();
-  }
 }
 
 connect();

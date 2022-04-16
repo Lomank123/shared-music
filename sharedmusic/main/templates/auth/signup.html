@@ -4,15 +4,40 @@
 {% block title %}Sign up{% endblock title %}
 
 {% block content %}
-  <h2>Sign up</h2>
-  <hr />
 
-  <p>
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-      {{ form|crispy }}
-      <button class="btn btn-primary" type="submit">Sign up</button>
+  {% if user.is_authenticated %}
+    <p>Already logged in</p>
+  {% else %}
+  <div class="sign-form">
+    <div class="switch-buttons">
+        <a
+            id="switch-login-button"
+            class="switch-buttons__button"
+            href="{% url 'login' %}"
+        >
+            Sign In
+        </a>
+        <a
+            id="switch-register-button"
+            class="switch-buttons__button switch-buttons__button_chosen"
+            href="{% url 'signup' %}" 
+        >
+            Register
+        </a>
+    </div>
+    <form
+        id="signup-form"
+        class="signup"
+        method="post"
+        enctype="multipart/form-data"
+    >
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button class="btn signup__btn" type="submit">
+            Sign In
+        </button>
     </form>
-  </p>
+  </div>
+  {% endif %}
 
 {% endblock %}

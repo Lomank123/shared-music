@@ -6,30 +6,70 @@
     <!-- Required meta tags -->
     <meta http-equiv="Content-Type" content="text/html"; charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script
+    src="https://kit.fontawesome.com/c4996a1df8.js"
+    crossorigin="anonymous"
+    ></script>
     <!-- Styles -->
-		<link rel="stylesheet" type="text/css" href="{% static 'main/styles/style.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
 		<!-- Title -->
     <title>Shared Music | {% block title %}{% endblock title %}</title>
   </head>
 
   <body>
-    {% if user.is_authenticated %}
-      <h6>Welcome, {{ user.username }}</h6>
-      <h6><a href="{% url 'logout' %}">Logout</a></h6>
-    {% endif %}
+    <nav id="collapse-sidebar" class="sidebar">
+        <a
+            href="javascript:void(0)"
+            class="sidebar__closebtn"
+            onclick="closeNav()"
+            >&times;</a
+        >
+        <a href="{% url 'home' %}" class="sidebar__link">
+            <i class="fa-solid fa-house"></i>
+            <p>Home</p>
+        </a>
+        <a href="{% url 'login' %}" class="sidebar__link">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            <p>Log in</p>
+        </a>
+        <a href="#" class="sidebar__link">
+            <i class="fa-solid fa-address-card"></i>
+            <p>Profile</p>
+        </a>
+        {% if user.is_authenticated %}
+        <div class="user-data">
+            <h6>Welcome, {{ user.username }}</h6>
+            <a href="{% url 'logout' %}" class="sidebar__link sidebar__link_logout">Logout</a>
+        </div>
+      {% endif %}
+    </nav>
+    <button class="openbtn" onclick="openNav()">
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="100%"
+            fill="none"
+            viewBox="0 0 24 16"
+        >
+            <path
+                fill="#fff"
+                fill-rule="evenodd"
+                d="M0 1.4c0 .7.567 1.267 1.267 1.267h21.466C23.433 2.667 24 2.1 24 1.4v-.133C24 .567 23.433 0 22.733 0H1.267C.567 0 0 .567 0 1.267V1.4zm1.267 7.933C.567 9.333 0 8.766 0 8.067v-.134c0-.7.567-1.266 1.267-1.266h21.466c.7 0 1.267.567 1.267 1.266v.134c0 .7-.567 1.266-1.267 1.266H1.267zm0 6.667C.567 16 0 15.433 0 14.733V14.6c0-.7.567-1.267 1.267-1.267h21.466c.7 0 1.267.567 1.267 1.267v.133c0 .7-.567 1.267-1.267 1.267H1.267z"
+                clip-rule="evenodd"
+            ></path>
+        </svg>
+    </button>
 
-    <div class="container">
-      {% block content %}
-      {% endblock content %}
-    </div>
+    <main id="main">
+        <div class="container">
+            {% block content %}
+            {% endblock content %}
+        </div>
+    </main>
   </body>
 
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script src="{% static 'js/navbar.js' %}"></script>
   <!-- Optional JavaScript -->
   {% block scripts %}
   {% endblock scripts %}

@@ -46,6 +46,7 @@ class RoomView(LoginRequiredMixin, TemplateView):
 
 
 class CustomLoginView(LoginView):
+    #template_name = "auth/login.html"
     template_name = "auth/login.html"
 
 
