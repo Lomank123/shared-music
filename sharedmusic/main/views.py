@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, reverse
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
@@ -22,15 +22,18 @@ class HomeView(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
-    
+
     def post(self, request, *args, **kwargs):
         if "room_code" in request.POST:
             # Join to existing room
             room_code = request.POST.get("room_code")
             room_url = reverse('room', kwargs={ "code": room_code })
             return redirect(room_url)
-        else:
-            return super().post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.host = self.request.user
+        return super().form_valid(form)
 
 
 class RoomView(LoginRequiredMixin, TemplateView):
@@ -51,7 +54,7 @@ class CustomLogoutView(LogoutView):
 
 
 class CustomUserSignUpView(CreateView):
-    model = User
+    model = get_user_model()
     form_class = CustomUserCreationForm
     template_name = 'auth/signup.html'
     success_url = '/'

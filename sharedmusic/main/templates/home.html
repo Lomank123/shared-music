@@ -18,7 +18,7 @@
 
   <div>
     <h4>Join room</h4>
-    <form id="create-room-form" method="POST">
+    <form id="join-room-form" method="POST">
       {% csrf_token %}
       <input id="room" type="text" name="room_code" required /> 
       <input class="btn btn-primary" type="submit" value="Join" />

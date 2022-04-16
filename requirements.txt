@@ -1,4 +1,5 @@
 Django
+django-extensions
 channels
 channels_redis
 flake8

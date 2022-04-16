@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django_cleanup',
     'crispy_forms',
     'easy_thumbnails',
+    'django_extensions',
     'main',
 ]
 
