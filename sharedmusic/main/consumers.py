@@ -7,77 +7,65 @@ from asgiref.sync import sync_to_async
 class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
 
     async def connect(self):
-        user = self.scope.get('user')
+        self.user = self.scope.get('user')
         self.room_name = self.scope['url_route']['kwargs']['code']
         self.room_group_name = f'room_{self.room_name}'
-        self.user_group_name = f'user_{user}'
+        # User group must contain only one user
+        self.user_group_name = f'user_{self.user}'
+        # Handle authenticated user connection
+        if self.user.is_authenticated:
+            await self.connect_user()
+        await self.accept()
 
-        # Join room group
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-        )
+    async def connect_user(self):
+        # Remove all previous connections of the same user if they exist
+        await self.remove_old_connections()
+        # Join groups
+        for group_name in [self.room_group_name, self.user_group_name]:
+            await self.channel_layer.group_add(group_name, self.channel_name)
+        # Add new listener
+        await Room.add_listener(self.room_name, self.user)
 
+    async def remove_old_connections(self):
+        """
+        Removes all previous (old) channels from room and user groups.
+        """
         try:
+            # Create copy to iterate through
             user_group = self.channel_layer.groups[self.user_group_name].copy()
         except KeyError:
-            user_group = None
-
-        same_user_instances = []
-        if user_group is not None:
-            for us in user_group:
-                if us != self.channel_name:
-                    same_user_instances.append(us)
-                    await self.channel_layer.group_send(self.user_group_name, {
-                        'type': 'send_message',
-                        'message': "Already connected. Refresh the page",
-                        'event': 'ALREADY_CONNECTED'
-                    })
-                    await self.channel_layer.group_discard(
-                        self.user_group_name,
-                        us
-                    )
-            for us in same_user_instances:
-                await self.channel_layer.group_discard(
-                    self.room_group_name,
-                    us
-                )
-
-        await self.channel_layer.group_add(
-            self.user_group_name,
-            self.channel_name
-        )
-
-        sync_to_async(print(self.channel_layer.groups))
-
-        # Adding new listener
-        
-        if user.is_authenticated:
-            await Room.add_listener(self.room_name, user)
-
-        await self.accept()
+            user_group = {}
+        # Remove old channel (if same user or multiple tabs)
+        for channel in user_group:
+            if channel != self.channel_name:
+                # Send message to old channel to show alert
+                await self.channel_layer.group_send(self.user_group_name, {
+                    'type': 'send_message',
+                    'message': "User has already connected. Refresh the page.",
+                    'event': 'ALREADY_CONNECTED',
+                })
+                # Leave groups
+                for group_name in [self.room_group_name, self.user_group_name]:
+                    await self.channel_layer.group_discard(group_name, channel)
 
     async def disconnect(self, close_code):
         if self.channel_name in self.channel_layer.groups[self.room_group_name]:
-            user = self.scope.get('user')
             # Removing listener
-            if user.is_authenticated:
-                    await Room.remove_listener(self.room_name, user)
-            # Retrieving new list
+            if self.user.is_authenticated:
+                await Room.remove_listener(self.room_name, self.user)
+            # Send message to other listeners
             listeners = await Room.get_listeners(self.room_name)
             count = await Room.listeners_count(self.room_name)
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
-                'message': f"User {user} disconnected.",
+                'message': f"User {self.user} disconnected.",
                 'event': "DISCONNECT",
                 'listeners': listeners,
                 'count': count,
             })
-            # Leave room group
-            await self.channel_layer.group_discard(
-                self.room_group_name,
-                self.channel_name
-            )
+            # Leave groups
+            for group_name in [self.room_group_name, self.user_group_name]:
+                await self.channel_layer.group_discard(group_name, self.channel_name)
 
     async def receive(self, text_data):
         """
@@ -88,23 +76,13 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         response = json.loads(text_data)
         event = response.get("event", None)
         message = response.get("message", None)
-        user = self.scope.get('user')
 
-        # If event == 'CONNECT' then we should add user to room instance
         if event == 'CONNECT':
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
                 'message': message,
                 'event': 'CONNECT',
-                'user': user.username,
-                'count': count,
-                'listeners': listeners,
-            })
-        elif event == 'DISCONNECT':
-            await self.channel_layer.group_send(self.room_group_name, {
-                'type': 'send_message',
-                'message': message,
-                'event': 'DISCONNECT',
+                'user': self.user.username,
                 'count': count,
                 'listeners': listeners,
             })

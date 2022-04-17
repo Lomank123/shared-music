@@ -26,9 +26,6 @@ function connect() {
       console.log(data.message);
       document.getElementById("users-count").innerHTML = data.count.toString();
     }
-    if (data.event == "ALREADY_CONNECTED") {
-      alert(data.message);
-    }
   }
   console.log(roomSocket.readyState);
   if (roomSocket.readyState == WebSocket.OPEN) {
