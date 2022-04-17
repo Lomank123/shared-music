@@ -15,7 +15,7 @@ function connect() {
   }
 
   roomSocket.onclose = (e) => {
-    console.log('Socket is closed. Reconnect will be attempted in 10 seconds.', e.reason);
+    console.log(e.reason);
   }
 
   roomSocket.onmessage = (e) => {
@@ -25,6 +25,9 @@ function connect() {
     if (data.event == "CONNECT" || data.event == "DISCONNECT") {
       console.log(data.message);
       document.getElementById("users-count").innerHTML = data.count.toString();
+    }
+    if (data.event == "ALREADY_CONNECTED") {
+      alert(data.message);
     }
   }
   console.log(roomSocket.readyState);
