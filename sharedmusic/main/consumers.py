@@ -1,7 +1,7 @@
 import json
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from main.models import Room
-from asgiref.sync import sync_to_async
+from main import consts
 
 
 class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
@@ -9,9 +9,9 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.user = self.scope.get('user')
         self.room_name = self.scope['url_route']['kwargs']['code']
-        self.room_group_name = f'room_{self.room_name}'
+        self.room_group_name = f'{consts.ROOM_GROUP_PREFIX}_{self.room_name}'
         # User group must contain only one user
-        self.user_group_name = f'user_{self.user}'
+        self.user_group_name = f'{consts.USER_GROUP_PREFIX}_{self.user}'
         # Handle authenticated user connection
         if self.user.is_authenticated:
             await self.connect_user()
@@ -41,8 +41,8 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                 # Send message to old channel to show alert
                 await self.channel_layer.group_send(self.user_group_name, {
                     'type': 'send_message',
-                    'message': "User has already connected. Refresh the page.",
-                    'event': 'ALREADY_CONNECTED',
+                    'message': consts.USER_ALREADY_IN_ROOM,
+                    'event': consts.ALREADY_CONNECTED_EVENT,
                 })
                 # Leave groups
                 for group_name in [self.room_group_name, self.user_group_name]:
@@ -53,13 +53,13 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
             # Removing listener
             if self.user.is_authenticated:
                 await Room.remove_listener(self.room_name, self.user)
-            # Send message to other listeners
+            # Send disconnect message to other listeners
             listeners = await Room.get_listeners(self.room_name)
             count = await Room.listeners_count(self.room_name)
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
-                'message': f"User {self.user} disconnected.",
-                'event': "DISCONNECT",
+                'message': f"{self.user} {consts.USER_DISCONNECTED}",
+                'event': consts.DISCONNECT_EVENT,
                 'listeners': listeners,
                 'count': count,
             })
@@ -77,11 +77,11 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         event = response.get("event", None)
         message = response.get("message", None)
 
-        if event == 'CONNECT':
+        if event == consts.CONNECT_EVENT:
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
                 'message': message,
-                'event': 'CONNECT',
+                'event': consts.CONNECT_EVENT,
                 'user': self.user.username,
                 'count': count,
                 'listeners': listeners,
