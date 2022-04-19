@@ -1,5 +1,8 @@
 # Auth
 
+# Sets custom user model
+AUTH_USER_MODEL = 'main.CustomUser'
+
 # Login
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login/'

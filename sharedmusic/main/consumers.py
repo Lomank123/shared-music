@@ -86,6 +86,8 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                 'count': count,
                 'listeners': listeners,
             })
+        elif event == consts.SET_TRACK_EVENT:
+            pass
         else:
             # Send message to room group
             await self.channel_layer.group_send(self.room_group_name, {

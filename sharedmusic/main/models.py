@@ -1,8 +1,25 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from channels.db import database_sync_to_async
-from main import consts
 from django.db import connection
+from django.core import validators
+from django.contrib.auth.models import AbstractUser
+
+from main import consts
+from main.validators import validate_file_size
+
+
+class CustomUser(AbstractUser):
+    photo = models.FileField(
+        null=True,
+        blank=True,
+        verbose_name="Photo",
+        validators=[validators.FileExtensionValidator(allowed_extensions=("jpg", "png")), validate_file_size],
+        error_messages={"invalid_extension": "This format does not supported."}
+    )
+
+    def __str__(self):
+        return self.username
 
 
 class Room(models.Model):
