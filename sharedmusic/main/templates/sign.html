@@ -10,25 +10,26 @@
   {% else %}
   <div class="sign-form">
     <div class="switch-buttons">
-        <a
+        <button
             id="switch-login-button"
             class="switch-buttons__button switch-buttons__button_chosen"
-            href="{% url 'login' %}"
+            onclick="switchFormToSignIn()"
         >
             Sign In
-        </a>
-        <a
+        </button>
+        <button
             id="switch-register-button"
             class="switch-buttons__button"
-            href="{% url 'signup' %}"
+            onclick="switchFormToRegister()"
         >
             Register
-        </a>
+        </button>
     </div>
     <form
         id="login-form"
         class="login"
         method="POST"
+        action="#"
     >
         {% csrf_token %}
         {{ form|crispy }}
@@ -36,8 +37,15 @@
             Sign In
         </button>
     </form>
-  </div>
-
+</div>
+     <!-- <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input type="hidden" name="next" value="{{ next }}" />
+        <input class="btn btn-primary" type="submit" value="Log in" />
+      </form>
+    </p> 
+    <p><a href="{% url 'signup' %}">Sign up</a></p> -->
   {% endif %}
 
 {% endblock content %}

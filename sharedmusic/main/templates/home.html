@@ -4,24 +4,22 @@
 {% block title %}Home page{% endblock title %}
 
 {% block content %}
-  <h1>Home page</h1>
-  <hr />
 
   <div>
     <h4>Create room</h4>
-    <form id="create-room-form" method="POST">
+    <form id="create-room-form" class="create-room" method="POST">
       {% csrf_token %}
       {{ form|crispy }}
-      <input class="btn btn-primary" type="submit" value="Create" />
+      <input class="btn" type="submit" value="Create" />
     </form>
   </div>
 
   <div>
     <h4>Join room</h4>
-    <form id="join-room-form" method="POST">
+    <form id="join-room-form" class="join-room" method="POST">
       {% csrf_token %}
       <input id="room" type="text" name="room_code" required /> 
-      <input class="btn btn-primary" type="submit" value="Join" />
+      <input class="btn" type="submit" value="Join" />
     </form>
   </div>
 
