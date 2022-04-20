@@ -30,14 +30,21 @@ class Playlist(models.Model):
 class Soundtrack(models.Model):
     name = models.CharField(default="Soundtrack", max_length=120, verbose_name="Name")
     url = models.URLField(verbose_name="URL")
-    duration = models.IntegerField(default=0, verbose_name="Duration")
-    order = models.IntegerField(default=0, verbose_name="Order")
-    playlists = models.ManyToManyField(Playlist, related_name="playlists", verbose_name="Playlists")
     creation_date = models.DateTimeField(auto_now_add=True, verbose_name="Creation date")
 
     class Meta:
         verbose_name_plural = 'Soundtracks'
         verbose_name = 'Soundtrack'
+        ordering = ['-id']
+
+
+class PlaylistItem(models.Model):
+    order = models.IntegerField(default=0, verbose_name="Order")
+    soundtrack = models.OneToOneField(Soundtrack, on_delete=models.CASCADE, verbose_name="Soundtrack")
+
+    class Meta:
+        verbose_name_plural = 'Playlist Items'
+        verbose_name = 'Playlist Item'
         ordering = ['-id']
 
 
