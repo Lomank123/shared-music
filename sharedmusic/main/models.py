@@ -41,6 +41,7 @@ class Soundtrack(models.Model):
 class PlaylistItem(models.Model):
     order = models.IntegerField(default=0, verbose_name="Order")
     soundtrack = models.OneToOneField(Soundtrack, on_delete=models.CASCADE, verbose_name="Soundtrack")
+    playlist = models.ForeignKey(Playlist, on_delete=models.CASCADE, verbose_name="Playlist")
 
     class Meta:
         verbose_name_plural = 'Playlist Items'
