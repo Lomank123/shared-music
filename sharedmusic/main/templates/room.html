@@ -7,13 +7,19 @@
   <h1>Room</h1>
   <hr />
 
-  <div id="room" room_code="{{ room.code }}">
-  </div>
-  <p id="users-count"></p>
-  <div id="user" username="{{ user.username }}"></div>
-  <h6>Greetings, {{ user.username }}</h6>
-  <p>Room name: {{ room.code }}</p>
-
+    <div id="room" room_code="{{ room.code }}">
+    </div>
+    <p id="users-count"></p>
+    <div id="user" username="{{ user.username }}"></div>
+    <h6>Greetings, {{ user.username }}</h6>
+    <p>Room name: {{ room.code }}</p>
+    <div style="margin-top: 20px">
+        <audio id="youtube" src="" controls></audio>
+        <div style="margin-top: 20px">
+            <input id="url-field" type="text" placeholder="Enter youtube url"/>
+            <button class="btn" onclick="changeSong()">Change song</button>
+        </div>
+    </div>
 {% endblock content %}
 
 {% block scripts %}

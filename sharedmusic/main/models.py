@@ -54,7 +54,7 @@ class Room(models.Model):
     host = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="host", verbose_name="Host")
     listeners = models.ManyToManyField(get_user_model(), blank=True, related_name="listeners", verbose_name="Listeners")
     creation_date = models.DateTimeField(auto_now_add=True, verbose_name="Creation date")
-    playlist = models.ForeignKey(Playlist, on_delete=models.CASCADE, verbose_name="Playlist")
+    playlist = models.ForeignKey(Playlist, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Playlist")
 
     @classmethod
     @database_sync_to_async
