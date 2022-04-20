@@ -16,12 +16,9 @@ function connect() {
         );
     };
 
-    roomSocket.onclose = (e) => {
-        console.log(
-            "Socket is closed. Reconnect will be attempted in 10 seconds.",
-            e.reason
-        );
-    };
+  roomSocket.onclose = (e) => {
+    console.log(e.reason);
+  }
 
     roomSocket.onmessage = (e) => {
         let data = JSON.parse(e.data);

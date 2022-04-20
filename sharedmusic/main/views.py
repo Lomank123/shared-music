@@ -6,8 +6,10 @@ from django.views.generic.edit import CreateView
 from django.views.generic import DetailView
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.views import LoginView, LogoutView
+from django.http import Http404
 from main.models import Room
 from main.forms import CustomUserCreationForm, RoomCreationForm
+from main import consts
 
 
 class HomeView(LoginRequiredMixin, CreateView):
@@ -28,7 +30,12 @@ class HomeView(LoginRequiredMixin, CreateView):
             # Join to existing room
             room_code = request.POST.get("room_code")
             room_url = reverse('room', kwargs={ "code": room_code })
-            return redirect(room_url)
+            # Check if room exists
+            room_exists = self.model.objects.filter(code=room_code).exists()
+            if room_exists:
+                return redirect(room_url)
+            else:
+                raise Http404(consts.ROOM_NOT_FOUND)
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
