@@ -7,7 +7,7 @@ from django.views.generic import DetailView
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import Http404
-from main.models import Room
+from main.models import Room, Soundtrack, Playlist, PlaylistItem
 from main.forms import CustomUserCreationForm, RoomCreationForm
 from main import consts
 
@@ -40,6 +40,9 @@ class HomeView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.host = self.request.user
+        # Create new playlist
+        playlist = Playlist.objects.create()
+        form.instance.playlist = playlist
         return super().form_valid(form)
 
 

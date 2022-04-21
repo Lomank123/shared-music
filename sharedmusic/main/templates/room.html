@@ -7,8 +7,8 @@
   <h1>Room</h1>
   <hr />
 
-    <div id="room" room_code="{{ room.code }}">
-    </div>
+    <div id="room" room_code="{{ room.code }}"></div>
+    <div id="host" host_username="{{ room.host.username }}"></div>
     <p id="users-count"></p>
     <div id="user" username="{{ user.username }}"></div>
     <h6>Greetings, {{ user.username }}</h6>

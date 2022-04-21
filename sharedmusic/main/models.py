@@ -14,9 +14,22 @@ class CustomUser(AbstractUser):
         return self.username
 
 
+# TODO: Add playlist Foreign key field
+class Soundtrack(models.Model):
+    name = models.CharField(default="Soundtrack", max_length=120, verbose_name="Name")
+    url = models.URLField(max_length=2000, verbose_name="URL")
+    creation_date = models.DateTimeField(auto_now_add=True, verbose_name="Creation date")
+
+    class Meta:
+        verbose_name_plural = 'Soundtracks'
+        verbose_name = 'Soundtrack'
+        ordering = ['-id']
+
+
 class Playlist(models.Model):
     name = models.CharField(default="Playlist", max_length=120, verbose_name="Name")
     creation_date = models.DateTimeField(auto_now_add=True, verbose_name="Creation date")
+    current_track = models.OneToOneField(Soundtrack, null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.name} ({self.id})"
@@ -27,21 +40,17 @@ class Playlist(models.Model):
         ordering = ['-id']
 
 
-class Soundtrack(models.Model):
-    name = models.CharField(default="Soundtrack", max_length=120, verbose_name="Name")
-    url = models.URLField(verbose_name="URL")
-    creation_date = models.DateTimeField(auto_now_add=True, verbose_name="Creation date")
-
-    class Meta:
-        verbose_name_plural = 'Soundtracks'
-        verbose_name = 'Soundtrack'
-        ordering = ['-id']
-
-
+# TODO: Remove this model
 class PlaylistItem(models.Model):
     order = models.IntegerField(default=0, verbose_name="Order")
     soundtrack = models.OneToOneField(Soundtrack, on_delete=models.CASCADE, verbose_name="Soundtrack")
     playlist = models.ForeignKey(Playlist, on_delete=models.CASCADE, verbose_name="Playlist")
+
+    # TODO: Move to Soundtrack model
+    @classmethod
+    @database_sync_to_async
+    def get_playlist_item(cls, playlist):
+        return cls.objects.filter(soundtrack=playlist.current_track).select_related('soundtrack').first()
 
     class Meta:
         verbose_name_plural = 'Playlist Items'
@@ -54,7 +63,15 @@ class Room(models.Model):
     host = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="host", verbose_name="Host")
     listeners = models.ManyToManyField(get_user_model(), blank=True, related_name="listeners", verbose_name="Listeners")
     creation_date = models.DateTimeField(auto_now_add=True, verbose_name="Creation date")
+    # Should be OneToOne
     playlist = models.ForeignKey(Playlist, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Playlist")
+
+    @classmethod
+    @database_sync_to_async
+    def get_room_playlist(cls, room_name):
+        room = cls.objects.filter(code=room_name).select_related("playlist").first()
+        playlist = room.playlist
+        return playlist
 
     @classmethod
     @database_sync_to_async

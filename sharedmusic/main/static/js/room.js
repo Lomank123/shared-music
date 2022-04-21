@@ -1,8 +1,12 @@
 const roomCode = $("#room").attr("room_code");
+const urlField = document.getElementById("url-field");
+const audio_tag = document.getElementById("youtube");
 const connectionString =
     "ws://" + window.location.host + "/ws/room/" + roomCode + "/";
 const roomSocket = new WebSocket(connectionString);
 const username = $("#user").attr("username");
+const hostUsername = $("#host").attr("host_username");
+// Need to give host username
 let users = [];
 
 function connect() {
@@ -17,19 +21,39 @@ function connect() {
     };
 
     roomSocket.onclose = (e) => {
-        console.log(e.reason);
+        console.log("Closing connection...");
     };
 
     roomSocket.onmessage = (e) => {
         let data = JSON.parse(e.data);
         data = data["payload"];
         console.log(data);
+
         if (data.event == "CONNECT" || data.event == "DISCONNECT") {
-            console.log(data.message);
             document.getElementById("users-count").innerHTML =
                 data.count.toString();
+            if (username === hostUsername) {
+                roomSocket.send(
+                    JSON.stringify({
+                        event: "NEW_USER_JOINED",
+                        message: audio_tag.currentTime,
+                        is_paused: audio_tag.paused,
+                        user: data.user,
+                    })
+                );
+            }
+        }
+        if (data.event == "CHANGE_SONG") {
+            audio_tag.src = data.playlist_item.url;
+        }
+        if (data.event == "CHANGE_CURRENT_TIME") {
+            audio_tag.currentTime = data.current_time;
+            if (!data.is_paused) {
+                audio_tag.play();
+            }
         }
     };
+
     console.log(roomSocket.readyState);
     if (roomSocket.readyState == WebSocket.OPEN) {
         roomSocket.onopen();
@@ -37,9 +61,6 @@ function connect() {
 }
 
 connect();
-
-const urlField = document.getElementById("url-field");
-const audio_tag = document.getElementById("youtube");
 
 function changeSong() {
     const url = urlField.value;
@@ -119,6 +140,22 @@ function changeSong() {
                     audio_streams["256kbps"] ||
                     audio_streams["128kbps"] ||
                     audio_streams["48kbps"];
+                
+                if (audio_tag.src) {
+                    roomSocket.send(
+                        JSON.stringify({
+                            event: "CHANGE_SONG",
+                            message: audio_tag.src,
+                        })
+                    );
+                } else {
+                    roomSocket.send(
+                        JSON.stringify({
+                            event: "CHANGE_SONG_ERROR",
+                            message: "Could not find audio url.",
+                        })
+                    );
+                }
             });
         }
     });

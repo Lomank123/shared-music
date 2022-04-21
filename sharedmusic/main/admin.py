@@ -1,5 +1,5 @@
 from django.contrib import admin
-from main.models import Room, CustomUser, Soundtrack, Playlist
+from main.models import Room, CustomUser, Soundtrack, Playlist, PlaylistItem
 from django.contrib.auth.admin import UserAdmin
 
 
@@ -12,7 +12,7 @@ class CustomUserAdmin(UserAdmin):
     list_filter = ('is_staff', 'is_active',)
     # When editing user
     fieldsets = (
-        ('Information', {'fields': ('email', 'username', 'password', 'playlist',)}),
+        ('Information', {'fields': ('email', 'username', 'password', )}),
         ('Permissions', {
             'fields': ('is_superuser', 'is_staff', 'is_active', 'user_permissions', 'groups',)
         }),
@@ -47,3 +47,4 @@ class CustomUserAdmin(UserAdmin):
 admin.site.register(Room)
 admin.site.register(Soundtrack)
 admin.site.register(Playlist)
+admin.site.register(PlaylistItem)
