@@ -5,7 +5,7 @@ const connectionString =
     "ws://" + window.location.host + "/ws/room/" + roomCode + "/";
 const roomSocket = new WebSocket(connectionString);
 const username = $("#user").attr("username");
-const hostUsername = $("#host").attr("host_username");
+let hostUsername = $("#host").attr("host_username");
 let player;
 const audioPlayer = document.querySelector(".audio-player");
 // Need to give host username
@@ -36,7 +36,8 @@ function connect() {
                 data.count.toString();
             if (username === hostUsername) {
                 const trackData = {
-                    name: "Soundtrack",
+                    name: player.getVideoData().title,
+                    duration: player.getDuration(),
                     url: player.getVideoUrl(),
                     currentTime: player.getCurrentTime(),
                     isPaused: player.getPlayerState() == 2,
@@ -60,17 +61,12 @@ function connect() {
         if (data.event == "SET_CURRENT_TRACK") {
             const id = youtube_parser(data.track.url);
             player.loadVideoById(id, data.track.currentTime);
-            playTrack();
             if (data.track.isPaused) {
-                pauseTrack();
-            }
-        }
-        if (data.event == "SET_CURRENT_TRACK") {
-            const id = youtube_parser(data.track.url);
-            player.loadVideoById(id, data.track.currentTime);
-            playTrack();
-            if (data.track.isPaused) {
-                pauseTrack();
+                player.mute();
+                setTimeout(() => {
+                    pauseTrack();
+                    player.unMute();
+                }, 500)
             }
         }
         if (data.event == "PLAY") {
@@ -232,8 +228,6 @@ function youtube_parser(url) {
 
 function changeSong() {
     const id = youtube_parser(urlField.value);
-    player.loadVideoById(id);
-    playTrack();
     if (id) {
         roomSocket.send(
             JSON.stringify({

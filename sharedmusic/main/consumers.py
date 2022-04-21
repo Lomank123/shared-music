@@ -91,6 +91,8 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         elif event == consts.CHANGE_TRACK_EVENT:
             url = response.get("url", None)
             soundtrack = await self.add_track(url)
+            # TODO: Send updated playlist as well
+            #playlist = {}
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
                 'event': consts.CHANGE_TRACK_EVENT,
@@ -98,6 +100,7 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                 'track': {
                     'name': soundtrack.name,
                     'url': soundtrack.url,
+                    #'playlist': playlist,
                 },
             })
         elif event == consts.CHANGE_TRACK_ERROR_EVENT:
