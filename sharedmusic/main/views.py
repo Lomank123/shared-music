@@ -7,7 +7,7 @@ from django.views.generic import DetailView
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import Http404
-from main.models import Room, Soundtrack, Playlist, PlaylistItem
+from main.models import Room, Soundtrack, Playlist
 from main.forms import CustomUserCreationForm, RoomCreationForm
 from main import consts
 

@@ -33,22 +33,30 @@ function connect() {
             document.getElementById("users-count").innerHTML =
                 data.count.toString();
             if (username === hostUsername) {
+                const trackData = {
+                    name: "Soundtrack",
+                    url: audio_tag.src,
+                    currentTime: audio_tag.currentTime,
+                    isPaused: audio_tag.paused,
+                };
                 roomSocket.send(
                     JSON.stringify({
                         event: "NEW_USER_JOINED",
-                        message: audio_tag.currentTime,
-                        is_paused: audio_tag.paused,
+                        message: "New user joined.",
                         user: data.user,
+                        track: trackData,
                     })
                 );
             }
         }
-        if (data.event == "CHANGE_SONG") {
-            audio_tag.src = data.playlist_item.url;
+        if (data.event == "CHANGE_TRACK") {
+            console.log(data.track.name);
+            audio_tag.src = data.track.url;
         }
-        if (data.event == "CHANGE_CURRENT_TIME") {
-            audio_tag.currentTime = data.current_time;
-            if (!data.is_paused) {
+        if (data.event == "SET_CURRENT_TRACK") {
+            audio_tag.src = data.track.url;
+            audio_tag.currentTime = data.track.currentTime;
+            if (!data.track.isPaused) {
                 audio_tag.play();
             }
         }
@@ -142,16 +150,18 @@ function changeSong() {
                     audio_streams["48kbps"];
                 
                 if (audio_tag.src) {
+                    console.log(audio_tag.src);
                     roomSocket.send(
                         JSON.stringify({
-                            event: "CHANGE_SONG",
-                            message: audio_tag.src,
+                            event: "CHANGE_TRACK",
+                            url: audio_tag.src,
+                            message: "Change track."
                         })
                     );
                 } else {
                     roomSocket.send(
                         JSON.stringify({
-                            event: "CHANGE_SONG_ERROR",
+                            event: "CHANGE_TRACK_ERROR",
                             message: "Could not find audio url.",
                         })
                     );
