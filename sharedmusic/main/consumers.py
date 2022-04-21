@@ -115,6 +115,14 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                 'track': track_data,
                 'event': consts.SET_CURRENT_TRACK_EVENT,
             })
+        elif event == "CHANGE_TIME":
+            time = response.get("time", None)
+            await self.channel_layer.group_send(self.room_group_name, {
+                'type': 'send_message',
+                'message': f"Set current track data.",
+                'time': time,
+                'event': event,
+            })
         else:
             # Send message to room group
             await self.channel_layer.group_send(self.room_group_name, {

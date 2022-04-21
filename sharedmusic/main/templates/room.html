@@ -14,7 +14,34 @@
     <h6>Greetings, {{ user.username }}</h6>
     <p>Room name: {{ room.code }}</p>
     <div style="margin-top: 20px">
-        <audio id="youtube" src="" controls></audio>
+        <!--Youtube-->
+        <div id="player" style="display: none; visibility: hidden;"></div>
+        <!--Player-->
+        <div class="audio-player">
+            <div class="timeline">
+                <div class="progress"></div>
+            </div>
+            <div class="controls">
+                <div class="play-container">
+                    <div class="toggle-play play"></div>
+                </div>
+                <div class="time">
+                    <div class="current">0:00</div>
+                    <div class="divider">/</div>
+                    <div class="length"></div>
+                </div>
+                <div class="name"></div>
+                <div class="volume-container">
+                    <div class="volume-button">
+                        <div class="volume icono-volumeMedium"></div>
+                    </div>
+
+                    <div class="volume-slider">
+                        <div class="volume-percentage"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div style="margin-top: 20px">
             <input id="url-field" type="text" placeholder="Enter youtube url"/>
             <button class="btn" onclick="changeSong()">Change song</button>
@@ -23,5 +50,6 @@
 {% endblock content %}
 
 {% block scripts %}
+    <script src="https://www.youtube.com/iframe_api"></script>
 	<script src="{% static 'js/room.js' %}"></script>
 {% endblock scripts %}
