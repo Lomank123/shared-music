@@ -31,9 +31,9 @@ function connect() {
         data = data["payload"];
         console.log(data);
 
-        if (data.event == "CONNECT" || data.event == "DISCONNECT") {
+        if (data.event == "CONNECT") {
             document.getElementById("users-count").innerHTML =
-                data.count.toString();
+                data.listeners.count.toString();
             if (username === hostUsername) {
                 const trackData = {
                     name: player.getVideoData().title,
@@ -52,15 +52,28 @@ function connect() {
                 );
             }
         }
+        if (data.event == "DISCONNECT") {
+            document.getElementById("users-count").innerHTML =
+                data.listeners.count.toString();
+        }
+        if (data.event == "ALREADY_CONNECTED") {
+            roomSocket.close();
+            console.log("Closing connection. Refresh the page.");
+        }
         if (data.event == "CHANGE_TRACK") {
-            console.log(data.track);
+            console.log(data.playlist);
             const id = youtube_parser(data.track.url);
             player.loadVideoById(id);
+            //player.mute();
             playTrack();
+            //player.unMute();
         }
         if (data.event == "SET_CURRENT_TRACK") {
             const id = youtube_parser(data.track.url);
             player.loadVideoById(id, data.track.currentTime);
+            //player.mute();
+            playTrack();
+            //player.unMute();
             if (data.track.isPaused) {
                 player.mute();
                 setTimeout(() => {
@@ -71,9 +84,11 @@ function connect() {
         }
         if (data.event == "PLAY") {
             playTrack();
+            console.log(player.getPlayerState());
         }
         if (data.event == "PAUSE") {
             pauseTrack();
+            console.log(player.getPlayerState());
         }
         if (data.event == "CHANGE_TIME") {
             player.seekTo(data.time);

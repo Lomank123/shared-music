@@ -21,6 +21,12 @@ class Playlist(models.Model):
     def __str__(self):
         return f"{self.name} ({self.id})"
 
+    @classmethod
+    @database_sync_to_async
+    def get_playlist_tracks(cls, playlist):
+        soundtracks = cls.objects.filter(id=playlist.id).first().soundtrack_set.values("url", "name")
+        return list(soundtracks)
+
     class Meta:
         verbose_name_plural = 'Playlists'
         verbose_name = 'Playlist'

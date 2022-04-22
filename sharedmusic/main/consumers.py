@@ -14,6 +14,7 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         self.room_group_name = f'{consts.ROOM_GROUP_PREFIX}_{self.room_name}'
         # User group must contain only one user
         self.user_group_name = f'{consts.USER_GROUP_PREFIX}_{self.user}'
+        self.playlist = await Room.get_room_playlist(self.room_name)
         # Handle authenticated user connection
         if self.user.is_authenticated:
             await self.connect_user()
@@ -56,14 +57,12 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
             if self.user.is_authenticated:
                 await Room.remove_listener(self.room_name, self.user)
             # Send disconnect message to other listeners
-            listeners = await Room.get_listeners(self.room_name)
-            count = await Room.listeners_count(self.room_name)
+            listeners_data = await self.get_listeners_info()
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
                 'message': f"{self.user} {consts.USER_DISCONNECTED}",
                 'event': consts.DISCONNECT_EVENT,
-                'listeners': listeners,
-                'count': count,
+                'listeners': listeners_data,
             })
             # Leave groups
             for group_name in [self.room_group_name, self.user_group_name]:
@@ -73,34 +72,35 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         """
         Receive messages from WebSocket and sets appropriate event.
         """
-        count = await Room.listeners_count(self.room_name)
-        listeners = await Room.get_listeners(self.room_name)
         response = json.loads(text_data)
         event = response.get("event", None)
         message = response.get("message", None)
 
         if event == consts.CONNECT_EVENT:
+            sync_to_async(print(self.channel_layer.groups))
+            listeners_data = await self.get_listeners_info()
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
                 'message': message,
                 'event': consts.CONNECT_EVENT,
                 'user': self.user.username,
-                'count': count,
-                'listeners': listeners,
+                'listeners': listeners_data,
             })
         elif event == consts.CHANGE_TRACK_EVENT:
             url = response.get("url", None)
-            soundtrack = await self.add_track(url)
-            # TODO: Send updated playlist as well
-            #playlist = {}
+
+            # Get new track and updated tracks list
+            new_track = await self.get_or_create_track(url)
+            playlist_tracks = await self.get_playlist_tracks()
+
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
                 'event': consts.CHANGE_TRACK_EVENT,
                 'message': f"Track changed by {self.user.username}.",
+                'playlist': playlist_tracks,
                 'track': {
-                    'name': soundtrack.name,
-                    'url': soundtrack.url,
-                    #'playlist': playlist,
+                    'name': new_track.name,
+                    'url': new_track.url,
                 },
             })
         elif event == consts.CHANGE_TRACK_ERROR_EVENT:
@@ -118,7 +118,7 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                 'track': track_data,
                 'event': consts.SET_CURRENT_TRACK_EVENT,
             })
-        elif event == "CHANGE_TIME":
+        elif event == consts.CHANGE_TIME_EVENT:
             time = response.get("time", None)
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
@@ -132,14 +132,33 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                 'type': 'send_message',
                 'message': message,
                 'event': event,
-                'count': count,
             })
-        
-    async def add_track(self, url):
-        # Get room playlist
-        playlist = await Room.get_room_playlist(self.room_name)
-        # Get or create soundtrack (by given url)
-        soundtrack, _ = await database_sync_to_async(Soundtrack.objects.get_or_create)(url=url, playlist=playlist)
+
+    async def get_listeners_info(self):
+        """
+        Get all usernames and their count from room.
+        """
+        count = await Room.listeners_count(self.room_name)
+        listeners = await Room.get_listeners(self.room_name)
+        data = {
+            'count': count,
+            'users': listeners,
+        }
+        return data
+
+    async def get_playlist_tracks(self):
+        """
+        Get all tracks from room playlist.
+        """
+        playlist_tracks = await Playlist.get_playlist_tracks(self.playlist)
+        return playlist_tracks
+
+
+    async def get_or_create_track(self, url):
+        """
+        Get or create soundtrack by given url and room playlist.
+        """
+        soundtrack, _ = await database_sync_to_async(Soundtrack.objects.get_or_create)(url=url, playlist=self.playlist)
         return soundtrack
 
     async def send_message(self, res):
