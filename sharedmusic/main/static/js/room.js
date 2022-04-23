@@ -10,6 +10,7 @@ let player;
 const audioPlayer = document.querySelector(".audio-player");
 // Need to give host username
 let users = [];
+isFirstClick = true;
 
 function connect() {
     roomSocket.onopen = () => {
@@ -64,16 +65,12 @@ function connect() {
             console.log(data.playlist);
             const id = youtube_parser(data.track.url);
             player.loadVideoById(id);
-            //player.mute();
             playTrack();
-            //player.unMute();
         }
         if (data.event == "SET_CURRENT_TRACK") {
             const id = youtube_parser(data.track.url);
             player.loadVideoById(id, data.track.currentTime);
-            //player.mute();
             playTrack();
-            //player.unMute();
             if (data.track.isPaused) {
                 player.mute();
                 setTimeout(() => {
@@ -119,9 +116,21 @@ function onPlayerReady(event) {
     audioPlayer.querySelector(".time .length").textContent = getTimeCodeFromNum(
         player.getDuration()
     );
-    player.setVolume(75);
+    mutePlayer();
+    //player.setVolume(75);
     audioPlayer.querySelector(".name").textContent =
         player.getVideoData().title;
+
+    // Set click listener to the whole page
+    document.addEventListener('mouseup', firstClickListener);
+    function firstClickListener(event) {
+        if (isFirstClick) {
+            isFirstClick = false;
+            unMutePlayer();
+            console.log("No longer muted!");
+            document.getElementById('mute-msg').style.display = 'none';
+        }
+    }
 
     connect();
 }
@@ -209,18 +218,27 @@ playBtn.addEventListener(
     false
 );
 
+const volumeEl = audioPlayer.querySelector(".volume-container .volume");
+
 audioPlayer.querySelector(".volume-button").addEventListener("click", () => {
-    const volumeEl = audioPlayer.querySelector(".volume-container .volume");
     if (!player.isMuted()) {
-        player.mute();
-        volumeEl.classList.remove("icono-volumeMedium");
-        volumeEl.classList.add("icono-volumeMute");
+        mutePlayer();
     } else {
-        player.unMute();
-        volumeEl.classList.add("icono-volumeMedium");
-        volumeEl.classList.remove("icono-volumeMute");
+        unMutePlayer();
     }
 });
+
+function mutePlayer() {
+    player.mute();
+    volumeEl.classList.remove("icono-volumeMedium");
+    volumeEl.classList.add("icono-volumeMute");
+}
+
+function unMutePlayer() {
+    player.unMute();
+    volumeEl.classList.add("icono-volumeMedium");
+    volumeEl.classList.remove("icono-volumeMute");
+}
 
 //turn 128 seconds into 2:08
 function getTimeCodeFromNum(num) {

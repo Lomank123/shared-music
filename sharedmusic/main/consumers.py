@@ -77,7 +77,6 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         message = response.get("message", None)
 
         if event == consts.CONNECT_EVENT:
-            sync_to_async(print(self.channel_layer.groups))
             listeners_data = await self.get_listeners_info()
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
@@ -112,10 +111,12 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         elif event == consts.NEW_USER_JOINED_EVENT:
             new_user = response.get("user", None)
             track_data = response.get("track", None)
+            playlist_tracks = await self.get_playlist_tracks()
             await self.channel_layer.group_send(f"{consts.USER_GROUP_PREFIX}_{new_user}", {
                 'type': 'send_message',
                 'message': f"Set current track data.",
                 'track': track_data,
+                'playlist': playlist_tracks,
                 'event': consts.SET_CURRENT_TRACK_EVENT,
             })
         elif event == consts.CHANGE_TIME_EVENT:
