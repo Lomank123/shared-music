@@ -8,6 +8,7 @@ const username = $("#user").attr("username");
 let hostUsername = $("#host").attr("host_username");
 let player;
 const audioPlayer = document.querySelector(".audio-player");
+const usersList = document.getElementById("users-list");
 // Need to give host username
 let users = [];
 
@@ -34,6 +35,16 @@ function connect() {
         if (data.event == "CONNECT") {
             document.getElementById("users-count").innerHTML =
                 data.listeners.count.toString();
+            users = data.listeners.users;
+            while (usersList.hasChildNodes()) {
+                usersList.removeChild(usersList.firstChild);
+            }
+            users.map((user) => {
+                const node = document.createElement("li");
+                const textnode = document.createTextNode(user.username);
+                node.appendChild(textnode);
+                usersList.appendChild(node);
+            });
             if (username === hostUsername) {
                 const trackData = {
                     name: player.getVideoData().title,
@@ -55,6 +66,16 @@ function connect() {
         if (data.event == "DISCONNECT") {
             document.getElementById("users-count").innerHTML =
                 data.listeners.count.toString();
+            users = data.listeners.users;
+            while (usersList.hasChildNodes()) {
+                usersList.removeChild(usersList.firstChild);
+            }
+            users.map((user) => {
+                const node = document.createElement("li");
+                const textnode = document.createTextNode(user.username);
+                node.appendChild(textnode);
+                usersList.appendChild(node);
+            });
         }
         if (data.event == "ALREADY_CONNECTED") {
             roomSocket.close();
@@ -79,7 +100,7 @@ function connect() {
                 setTimeout(() => {
                     pauseTrack();
                     player.unMute();
-                }, 500)
+                }, 500);
             }
         }
         if (data.event == "PLAY") {
