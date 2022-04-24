@@ -119,13 +119,22 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                 'playlist': playlist_tracks,
                 'created': created,
             })
-        elif event == consts.CHANGE_TRACK_EVENT:
-            pass
         elif event == consts.ADD_TRACK_ERROR_EVENT:
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
                 'message': message,
                 'event': consts.ADD_TRACK_ERROR_EVENT,
+            })
+        elif event == consts.CHANGE_TRACK_EVENT:
+            # Get new track data and send to clients
+            track_data = response.get("track", None)
+            playlist_tracks = await self.get_playlist_tracks()
+            await self.channel_layer.group_send(self.room_group_name, {
+                'type': 'send_message',
+                'event': consts.CHANGE_TRACK_EVENT,
+                'message': f"Track changed by {self.user.username}.",
+                'playlist': playlist_tracks,
+                'track': track_data,
             })
         elif event == consts.NEW_USER_JOINED_EVENT:
             new_user = response.get("user", None)

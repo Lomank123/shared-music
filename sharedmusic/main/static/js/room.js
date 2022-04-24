@@ -39,12 +39,14 @@ function connect() {
             updatePlaylist(data.playlist);
         }
         if (data.event == "SEND_TRACK_TO_NEW_USER") {
+            console.log(player.getPlayerState());
+            let state = player.getPlayerState();
             const trackData = {
                 name: player.getVideoData().title,
                 duration: player.getDuration(),
                 url: player.getVideoUrl(),
                 currentTime: player.getCurrentTime(),
-                isPaused: player.getPlayerState() == 2,
+                isPaused: state == 2 || state == -1,
             };
             roomSocket.send(
                 JSON.stringify({
@@ -78,10 +80,10 @@ function connect() {
             player.loadVideoById(id, data.track.currentTime);
             playTrack();
             if (data.track.isPaused) {
-                player.mute();
+                //player.mute();
                 setTimeout(() => {
                     pauseTrack();
-                    player.unMute();
+                    //player.unMute();
                 }, 500)
             }
             updatePlaylist(data.playlist, data.track.url);
@@ -110,14 +112,25 @@ function clearPlaylist() {
 function updatePlaylist(newPlaylist, url='') {
     clearPlaylist();
     let playlist = document.getElementById("playlist");
-    newPlaylist.forEach(element => {
-        let track = document.createElement("p");
-        track.textContent = element.name;
-        if (url === element.url) {
-            track.style.fontWeight = 'bold';
+    newPlaylist.forEach(track => {
+        let trackBlock = document.createElement("p");
+        trackBlock.textContent = track.name;
+        if (url === track.url) {
+            trackBlock.style.fontWeight = 'bold';
         }
-        playlist.appendChild(track);
+        playlist.appendChild(trackBlock);
+        trackBlock.addEventListener('click', (e) => {changeTrack(e, track)});
     });
+}
+
+function changeTrack(event, trackData) {
+    roomSocket.send(
+        JSON.stringify({
+            event: "CHANGE_TRACK",
+            message: "Change track.",
+            track: trackData,
+        })
+    );
 }
 
 function onYouTubeIframeAPIReady() {
