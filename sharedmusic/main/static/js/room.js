@@ -64,6 +64,7 @@ function connect() {
                         track: trackData,
                     })
                 );
+            }
             if (username === data.user) {
                 updatePlaylist(data.playlist);
             }
@@ -124,7 +125,7 @@ function connect() {
                 setTimeout(() => {
                     pauseTrack();
                     //player.unMute();
-                }, 500)
+                }, 500);
             }
             updatePlaylist(data.playlist, data.track.url);
         }
@@ -146,27 +147,28 @@ function connect() {
 
 function clearPlaylist() {
     let playlist = document.getElementById("playlist");
-    playlist.innerHTML = '';
+    playlist.innerHTML = "";
 }
 
-function updatePlaylist(newPlaylist, url='') {
+function updatePlaylist(newPlaylist, url = "") {
     clearPlaylist();
     let playlist = document.getElementById("playlist");
-    newPlaylist.forEach(track => {
+    newPlaylist.forEach((track) => {
         let trackBlock = document.createElement("p");
         trackBlock.textContent = track.name;
         playlist.appendChild(trackBlock);
-        trackBlock.addEventListener('click', (e) => {changeTrack(e, track)});
+        trackBlock.addEventListener("click", (e) => {
+            changeTrack(e, track);
+        });
         try {
             let chosenUrl = youtube_parser(url);
             let trackUrl = youtube_parser(track.url);
             if (chosenUrl === trackUrl) {
-                trackBlock.style.fontWeight = 'bold';
+                trackBlock.style.fontWeight = "bold";
             }
         } catch (error) {
             console.log(error);
         }
-
     });
 }
 
@@ -204,13 +206,13 @@ function onPlayerReady(event) {
         player.getVideoData().title;
 
     // Set click listener to the whole page
-    document.addEventListener('mouseup', firstClickListener);
+    document.addEventListener("mouseup", firstClickListener);
     function firstClickListener(event) {
         if (isFirstClick) {
             isFirstClick = false;
             unMutePlayer();
             console.log("No longer muted!");
-            document.getElementById('mute-msg').style.display = 'none';
+            document.getElementById("mute-msg").style.display = "none";
         }
     }
 
