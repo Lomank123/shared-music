@@ -12,6 +12,7 @@ const usersList = document.getElementById("users-list");
 // Need to give host username
 let users = [];
 isFirstClick = true;
+const ytApiKey = "AIzaSyCp-e6T1qe6QqgjH6JydzBHCjB2raF6FrE";
 
 // connect function is called only when player is ready
 function connect() {
@@ -190,6 +191,7 @@ function onYouTubeIframeAPIReady() {
         events: {
             onReady: onPlayerReady,
             onStateChange: onPlayerStateChange,
+            onError: onPlayerError,
         },
     });
 }
@@ -217,6 +219,11 @@ function onPlayerReady(event) {
     }
 
     connect();
+}
+
+function onPlayerError(event) {
+    console.log(event);
+    // Catch 101 and 150 error codes if video is unplayabled in iframe (data key in event json)
 }
 
 function onPlayerStateChange(event) {
@@ -345,23 +352,34 @@ function youtube_parser(url) {
 
 function addTrack() {
     const id = youtube_parser(urlField.value);
-    let youtubeURL = "https://www.youtube.com/watch?v=" + id;
-    if (id) {
-        roomSocket.send(
-            JSON.stringify({
-                event: "ADD_TRACK",
-                url: youtubeURL,
-                message: "Add new track.",
-            })
-        );
-    } else {
-        roomSocket.send(
-            JSON.stringify({
-                event: "ADD_TRACK_ERROR",
-                message: "Could not find audio url.",
-            })
-        );
-    }
+    fetch(
+        "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" +
+            id +
+            "&key=" +
+            ytApiKey
+    ).then((response) =>
+        response.json().then((data) => {
+            let youtubeURL = "https://www.youtube.com/watch?v=" + id;
+            let title = data.items[0].snippet.title;
+            if (id) {
+                roomSocket.send(
+                    JSON.stringify({
+                        event: "ADD_TRACK",
+                        url: youtubeURL,
+                        name: title,
+                        message: "Add new track.",
+                    })
+                );
+            } else {
+                roomSocket.send(
+                    JSON.stringify({
+                        event: "ADD_TRACK_ERROR",
+                        message: "Could not find audio url.",
+                    })
+                );
+            }
+        })
+    );
 }
 
 function pauseTrack() {

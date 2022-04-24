@@ -109,8 +109,9 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                 )
         elif event == consts.ADD_TRACK_EVENT:
             url = response.get("url", None)
+            title = response.get("name", None)
             # Get new track and updated tracks list
-            new_track, created = await self.get_or_create_track(url)
+            new_track, created = await self.get_or_create_track(url, title)
             playlist_tracks = await self.get_playlist_tracks()
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
@@ -193,11 +194,11 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         playlist_tracks = await Playlist.get_playlist_tracks(self.playlist)
         return playlist_tracks
 
-    async def get_or_create_track(self, url):
+    async def get_or_create_track(self, url, title="soundtrack"):
         """
         Get or create soundtrack by given url and room playlist.
         """
-        soundtrack, created = await database_sync_to_async(Soundtrack.objects.get_or_create)(url=url, playlist=self.playlist)
+        soundtrack, created = await database_sync_to_async(Soundtrack.objects.get_or_create)(url=url, name=title, playlist=self.playlist)
         return soundtrack, created
 
     async def send_message(self, res):
