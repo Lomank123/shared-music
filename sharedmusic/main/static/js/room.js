@@ -26,6 +26,7 @@ function connect() {
 
     roomSocket.onclose = (e) => {
         console.log("Closing connection...");
+        pauseTrack();
     };
 
     roomSocket.onmessage = (e) => {
@@ -36,7 +37,9 @@ function connect() {
         if (data.event == "CONNECT") {
             document.getElementById("users-count").innerHTML =
                 data.listeners.count.toString();
-            updatePlaylist(data.playlist);
+            if (username === data.user) {
+                updatePlaylist(data.playlist);
+            }
         }
         if (data.event == "SEND_TRACK_TO_NEW_USER") {
             console.log(player.getPlayerState());
@@ -73,7 +76,7 @@ function connect() {
         }
         if (data.event == "ADD_TRACK") {
             // display new track in playlist with buttons
-            updatePlaylist(data.playlist);
+            updatePlaylist(data.playlist, player.getVideoUrl());
         }
         if (data.event == "SET_CURRENT_TRACK") {
             const id = youtube_parser(data.track.url);
@@ -115,11 +118,18 @@ function updatePlaylist(newPlaylist, url='') {
     newPlaylist.forEach(track => {
         let trackBlock = document.createElement("p");
         trackBlock.textContent = track.name;
-        if (url === track.url) {
-            trackBlock.style.fontWeight = 'bold';
-        }
         playlist.appendChild(trackBlock);
         trackBlock.addEventListener('click', (e) => {changeTrack(e, track)});
+        try {
+            let chosenUrl = youtube_parser(url);
+            let trackUrl = youtube_parser(track.url);
+            if (chosenUrl === trackUrl) {
+                trackBlock.style.fontWeight = 'bold';
+            }
+        } catch (error) {
+            console.log(error);
+        }
+
     });
 }
 
@@ -296,11 +306,12 @@ function youtube_parser(url) {
 
 function addTrack() {
     const id = youtube_parser(urlField.value);
+    let youtubeURL = "https://www.youtube.com/watch?v=" + id;
     if (id) {
         roomSocket.send(
             JSON.stringify({
                 event: "ADD_TRACK",
-                url: urlField.value,
+                url: youtubeURL,
                 message: "Add new track.",
             })
         );
