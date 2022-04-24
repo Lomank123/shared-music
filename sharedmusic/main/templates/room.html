@@ -13,6 +13,13 @@
     <div id="user" username="{{ user.username }}"></div>
     <h6>Greetings, {{ user.username }}</h6>
     <p>Room name: {{ room.code }}</p>
+
+    <div id="mute-msg">
+        <p>Player is currently muted. Click anywhere to unmute it.</p>
+    </div>
+    <h6>Playlist:</h6>
+    <div id="playlist">
+    </div>
     <div style="margin-top: 20px">
         <!--Youtube-->
         <div id="player" style="display: none; visibility: hidden;"></div>
@@ -44,7 +51,7 @@
         </div>
         <div style="margin-top: 20px">
             <input id="url-field" type="text" placeholder="Enter youtube url"/>
-            <button class="btn" onclick="changeSong()">Change song</button>
+            <button class="btn" onclick="addTrack()">Add track</button>
         </div>
         <div class="users-container">
             <ul id="users-list">

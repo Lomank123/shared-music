@@ -11,7 +11,9 @@ const audioPlayer = document.querySelector(".audio-player");
 const usersList = document.getElementById("users-list");
 // Need to give host username
 let users = [];
+isFirstClick = true;
 
+// connect function is called only when player is ready
 function connect() {
     roomSocket.onopen = () => {
         console.log("WebSocket connection created.");
@@ -25,6 +27,7 @@ function connect() {
 
     roomSocket.onclose = (e) => {
         console.log("Closing connection...");
+        pauseTrack();
     };
 
     roomSocket.onmessage = (e) => {
@@ -61,7 +64,28 @@ function connect() {
                         track: trackData,
                     })
                 );
+            if (username === data.user) {
+                updatePlaylist(data.playlist);
             }
+        }
+        if (data.event == "SEND_TRACK_TO_NEW_USER") {
+            console.log(player.getPlayerState());
+            let state = player.getPlayerState();
+            const trackData = {
+                name: player.getVideoData().title,
+                duration: player.getDuration(),
+                url: player.getVideoUrl(),
+                currentTime: player.getCurrentTime(),
+                isPaused: state == 2 || state == -1,
+            };
+            roomSocket.send(
+                JSON.stringify({
+                    event: "NEW_USER_JOINED",
+                    message: "New user joined.",
+                    user: data.receiver,
+                    track: trackData,
+                })
+            );
         }
         if (data.event == "DISCONNECT") {
             document.getElementById("users-count").innerHTML =
@@ -82,44 +106,78 @@ function connect() {
             console.log("Closing connection. Refresh the page.");
         }
         if (data.event == "CHANGE_TRACK") {
-            console.log(data.playlist);
             const id = youtube_parser(data.track.url);
             player.loadVideoById(id);
-            //player.mute();
             playTrack();
-            //player.unMute();
+            updatePlaylist(data.playlist, data.track.url);
+        }
+        if (data.event == "ADD_TRACK") {
+            // display new track in playlist with buttons
+            updatePlaylist(data.playlist, player.getVideoUrl());
         }
         if (data.event == "SET_CURRENT_TRACK") {
             const id = youtube_parser(data.track.url);
             player.loadVideoById(id, data.track.currentTime);
-            //player.mute();
             playTrack();
-            //player.unMute();
             if (data.track.isPaused) {
-                player.mute();
+                //player.mute();
                 setTimeout(() => {
                     pauseTrack();
-                    player.unMute();
-                }, 500);
+                    //player.unMute();
+                }, 500)
             }
+            updatePlaylist(data.playlist, data.track.url);
         }
         if (data.event == "PLAY") {
             playTrack();
-            console.log(player.getPlayerState());
         }
         if (data.event == "PAUSE") {
             pauseTrack();
-            console.log(player.getPlayerState());
         }
         if (data.event == "CHANGE_TIME") {
             player.seekTo(data.time);
         }
     };
 
-    console.log(roomSocket.readyState);
     if (roomSocket.readyState == WebSocket.OPEN) {
         roomSocket.onopen();
     }
+}
+
+function clearPlaylist() {
+    let playlist = document.getElementById("playlist");
+    playlist.innerHTML = '';
+}
+
+function updatePlaylist(newPlaylist, url='') {
+    clearPlaylist();
+    let playlist = document.getElementById("playlist");
+    newPlaylist.forEach(track => {
+        let trackBlock = document.createElement("p");
+        trackBlock.textContent = track.name;
+        playlist.appendChild(trackBlock);
+        trackBlock.addEventListener('click', (e) => {changeTrack(e, track)});
+        try {
+            let chosenUrl = youtube_parser(url);
+            let trackUrl = youtube_parser(track.url);
+            if (chosenUrl === trackUrl) {
+                trackBlock.style.fontWeight = 'bold';
+            }
+        } catch (error) {
+            console.log(error);
+        }
+
+    });
+}
+
+function changeTrack(event, trackData) {
+    roomSocket.send(
+        JSON.stringify({
+            event: "CHANGE_TRACK",
+            message: "Change track.",
+            track: trackData,
+        })
+    );
 }
 
 function onYouTubeIframeAPIReady() {
@@ -140,9 +198,21 @@ function onPlayerReady(event) {
     audioPlayer.querySelector(".time .length").textContent = getTimeCodeFromNum(
         player.getDuration()
     );
-    player.setVolume(75);
+    mutePlayer();
+    //player.setVolume(75);
     audioPlayer.querySelector(".name").textContent =
         player.getVideoData().title;
+
+    // Set click listener to the whole page
+    document.addEventListener('mouseup', firstClickListener);
+    function firstClickListener(event) {
+        if (isFirstClick) {
+            isFirstClick = false;
+            unMutePlayer();
+            console.log("No longer muted!");
+            document.getElementById('mute-msg').style.display = 'none';
+        }
+    }
 
     connect();
 }
@@ -230,18 +300,27 @@ playBtn.addEventListener(
     false
 );
 
+const volumeEl = audioPlayer.querySelector(".volume-container .volume");
+
 audioPlayer.querySelector(".volume-button").addEventListener("click", () => {
-    const volumeEl = audioPlayer.querySelector(".volume-container .volume");
     if (!player.isMuted()) {
-        player.mute();
-        volumeEl.classList.remove("icono-volumeMedium");
-        volumeEl.classList.add("icono-volumeMute");
+        mutePlayer();
     } else {
-        player.unMute();
-        volumeEl.classList.add("icono-volumeMedium");
-        volumeEl.classList.remove("icono-volumeMute");
+        unMutePlayer();
     }
 });
+
+function mutePlayer() {
+    player.mute();
+    volumeEl.classList.remove("icono-volumeMedium");
+    volumeEl.classList.add("icono-volumeMute");
+}
+
+function unMutePlayer() {
+    player.unMute();
+    volumeEl.classList.add("icono-volumeMedium");
+    volumeEl.classList.remove("icono-volumeMute");
+}
 
 //turn 128 seconds into 2:08
 function getTimeCodeFromNum(num) {
@@ -262,20 +341,21 @@ function youtube_parser(url) {
     return typeof code[1] == "string" ? code[1] : false;
 }
 
-function changeSong() {
+function addTrack() {
     const id = youtube_parser(urlField.value);
+    let youtubeURL = "https://www.youtube.com/watch?v=" + id;
     if (id) {
         roomSocket.send(
             JSON.stringify({
-                event: "CHANGE_TRACK",
-                url: urlField.value,
-                message: "Change track.",
+                event: "ADD_TRACK",
+                url: youtubeURL,
+                message: "Add new track.",
             })
         );
     } else {
         roomSocket.send(
             JSON.stringify({
-                event: "CHANGE_TRACK_ERROR",
+                event: "ADD_TRACK_ERROR",
                 message: "Could not find audio url.",
             })
         );
