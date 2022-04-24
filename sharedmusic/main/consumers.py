@@ -156,6 +156,20 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                 'time': time,
                 'event': event,
             })
+        elif event == consts.DELETE_TRACK_EVENT:
+            track_data = response.get("track", None)
+            chosen_track_url = response.get("chosenTrackUrl", None)
+            soundtrack = await database_sync_to_async(Soundtrack.objects.get)(url=track_data["url"], name=track_data["name"])
+            await database_sync_to_async(soundtrack.delete)()
+            # Get updated playlist
+            playlist_tracks = await self.get_playlist_tracks()
+            await self.channel_layer.group_send(self.room_group_name, {
+                'type': 'send_message',
+                'event': consts.DELETE_TRACK_EVENT,
+                'message': f"Track removed by {self.user.username}.",
+                'playlist': playlist_tracks,
+                'chosenTrackUrl': chosen_track_url,
+            })
         else:
             sync_to_async(print(message))
             # Send message to room group

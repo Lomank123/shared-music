@@ -130,6 +130,9 @@ function connect() {
             }
             updatePlaylist(data.playlist, data.track.url);
         }
+        if (data.event == "DELETE_TRACK") {
+            updatePlaylist(data.playlist, data.chosenTrackUrl);
+        }
         if (data.event == "PLAY") {
             playTrack();
         }
@@ -152,17 +155,16 @@ function clearPlaylist() {
 }
 
 function updatePlaylist(newPlaylist, url = "") {
+    console.log(url);
     clearPlaylist();
     let playlist = document.getElementById("playlist");
     newPlaylist.forEach((track) => {
         let trackBlock = document.createElement("p");
         trackBlock.textContent = track.name;
         playlist.appendChild(trackBlock);
-        trackBlock.addEventListener("click", (e) => {
-            changeTrack(e, track);
-        });
+        let chosenUrl = "";
         try {
-            let chosenUrl = youtube_parser(url);
+            chosenUrl = youtube_parser(url);
             let trackUrl = youtube_parser(track.url);
             if (chosenUrl === trackUrl) {
                 trackBlock.style.fontWeight = "bold";
@@ -170,7 +172,31 @@ function updatePlaylist(newPlaylist, url = "") {
         } catch (error) {
             console.log(error);
         }
+        let playButton = document.createElement("button");
+        let deleteButton = document.createElement("button");
+        deleteButton.textContent = "Remove";
+        playButton.textContent = "Play";
+        trackBlock.appendChild(deleteButton);
+        trackBlock.appendChild(playButton);
+        let trackData = {
+            name: track.name,
+            url: track.url,
+        }
+        let youtubeURL = "https://www.youtube.com/watch?v=" + chosenUrl;
+        deleteButton.addEventListener('click', (e) => {deleteTrack(e, trackData, youtubeURL)});
+        playButton.addEventListener("click", (e) => {changeTrack(e, track);});
     });
+}
+
+function deleteTrack(event, trackData, chosenTrackUrl) {
+    roomSocket.send(
+        JSON.stringify({
+            event: "DELETE_TRACK",
+            message: "Delete track.",
+            track: trackData,
+            chosenTrackUrl: chosenTrackUrl,
+        })
+    );
 }
 
 function changeTrack(event, trackData) {
