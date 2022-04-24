@@ -36,6 +36,7 @@ function connect() {
         if (data.event == "CONNECT") {
             document.getElementById("users-count").innerHTML =
                 data.listeners.count.toString();
+            updatePlaylist(data.playlist);
         }
         if (data.event == "SEND_TRACK_TO_NEW_USER") {
             const trackData = {
@@ -66,6 +67,11 @@ function connect() {
             const id = youtube_parser(data.track.url);
             player.loadVideoById(id);
             playTrack();
+            updatePlaylist(data.playlist, data.track.url);
+        }
+        if (data.event == "ADD_TRACK") {
+            // display new track in playlist with buttons
+            updatePlaylist(data.playlist);
         }
         if (data.event == "SET_CURRENT_TRACK") {
             const id = youtube_parser(data.track.url);
@@ -78,6 +84,7 @@ function connect() {
                     player.unMute();
                 }, 500)
             }
+            updatePlaylist(data.playlist, data.track.url);
         }
         if (data.event == "PLAY") {
             playTrack();
@@ -93,6 +100,24 @@ function connect() {
     if (roomSocket.readyState == WebSocket.OPEN) {
         roomSocket.onopen();
     }
+}
+
+function clearPlaylist() {
+    let playlist = document.getElementById("playlist");
+    playlist.innerHTML = '';
+}
+
+function updatePlaylist(newPlaylist, url='') {
+    clearPlaylist();
+    let playlist = document.getElementById("playlist");
+    newPlaylist.forEach(element => {
+        let track = document.createElement("p");
+        track.textContent = element.name;
+        if (url === element.url) {
+            track.style.fontWeight = 'bold';
+        }
+        playlist.appendChild(track);
+    });
 }
 
 function onYouTubeIframeAPIReady() {
@@ -256,20 +281,20 @@ function youtube_parser(url) {
     return typeof code[1] == "string" ? code[1] : false;
 }
 
-function changeSong() {
+function addTrack() {
     const id = youtube_parser(urlField.value);
     if (id) {
         roomSocket.send(
             JSON.stringify({
-                event: "CHANGE_TRACK",
+                event: "ADD_TRACK",
                 url: urlField.value,
-                message: "Change track.",
+                message: "Add new track.",
             })
         );
     } else {
         roomSocket.send(
             JSON.stringify({
-                event: "CHANGE_TRACK_ERROR",
+                event: "ADD_TRACK_ERROR",
                 message: "Could not find audio url.",
             })
         );

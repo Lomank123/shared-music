@@ -107,28 +107,25 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                     f"{consts.USER_GROUP_PREFIX}_{another_user}",
                     track_sender_data
                 )
-        elif event == consts.CHANGE_TRACK_EVENT:
+        elif event == consts.ADD_TRACK_EVENT:
             url = response.get("url", None)
-
             # Get new track and updated tracks list
-            new_track = await self.get_or_create_track(url)
+            new_track, created = await self.get_or_create_track(url)
             playlist_tracks = await self.get_playlist_tracks()
-
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
-                'event': consts.CHANGE_TRACK_EVENT,
-                'message': f"Track changed by {self.user.username}.",
+                'event': consts.ADD_TRACK_EVENT,
+                'message': f"New track added by {self.user.username}.",
                 'playlist': playlist_tracks,
-                'track': {
-                    'name': new_track.name,
-                    'url': new_track.url,
-                },
+                'created': created,
             })
-        elif event == consts.CHANGE_TRACK_ERROR_EVENT:
+        elif event == consts.CHANGE_TRACK_EVENT:
+            pass
+        elif event == consts.ADD_TRACK_ERROR_EVENT:
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
                 'message': message,
-                'event': consts.CHANGE_TRACK_ERROR_EVENT,
+                'event': consts.ADD_TRACK_ERROR_EVENT,
             })
         elif event == consts.NEW_USER_JOINED_EVENT:
             new_user = response.get("user", None)
@@ -191,8 +188,8 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         """
         Get or create soundtrack by given url and room playlist.
         """
-        soundtrack, _ = await database_sync_to_async(Soundtrack.objects.get_or_create)(url=url, playlist=self.playlist)
-        return soundtrack
+        soundtrack, created = await database_sync_to_async(Soundtrack.objects.get_or_create)(url=url, playlist=self.playlist)
+        return soundtrack, created
 
     async def send_message(self, res):
         """
