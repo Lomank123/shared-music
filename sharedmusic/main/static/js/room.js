@@ -12,6 +12,7 @@ const audioPlayer = document.querySelector(".audio-player");
 let users = [];
 isFirstClick = true;
 
+// connect function is called only when player is ready
 function connect() {
     roomSocket.onopen = () => {
         console.log("WebSocket connection created.");
@@ -35,23 +36,23 @@ function connect() {
         if (data.event == "CONNECT") {
             document.getElementById("users-count").innerHTML =
                 data.listeners.count.toString();
-            if (username === hostUsername) {
-                const trackData = {
-                    name: player.getVideoData().title,
-                    duration: player.getDuration(),
-                    url: player.getVideoUrl(),
-                    currentTime: player.getCurrentTime(),
-                    isPaused: player.getPlayerState() == 2,
-                };
-                roomSocket.send(
-                    JSON.stringify({
-                        event: "NEW_USER_JOINED",
-                        message: "New user joined.",
-                        user: data.user,
-                        track: trackData,
-                    })
-                );
-            }
+        }
+        if (data.event == "SEND_TRACK_TO_NEW_USER") {
+            const trackData = {
+                name: player.getVideoData().title,
+                duration: player.getDuration(),
+                url: player.getVideoUrl(),
+                currentTime: player.getCurrentTime(),
+                isPaused: player.getPlayerState() == 2,
+            };
+            roomSocket.send(
+                JSON.stringify({
+                    event: "NEW_USER_JOINED",
+                    message: "New user joined.",
+                    user: data.receiver,
+                    track: trackData,
+                })
+            );
         }
         if (data.event == "DISCONNECT") {
             document.getElementById("users-count").innerHTML =
@@ -62,7 +63,6 @@ function connect() {
             console.log("Closing connection. Refresh the page.");
         }
         if (data.event == "CHANGE_TRACK") {
-            console.log(data.playlist);
             const id = youtube_parser(data.track.url);
             player.loadVideoById(id);
             playTrack();
@@ -81,18 +81,15 @@ function connect() {
         }
         if (data.event == "PLAY") {
             playTrack();
-            console.log(player.getPlayerState());
         }
         if (data.event == "PAUSE") {
             pauseTrack();
-            console.log(player.getPlayerState());
         }
         if (data.event == "CHANGE_TIME") {
             player.seekTo(data.time);
         }
     };
 
-    console.log(roomSocket.readyState);
     if (roomSocket.readyState == WebSocket.OPEN) {
         roomSocket.onopen();
     }

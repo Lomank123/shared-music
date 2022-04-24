@@ -78,13 +78,35 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
 
         if event == consts.CONNECT_EVENT:
             listeners_data = await self.get_listeners_info()
-            await self.channel_layer.group_send(self.room_group_name, {
+            playlist_tracks = await self.get_playlist_tracks()
+            data = {
                 'type': 'send_message',
                 'message': message,
                 'event': consts.CONNECT_EVENT,
                 'user': self.user.username,
                 'listeners': listeners_data,
-            })
+                'playlist': playlist_tracks,
+            }
+            await self.channel_layer.group_send(self.room_group_name, data)
+
+            # Here we need to send event from another user to new one
+            another_user = None
+            if len(listeners_data['users']) > 1:
+                for listener in listeners_data['users']:
+                    if listener['username'] != self.user.username:
+                        another_user = listener['username']
+                        break
+            if another_user is not None:
+                track_sender_data = {
+                    'type': 'send_message',
+                    'event': consts.SEND_TRACK_TO_NEW_USER,
+                    'receiver': self.user.username,
+                    'message': "Need to set current track.",
+                }
+                await self.channel_layer.group_send(
+                    f"{consts.USER_GROUP_PREFIX}_{another_user}",
+                    track_sender_data
+                )
         elif event == consts.CHANGE_TRACK_EVENT:
             url = response.get("url", None)
 
@@ -128,12 +150,23 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                 'event': event,
             })
         else:
+            sync_to_async(print(message))
             # Send message to room group
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
                 'message': message,
                 'event': event,
             })
+
+    async def change_host(self):
+        """
+        This method sets new host to current room and saves it.
+        New host is the first listener in the list.
+        """
+        room = await database_sync_to_async(Room.objects.get)(name=self.room_name)
+        new_host = await database_sync_to_async(room.listeners.first)()
+        room.host = new_host
+        await database_sync_to_async(room.save)()
 
     async def get_listeners_info(self):
         """
@@ -153,7 +186,6 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         """
         playlist_tracks = await Playlist.get_playlist_tracks(self.playlist)
         return playlist_tracks
-
 
     async def get_or_create_track(self, url):
         """
