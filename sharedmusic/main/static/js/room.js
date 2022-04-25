@@ -14,6 +14,13 @@ let users = [];
 isFirstClick = true;
 const ytApiKey = "AIzaSyCp-e6T1qe6QqgjH6JydzBHCjB2raF6FrE";
 
+// Player elements
+const timeline = document.querySelector(".timeline");
+const progressBar = document.querySelector(".progress");
+const volumeEl = document.querySelector(".volume-container .volume");
+const volumeSlider = document.querySelector(".controls .volume-slider");
+const playBtn = document.querySelector(".controls .toggle-play");
+
 // connect function is called only when player is ready
 function connect() {
     roomSocket.onopen = () => {
@@ -71,7 +78,6 @@ function connect() {
             }
         }
         if (data.event == "SEND_TRACK_TO_NEW_USER") {
-            console.log(player.getPlayerState());
             let state = player.getPlayerState();
             const trackData = {
                 name: player.getVideoData().title,
@@ -132,6 +138,11 @@ function connect() {
         }
         if (data.event == "DELETE_TRACK") {
             updatePlaylist(data.playlist, data.chosenTrackUrl);
+            if (player.getVideoData().title == data.deletedTrackInfo.name) {
+                player.stopVideo();
+                player.loadVideoById("");
+                progressBar.style.width = 0;
+            }
         }
         if (data.event == "PLAY") {
             playTrack();
@@ -155,7 +166,6 @@ function clearPlaylist() {
 }
 
 function updatePlaylist(newPlaylist, url = "") {
-    console.log(url);
     clearPlaylist();
     let playlist = document.getElementById("playlist");
     newPlaylist.forEach((track) => {
@@ -181,10 +191,14 @@ function updatePlaylist(newPlaylist, url = "") {
         let trackData = {
             name: track.name,
             url: track.url,
-        }
+        };
         let youtubeURL = "https://www.youtube.com/watch?v=" + chosenUrl;
-        deleteButton.addEventListener('click', (e) => {deleteTrack(e, trackData, youtubeURL)});
-        playButton.addEventListener("click", (e) => {changeTrack(e, track);});
+        deleteButton.addEventListener("click", (e) => {
+            deleteTrack(e, trackData, youtubeURL);
+        });
+        playButton.addEventListener("click", (e) => {
+            changeTrack(e, track);
+        });
     });
 }
 
@@ -223,13 +237,10 @@ function onYouTubeIframeAPIReady() {
 }
 
 function onPlayerReady(event) {
-    //document.getElementById(ui.play).addEventListener("click", togglePlay);
-    //timeupdater = setInterval(initProgressBar, 100);
     audioPlayer.querySelector(".time .length").textContent = getTimeCodeFromNum(
         player.getDuration()
     );
     mutePlayer();
-    //player.setVolume(75);
     audioPlayer.querySelector(".name").textContent =
         player.getVideoData().title;
 
@@ -253,12 +264,6 @@ function onPlayerError(event) {
 }
 
 function onPlayerStateChange(event) {
-    if (event.data == YT.PlayerState.ENDED) {
-        //document.getElementById(ui.play).classList.add("pause");
-        //document.getElementById(ui.percentage).style.width = 0;
-        //document.getElementById(ui.currentTime).innerHTML = "00:00";
-        //player.seekTo(0, true);
-    }
     audioPlayer.querySelector(".time .length").textContent = getTimeCodeFromNum(
         player.getDuration()
     );
@@ -267,7 +272,6 @@ function onPlayerStateChange(event) {
 }
 
 //click on timeline to skip around
-const timeline = audioPlayer.querySelector(".timeline");
 timeline.addEventListener(
     "click",
     (e) => {
@@ -287,7 +291,6 @@ timeline.addEventListener(
 );
 
 //click volume slider to change volume
-const volumeSlider = audioPlayer.querySelector(".controls .volume-slider");
 volumeSlider.addEventListener(
     "click",
     (e) => {
@@ -302,7 +305,6 @@ volumeSlider.addEventListener(
 
 //check audio percentage and update time accordingly
 setInterval(() => {
-    const progressBar = audioPlayer.querySelector(".progress");
     progressBar.style.width =
         (player.getCurrentTime() / player.getDuration()) * 100 + "%";
     audioPlayer.querySelector(".time .current").textContent =
@@ -310,7 +312,6 @@ setInterval(() => {
 }, 500);
 
 //toggle between playing and pausing on button click
-const playBtn = audioPlayer.querySelector(".controls .toggle-play");
 playBtn.addEventListener(
     "click",
     () => {
@@ -334,8 +335,6 @@ playBtn.addEventListener(
     },
     false
 );
-
-const volumeEl = audioPlayer.querySelector(".volume-container .volume");
 
 audioPlayer.querySelector(".volume-button").addEventListener("click", () => {
     if (!player.isMuted()) {
@@ -404,6 +403,7 @@ function addTrack() {
                     })
                 );
             }
+            urlField.value = "";
         })
     );
 }

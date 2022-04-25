@@ -169,6 +169,7 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                 'message': f"Track removed by {self.user.username}.",
                 'playlist': playlist_tracks,
                 'chosenTrackUrl': chosen_track_url,
+                'deletedTrackInfo': track_data,
             })
         else:
             sync_to_async(print(message))
