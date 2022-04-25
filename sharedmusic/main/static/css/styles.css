@@ -16,9 +16,14 @@
     font-family: "open sans", sans-serif;
 }
 
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     background-color: var(--main-bg-color);
-    height: 100vh;
 }
 
 input[type="text"],
@@ -44,12 +49,24 @@ input[type="email"] {
 }
 
 .container {
-    max-width: 1200px;
-    margin: 100px auto;
+    max-width: 1400px;
+    margin: 30px auto;
 }
 
 .hidden {
     display: none !important;
+}
+
+.lobby {
+    display: grid;
+    grid-template-columns: 50% 50%;
+}
+
+#mute-msg {
+    position: fixed;
+    bottom: 60px;
+    right: 0;
+    background-color: var(--primary-color);
 }
 
 /* Sidebar */
@@ -163,11 +180,101 @@ input[type="email"] {
     width: 100%;
 }
 
-/* Lobby */
-.create-room {
-    margin-bottom: 40px;
+.room-name {
+    text-align: center;
+    font-size: 1.6rem;
+    margin-bottom: 50px;
+}
+
+/* Info bar */
+
+.info-bar {
+    width: 500px;
+    justify-self: flex-end;
 }
 
 .users-container {
-    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.online {
+    width: 10px;
+    height: 10px;
+    background: green;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.offline {
+    width: 10px;
+    height: 10px;
+    background: red;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.username {
+    margin-left: 8px;
+}
+
+/* Playlist */
+.playlist {
+    max-height: 450px;
+    overflow-y: auto;
+}
+
+.playlist__track {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    padding-right: 20px;
+}
+
+.track__title {
+    margin: 0 20px;
+}
+
+.track__playButton {
+    order: -1;
+    transition: ease-in-out 0.2s;
+    display: flex;
+    place-items: center;
+    cursor: pointer;
+    padding: 15px;
+    background: #efeeee;
+    border-radius: 50%;
+    border: none;
+}
+.track__playButton .fas {
+    display: flex;
+    place-items: center;
+    font-size: 15px;
+    color: gray;
+}
+
+.track__playButton_active .fas {
+    color: var(--primary-color);
+}
+
+.track__deleteButton {
+    order: 1;
+    background: var(--primary-color);
+    transition: ease-in-out 0.2s;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    display: flex;
+    place-items: center;
+}
+
+.track__deleteButton:hover,
+.track__playButton:hover {
+    transform: scale(1.02);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2), inset 0 0 0 99999px rgba(0, 0, 0, 0.2);
+}
+
+.playlist-input {
+    margin-top: 20px;
+    margin-bottom: 50px;
 }

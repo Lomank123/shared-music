@@ -29,7 +29,7 @@
 }
 .audio-player .controls {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: stretch;
     padding: 0 20px;
 }
@@ -79,6 +79,7 @@
 }
 .audio-player .controls .time {
     display: flex;
+    margin-left: 50px;
 }
 .audio-player .controls .time > * {
     padding: 2px;
@@ -110,9 +111,17 @@
 .audio-player .controls .volume-container .volume-slider .volume-percentage {
     background: coral;
     height: 100%;
-    width: 75%;
+    width: 50%;
 }
 .audio-player .controls .volume-container:hover .volume-slider {
     left: -123px;
     width: 120px;
+}
+
+.name .thumb {
+    margin-right: 10px;
+}
+.name {
+    margin-left: auto;
+    margin-right: 130px;
 }

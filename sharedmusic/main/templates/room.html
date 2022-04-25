@@ -4,58 +4,63 @@
 {% block title %}Room{% endblock title %}
 
 {% block content %}
-  <h1>Room</h1>
-  <hr />
-
-    <div id="room" room_code="{{ room.code }}"></div>
-    <div id="host" host_username="{{ room.host.username }}"></div>
-    <p id="users-count"></p>
-    <div id="user" username="{{ user.username }}"></div>
-    <h6>Greetings, {{ user.username }}</h6>
-    <p>Room name: {{ room.code }}</p>
-
+    <div id="blur"></div>
     <div id="mute-msg">
         <p>Player is currently muted. Click anywhere to unmute it.</p>
     </div>
-    <h6>Playlist:</h6>
-    <div id="playlist">
-    </div>
-    <div style="margin-top: 20px">
-        <!--Youtube-->
-        <div id="player" style="display: none; visibility: hidden;"></div>
-        <!--Player-->
-        <div class="audio-player">
-            <div class="timeline">
-                <div class="progress"></div>
-            </div>
-            <div class="controls">
-                <div class="play-container">
-                    <div class="toggle-play play"></div>
-                </div>
-                <div class="time">
-                    <div class="current">0:00</div>
-                    <div class="divider">/</div>
-                    <div class="length"></div>
-                </div>
-                <div class="name"></div>
-                <div class="volume-container">
-                    <div class="volume-button">
-                        <div class="volume icono-volumeMedium"></div>
-                    </div>
+    <h1 class="room-name">Room name: {{ room.code }}</h1>
+    <div class="lobby">
+        <div class="primary-bar">
 
-                    <div class="volume-slider">
-                        <div class="volume-percentage"></div>
-                    </div>
-                </div>
+            <div id="room" room_code="{{ room.code }}"></div>
+            <div id="host" host_username="{{ room.host.username }}"></div>
+            <div id="user" username="{{ user.username }}"></div>
+            <h6>Greetings, {{ user.username }}</h6>
+        
+        </div>
+        <div class="info-bar">
+            <div class="users-container">
+                <h4>Online users:</h4>
+                <ul id="users-list">
+                </ul>
+            </div>
+            <h6>Playlist:</h6>
+            <div class="playlist"></div>
+            <div class="playlist-input">
+                <input id="url-field" type="text" placeholder="Enter youtube url"/>
+                <button class="btn" onclick="addTrack()">Add track</button>
             </div>
         </div>
-        <div style="margin-top: 20px">
-            <input id="url-field" type="text" placeholder="Enter youtube url"/>
-            <button class="btn" onclick="addTrack()">Add track</button>
+    </div>
+    <!--Youtube-->
+    <div id="player" style="display: none; visibility: hidden;"></div>
+    <!--Player-->
+    <div class="audio-player">
+        <div class="timeline">
+            <div class="progress"></div>
         </div>
-        <div class="users-container">
-            <ul id="users-list">
-            </ul>
+        <div class="controls">
+            <div class="play-container">
+                <div class="toggle-play play"></div>
+            </div>
+            <div class="time">
+                <div class="current">0:00</div>
+                <div class="divider">/</div>
+                <div class="length"></div>
+            </div>
+            <div class="name">
+                <img class="thumb" src="" width="50" height="50" hidden>
+                <div class="title"></div>
+            </div>
+            <div class="volume-container">
+                <div class="volume-button">
+                    <div class="volume icono-volumeMedium"></div>
+                </div>
+
+                <div class="volume-slider">
+                    <div class="volume-percentage"></div>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock content %}
