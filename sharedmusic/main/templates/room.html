@@ -9,26 +9,26 @@
     </div>
     <h1 class="room-name">Room name: {{ room.code }}</h1>
     <div class="lobby">
-        <div class="primary-bar">
-
+        <div class="chat-container">
             <div id="room" room_code="{{ room.code }}"></div>
             <div id="host" host_username="{{ room.host.username }}"></div>
             <div id="user" username="{{ user.username }}"></div>
             <h6>Greetings, {{ user.username }}</h6>
-        
+            <h5 style="color: red">Work in progress (chat)</h5>
+            <img src="https://1.bp.blogspot.com/-jvY1TIs1VwY/XcTci88_MLI/AAAAAAAADRo/jXDYe2RstFwVaW5DHK22D2LHF8tBUkmbgCLcBGAsYHQ/s320/images.jpg">
         </div>
-        <div class="info-bar">
-            <div class="users-container">
-                <h4>Online users:</h4>
-                <ul id="users-list">
-                </ul>
-            </div>
+        <div class="playlist-container">
             <h6>Playlist:</h6>
             <div class="playlist"></div>
             <div class="playlist-input">
                 <input id="url-field" type="text" placeholder="Enter youtube url"/>
                 <button class="btn" onclick="addTrack()">Add track</button>
             </div>
+        </div>
+        <div class="users-container">
+            <h4>Online users:</h4>
+            <ul id="users-list">
+            </ul>
         </div>
     </div>
     <!--Youtube-->
@@ -42,15 +42,6 @@
             <div class="play-container">
                 <div class="toggle-play play"></div>
             </div>
-            <div class="time">
-                <div class="current">0:00</div>
-                <div class="divider">/</div>
-                <div class="length"></div>
-            </div>
-            <div class="name">
-                <img class="thumb" src="" width="50" height="50" hidden>
-                <div class="title"></div>
-            </div>
             <div class="volume-container">
                 <div class="volume-button">
                     <div class="volume icono-volumeMedium"></div>
@@ -59,6 +50,15 @@
                 <div class="volume-slider">
                     <div class="volume-percentage"></div>
                 </div>
+            </div>
+            <div class="time">
+                <div class="current">0:00</div>
+                <div class="divider">/</div>
+                <div class="length"></div>
+            </div>
+            <div class="name">
+                <img class="thumb" src="" width="45" height="45" hidden>
+                <div class="title"></div>
             </div>
         </div>
     </div>

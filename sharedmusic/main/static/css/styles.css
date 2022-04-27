@@ -3,6 +3,29 @@
     --sidebar-bg-color: rgba(17, 24, 39);
     --primary-color: rgb(173, 33, 33);
     --primary-color-hover: rgb(109, 20, 20);
+    /* Scrollbar variables */
+    --scrollbarBG: rgba(255, 255, 255, 0.8);
+    --scrollbarThumb: rgb(173, 33, 33);
+    --scrollbarWidth: 10px;
+    --scrollbarBorder: 3px solid var(--scrollbarThumb);
+    --scrollbarBorderRadius: calc(var(--scrollbarWidth) / 2);
+}
+
+* {
+    scrollbar-width: var(--scrollbarWidth);
+    scrollbar-color: var(--scrollbarThumb) var(--scrollbarBG);
+}
+*::-webkit-scrollbar {
+    width: var(--scrollbarWidth);
+}
+*::-webkit-scrollbar-track {
+    background: var(--scrollbarBG);
+    border-radius: var(--scrollbarBorderRadius);
+}
+*::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbarThumb);
+    border-radius: var(--scrollbarBorderRadius);
+    border: var(--scrollbarBorder);
 }
 
 * {
@@ -79,7 +102,8 @@ input[type="email"] {
 
 .lobby {
     display: grid;
-    grid-template-columns: 50% 50%;
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-gap: 60px;
 }
 
 #mute-msg {
@@ -200,21 +224,47 @@ input[type="email"] {
     width: 100%;
 }
 
+.already-logged-message {
+    text-align: center;
+}
+
+.help-block,
+.help-block + ul li {
+    font-size: 1rem;
+    color: lightgray;
+    margin-top: 5px;
+}
+
+.help-block strong {
+    color: red;
+}
+
+.alert ul li {
+    color: red;
+    margin-top: 10px;
+}
+
+/* Room */
 .room-name {
     text-align: center;
     font-size: 1.6rem;
     margin-bottom: 50px;
 }
 
-/* Info bar */
+#users-list {
+    max-height: 50vh;
+    overflow-y: auto;
+    overflow-x: auto;
+}
 
-.info-bar {
-    width: 500px;
-    justify-self: flex-end;
+#users-list li {
+    display: flex;
+    align-items: center;
 }
 
 .users-container {
     margin-bottom: 30px;
+    max-width: 325px;
 }
 
 .online {
@@ -222,7 +272,7 @@ input[type="email"] {
     height: 10px;
     background: green;
     border-radius: 50%;
-    display: inline-block;
+    flex-shrink: 0;
 }
 
 .offline {
@@ -230,7 +280,7 @@ input[type="email"] {
     height: 10px;
     background: red;
     border-radius: 50%;
-    display: inline-block;
+    flex-shrink: 0;
 }
 
 .username {
@@ -239,7 +289,7 @@ input[type="email"] {
 
 /* Playlist */
 .playlist {
-    max-height: 450px;
+    max-height: 50vh;
     overflow-y: auto;
 }
 
@@ -252,6 +302,29 @@ input[type="email"] {
 
 .track__title {
     margin: 0 20px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 30vw;
+}
+
+.track__title::before {
+    background: black;
+    border-radius: 8px 8px 8px 0px;
+    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.5);
+    color: white;
+    content: attr(data-title);
+    margin-top: -40px;
+    opacity: 0;
+    padding: 3px 7px;
+    position: absolute;
+    visibility: hidden;
+    transition: all 0.4s ease-in-out;
+}
+
+.track__title:hover::before {
+    opacity: 1;
+    visibility: visible;
 }
 
 .track__playButton {
@@ -286,6 +359,7 @@ input[type="email"] {
     border-radius: 8px;
     display: flex;
     place-items: center;
+    margin-left: auto;
 }
 
 .track__deleteButton:hover,
@@ -297,4 +371,27 @@ input[type="email"] {
 .playlist-input {
     margin-top: 20px;
     margin-bottom: 50px;
+}
+
+/* Home */
+.home {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;
+}
+
+.home-buttons {
+    margin-top: 15px;
+    width: 80px;
+}
+
+.or-seperator {
+    margin: 50px 0;
+    font-size: 1.5rem;
+    text-align: center;
+}
+.label {
+    display: block;
 }

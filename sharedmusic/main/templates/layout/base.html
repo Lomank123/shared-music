@@ -31,10 +31,6 @@
             <i class="fa-solid fa-arrow-right-to-bracket"></i>
             <p>Log in</p>
         </a>
-        <a href="#" class="sidebar__link">
-            <i class="fa-solid fa-address-card"></i>
-            <p>Profile</p>
-        </a>
         {% if user.is_authenticated %}
         <div class="user-data">
             <h6>Welcome, {{ user.username }}</h6>

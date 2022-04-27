@@ -52,7 +52,7 @@ function connect() {
                 let node = $(
                     `<li>` +
                         `<div class="online"></div>` +
-                        `<span class="username">${user.username}</span>` +
+                        `<div class="username">${user.username}</div>` +
                         `</li>`
                 );
                 $("#users-list").append(node);
@@ -104,10 +104,7 @@ function connect() {
             }
             users.forEach((user) => {
                 let node = $(
-                    `<li>` +
-                        `<div class="online"></div>` +
-                        `<span>${user.username}</span>` +
-                        `</li>`
+                    `<li>` + `<div class="online"></div>` + `<div>${user.username}</div>` + `</li>`
                 );
                 $("#users-list").append(node);
             });
@@ -180,7 +177,9 @@ function updatePlaylist(newPlaylist, url = "") {
         let playButton = $(
             `<button class="track__playButton"><i class="fas fa-play"></i></button>`
         );
-        let trackTitle = $(`<p class="track__title">${track.name}</p>`);
+        let trackTitle = $(
+            `<div class="track__title" data-title="${track.name}">${track.name}</div>`
+        );
         let deleteButton = $(
             `<button class="track__deleteButton"><i class="fa-solid fa-trash-can"></i></button>`
         );
