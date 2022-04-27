@@ -57,7 +57,7 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
             if self.user.is_authenticated:
                 await Room.remove_listener(self.room_name, self.user)
             # Send disconnect message to other listeners
-            listeners_data = await self.get_listeners_info()
+            listeners_data = await Room.get_listeners_info(self.room_name)
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
                 'message': f"{self.user} {consts.USER_DISCONNECTED}",
@@ -77,8 +77,8 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         message = response.get("message", None)
 
         if event == consts.CONNECT_EVENT:
-            listeners_data = await self.get_listeners_info()
-            playlist_tracks = await self.get_playlist_tracks()
+            listeners_data = await Room.get_listeners_info(self.room_name)
+            playlist_tracks = await Playlist.get_playlist_tracks(self.playlist)
             data = {
                 'type': 'send_message',
                 'message': message,
@@ -111,8 +111,11 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
             url = response.get("url", None)
             title = response.get("name", None)
             # Get new track and updated tracks list
-            new_track, created = await self.get_or_create_track(url, title)
-            playlist_tracks = await self.get_playlist_tracks()
+            new_track, created = await database_sync_to_async(
+                Soundtrack.objects.get_or_create
+            )(url=url, name=title)
+            await Playlist.add_track(new_track, self.playlist)
+            playlist_tracks = await Playlist.get_playlist_tracks(self.playlist)
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
                 'event': consts.ADD_TRACK_EVENT,
@@ -129,7 +132,7 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         elif event == consts.CHANGE_TRACK_EVENT:
             # Get new track data and send to clients
             track_data = response.get("track", None)
-            playlist_tracks = await self.get_playlist_tracks()
+            playlist_tracks = await Playlist.get_playlist_tracks(self.playlist)
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
                 'event': consts.CHANGE_TRACK_EVENT,
@@ -140,7 +143,7 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         elif event == consts.NEW_USER_JOINED_EVENT:
             new_user = response.get("user", None)
             track_data = response.get("track", None)
-            playlist_tracks = await self.get_playlist_tracks()
+            playlist_tracks = await Playlist.get_playlist_tracks(self.playlist)
             await self.channel_layer.group_send(f"{consts.USER_GROUP_PREFIX}_{new_user}", {
                 'type': 'send_message',
                 'message': f"Set current track data.",
@@ -159,10 +162,13 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         elif event == consts.DELETE_TRACK_EVENT:
             track_data = response.get("track", None)
             chosen_track_url = response.get("chosenTrackUrl", None)
-            soundtrack = await database_sync_to_async(Soundtrack.objects.get)(url=track_data["url"], name=track_data["name"])
-            await database_sync_to_async(soundtrack.delete)()
+            soundtrack = await database_sync_to_async(
+                Soundtrack.objects.get
+            )(url=track_data["url"], name=track_data["name"])
+            #await database_sync_to_async(soundtrack.delete)()
+            await Playlist.remove_track(self.playlist, soundtrack)
             # Get updated playlist
-            playlist_tracks = await self.get_playlist_tracks()
+            playlist_tracks = await Playlist.get_playlist_tracks(self.playlist)
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
                 'event': consts.DELETE_TRACK_EVENT,
@@ -172,49 +178,12 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                 'deletedTrackInfo': track_data,
             })
         else:
-            sync_to_async(print(message))
             # Send message to room group
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
                 'message': message,
                 'event': event,
             })
-
-    async def change_host(self):
-        """
-        This method sets new host to current room and saves it.
-        New host is the first listener in the list.
-        """
-        room = await database_sync_to_async(Room.objects.get)(name=self.room_name)
-        new_host = await database_sync_to_async(room.listeners.first)()
-        room.host = new_host
-        await database_sync_to_async(room.save)()
-
-    async def get_listeners_info(self):
-        """
-        Get all usernames and their count from room.
-        """
-        count = await Room.listeners_count(self.room_name)
-        listeners = await Room.get_listeners(self.room_name)
-        data = {
-            'count': count,
-            'users': listeners,
-        }
-        return data
-
-    async def get_playlist_tracks(self):
-        """
-        Get all tracks from room playlist.
-        """
-        playlist_tracks = await Playlist.get_playlist_tracks(self.playlist)
-        return playlist_tracks
-
-    async def get_or_create_track(self, url, title="soundtrack"):
-        """
-        Get or create soundtrack by given url and room playlist.
-        """
-        soundtrack, created = await database_sync_to_async(Soundtrack.objects.get_or_create)(url=url, name=title, playlist=self.playlist)
-        return soundtrack, created
 
     async def send_message(self, res):
         """
