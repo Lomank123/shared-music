@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'easy_thumbnails',
     'django_extensions',
+    # Celery
+    'django_celery_beat',
     'main',
 ]
 
@@ -138,3 +140,9 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels.layers.InMemoryChannelLayer"
     },
 }
+
+# Celery
+
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", 'redis://redis:6379')
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER", 'redis://redis:6379')
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'

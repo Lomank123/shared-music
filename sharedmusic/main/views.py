@@ -22,6 +22,7 @@ class HomeView(LoginRequiredMixin, CreateView):
         return url
 
     def get_context_data(self, **kwargs):
+        # TODO: Add pre-generated name for room to create
         context = super().get_context_data(**kwargs)
         return context
 

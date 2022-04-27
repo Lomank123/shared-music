@@ -1,4 +1,4 @@
-Django
+Django==3.2.13
 django-extensions
 channels
 channels_redis
@@ -12,3 +12,6 @@ django-crispy-forms
 whitenoise
 dj-database-url
 easy-thumbnails
+celery
+django-celery-beat
+flower
