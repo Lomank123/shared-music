@@ -9,11 +9,11 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", 'sharedmusic.settings')
 app = Celery("sharedmusic")
 app.config_from_object("django.conf:settings", namespace="CELERY")
 
-app.conf.beat_schedule = {
-    'delete-rooms-without-listeners': {
-        'task': 'main.tasks.delete_rooms_without_listeners',
-        'schedule': 30.0,
-    },
-}
+#app.conf.beat_schedule = {
+#    'delete-rooms-without-listeners': {
+#        'task': 'main.tasks.delete_rooms_without_listeners',
+#        'schedule': 30.0,
+#    },
+#}
 
 app.autodiscover_tasks()

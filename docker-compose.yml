@@ -1,0 +1,119 @@
+version: '3.9'
+
+services:
+  django:
+    build:
+      context: .
+    command: >
+      sh -c "
+        python manage.py wait_for_db &&
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py collectstatic --noinput &&
+        gunicorn sharedmusic.wsgi --bind 0.0.0.0:8000 --workers=2
+      "
+    volumes:
+      - ./sharedmusic:/sharedmusic
+      - django:/vol/web/static
+    ports:
+      - 8000:8000
+    env_file: .env
+    depends_on:
+      - db
+      - redis
+
+  daphne-ws:
+    build:
+      context: .
+    command: >
+      sh -c "
+        daphne -b 0.0.0.0 -p 8001 sharedmusic.asgi:application
+      "
+    volumes:
+      - ./sharedmusic:/sharedmusic
+    ports:
+      - 8001:8001
+    env_file: .env
+    depends_on:
+      - db
+      - redis
+      - django
+
+  celery-worker:
+    build: .
+    command: wait-for-it.sh django:8000 -s -t 120 -- celery -A sharedmusic worker --loglevel=INFO --beat
+    volumes:
+      - ./sharedmusic:/sharedmusic
+    env_file: .env
+    depends_on:
+      - django
+      - redis
+      - db
+
+  nginx:
+    build:
+      context: ./nginx
+    ports:
+      - 80:${PORT}
+    env_file: .env
+    volumes:
+      - django:/var/www/static
+    depends_on:
+      - django
+
+  redis:
+    image: "redis:alpine"
+
+  db:
+    image: postgres:13-alpine
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+
+volumes:
+  django:
+
+  #lint:
+  #  build: .
+  #  command: >
+  #    sh -c "
+  #      flake8 --max-line-length 120 --exclude migrations,venv,manage.py,__init__.py
+  #    "
+  #  volumes: 
+  #    - ./sharedmusic:/sharedmusic
+  #  env_file: .env
+  #  depends_on:
+  #    - db
+
+  #filldb:
+  #  build: .
+  #  command: >
+  #    sh -c "
+  #      python manage.py wait_for_db &&
+  #      python manage.py makemigrations &&
+  #      python manage.py migrate && 
+  #      python manage.py loaddata fixtures/dev.json
+  #    "
+  #  volumes: 
+  #    - ./sharedmusic:/sharedmusic
+  #  env_file: .env
+  #  depends_on:
+  #    - db
+  #  profiles: ["init"]
+
+  #test:
+  #  build:
+  #    context: .
+  #  user: "${UID}"
+  #  command: >
+  #    sh -c "
+  #      python manage.py wait_for_db &&
+  #      coverage run --source='.' manage.py test mainapp.tests &&
+  #      coverage xml
+  #    "
+  #  volumes: 
+  #    - ./sharedmusic:/sharedmusic
+  #  env_file: .env
+  #  depends_on: 
+  #    - db

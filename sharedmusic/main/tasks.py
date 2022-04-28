@@ -14,6 +14,6 @@ def delete_rooms_without_listeners():
     expiration_date = timezone.now() - timedelta(seconds=15)
     playlists = Playlist.objects.filter(room__last_visited__lte=expiration_date)
     playlists_count = playlists.count()
-    playlists.delete()
+    #playlists.delete()
 
     return {"detail": f"{playlists_count} rooms has been deleted."}

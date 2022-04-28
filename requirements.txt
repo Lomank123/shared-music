@@ -9,9 +9,8 @@ python-dotenv
 psycopg2
 gunicorn
 django-crispy-forms
-whitenoise
-dj-database-url
-easy-thumbnails
 celery
 django-celery-beat
 flower
+daphne
+Redis

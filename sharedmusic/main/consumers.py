@@ -13,7 +13,7 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         self.room_name = self.scope['url_route']['kwargs']['code']
         self.room_group_name = f'{consts.ROOM_GROUP_PREFIX}_{self.room_name}'
         # User group must contain only one user
-        self.user_group_name = f'{consts.USER_GROUP_PREFIX}_{self.user}'
+        self.user_group_name = f'{consts.USER_GROUP_PREFIX}_{self.user.username}'
         self.playlist = await Room.get_room_playlist(self.room_name)
         # Handle authenticated user connection
         if self.user.is_authenticated:
@@ -35,13 +35,20 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         """
         try:
             # Create copy to iterate through
-            user_group = self.channel_layer.groups[self.user_group_name].copy()
+            u = self.channel_layer._get_group_channel_name(self.user_group_name)
+            user_group = self.channel_layer.groups[u].copy()
         except KeyError:
             user_group = {}
         # Remove old channel (if same user or multiple tabs)
         for channel in user_group:
             if channel != self.channel_name:
                 # Send message to old channel to show alert
+                sync_to_async(print(len(user_group)))
+                await self.channel_layer.group_send(self.user_group_name, {
+                    'type': 'send_message',
+                    'message': consts.USER_ALREADY_IN_ROOM,
+                    'event': consts.ALREADY_CONNECTED_EVENT,
+                })
                 await self.channel_layer.group_send(self.user_group_name, {
                     'type': 'send_message',
                     'message': consts.USER_ALREADY_IN_ROOM,
@@ -52,7 +59,8 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                     await self.channel_layer.group_discard(group_name, channel)
 
     async def disconnect(self, close_code):
-        if self.channel_name in self.channel_layer.groups[self.room_group_name]:
+        u = self.channel_layer._get_group_channel_name(self.room_group_name)
+        if self.channel_name in self.channel_layer.groups[u]:
             # Removing listener
             if self.user.is_authenticated:
                 await Room.remove_listener(self.room_name, self.user)
@@ -75,7 +83,6 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         response = json.loads(text_data)
         event = response.get("event", None)
         message = response.get("message", None)
-
         if event == consts.CONNECT_EVENT:
             listeners_data = await Room.get_listeners_info(self.room_name)
             playlist_tracks = await Playlist.get_playlist_tracks(self.playlist)
@@ -146,7 +153,7 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
             playlist_tracks = await Playlist.get_playlist_tracks(self.playlist)
             await self.channel_layer.group_send(f"{consts.USER_GROUP_PREFIX}_{new_user}", {
                 'type': 'send_message',
-                'message': f"Set current track data.",
+                'message': f"Set current track data. {self.user.username}",
                 'track': track_data,
                 'playlist': playlist_tracks,
                 'event': consts.SET_CURRENT_TRACK_EVENT,

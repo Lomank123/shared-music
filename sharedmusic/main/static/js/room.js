@@ -56,23 +56,6 @@ function connect() {
                 node.appendChild(textnode);
                 usersList.appendChild(node);
             });
-            if (username === hostUsername) {
-                const trackData = {
-                    name: player.getVideoData().title,
-                    duration: player.getDuration(),
-                    url: player.getVideoUrl(),
-                    currentTime: player.getCurrentTime(),
-                    isPaused: player.getPlayerState() == 2,
-                };
-                roomSocket.send(
-                    JSON.stringify({
-                        event: "NEW_USER_JOINED",
-                        message: "New user joined.",
-                        user: data.user,
-                        track: trackData,
-                    })
-                );
-            }
             if (username === data.user) {
                 updatePlaylist(data.playlist);
             }

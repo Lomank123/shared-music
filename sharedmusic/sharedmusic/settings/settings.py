@@ -33,7 +33,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_cleanup',
     'crispy_forms',
-    'easy_thumbnails',
     'django_extensions',
     # Celery
     'django_celery_beat',
@@ -41,7 +40,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -103,15 +101,13 @@ USE_I18N = True
 
 USE_TZ = True
 
-# Static files
+# Static
+STATIC_ROOT = 'vol/web/static'
+STATIC_URL = '/static/'
 
-STATIC_URL = 'static/'
-STATIC_ROOT = './../../../static'
-
-# Media files
-
-MEDIA_URL = 'media/'
-MEDIA_ROOT = '/media/'
+# Media
+MEDIA_ROOT = 'vol/web/media'
+MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -130,14 +126,14 @@ CHANNEL_LAYERS = {
         # },
 
         ### Method 2: Via local Redis
-        # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        # 'CONFIG': {
-        #      "hosts": [('127.0.0.1', 6379)],
-        # },
+        'BACKEND': 'channels_redis.pubsub.RedisPubSubChannelLayer',
+        'CONFIG': {
+            "hosts": [('redis', 6379)],
+        },
 
         ### Method 3: Via In-memory channel layer
         ## Using this method.
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
+        #"BACKEND": "channels.layers.InMemoryChannelLayer"
     },
 }
 
