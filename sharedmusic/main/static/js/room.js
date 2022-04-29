@@ -1,8 +1,7 @@
 const roomCode = $("#room").attr("room_code");
 const urlField = document.getElementById("url-field");
 const audio_tag = document.getElementById("youtube");
-const connectionString =
-    "ws://" + window.location.host + "/ws/room/" + roomCode + "/";
+const connectionString = "ws://" + window.location.host + "/ws/room/" + roomCode + "/";
 const roomSocket = new WebSocket(connectionString);
 const username = $("#user").attr("username");
 let hostUsername = $("#host").attr("host_username");
@@ -20,7 +19,7 @@ const progressBar = document.querySelector(".progress");
 const volumeEl = document.querySelector(".volume-container .volume");
 const volumeSlider = document.querySelector(".controls .volume-slider");
 const playBtn = document.querySelector(".controls .toggle-play");
-
+const thumb = document.querySelector(".name .thumb");
 // connect function is called only when player is ready
 function connect() {
     roomSocket.onopen = () => {
@@ -44,17 +43,19 @@ function connect() {
         console.log(data);
 
         if (data.event == "CONNECT") {
-            document.getElementById("users-count").innerHTML =
-                data.listeners.count.toString();
+            //document.getElementById("users-count").innerHTML = data.listeners.count.toString();
             users = data.listeners.users;
             while (usersList.hasChildNodes()) {
                 usersList.removeChild(usersList.firstChild);
             }
-            users.map((user) => {
-                const node = document.createElement("li");
-                const textnode = document.createTextNode(user.username);
-                node.appendChild(textnode);
-                usersList.appendChild(node);
+            users.forEach((user) => {
+                let node = $(
+                    `<li>` +
+                        `<div class="online"></div>` +
+                        `<div class="username">${user.username}</div>` +
+                        `</li>`
+                );
+                $("#users-list").append(node);
             });
             if (username === data.user) {
                 updatePlaylist(data.playlist);
@@ -79,17 +80,16 @@ function connect() {
             );
         }
         if (data.event == "DISCONNECT") {
-            document.getElementById("users-count").innerHTML =
-                data.listeners.count.toString();
+            //document.getElementById("users-count").innerHTML = data.listeners.count.toString();
             users = data.listeners.users;
             while (usersList.hasChildNodes()) {
                 usersList.removeChild(usersList.firstChild);
             }
-            users.map((user) => {
-                const node = document.createElement("li");
-                const textnode = document.createTextNode(user.username);
-                node.appendChild(textnode);
-                usersList.appendChild(node);
+            users.forEach((user) => {
+                let node = $(
+                    `<li>` + `<div class="online"></div>` + `<div>${user.username}</div>` + `</li>`
+                );
+                $("#users-list").append(node);
             });
         }
         if (data.event == "ALREADY_CONNECTED") {
@@ -98,6 +98,7 @@ function connect() {
         }
         if (data.event == "CHANGE_TRACK") {
             const id = youtube_parser(data.track.url);
+            setThumbnail(id);
             player.loadVideoById(id);
             playTrack();
             updatePlaylist(data.playlist, data.track.url);
@@ -108,6 +109,7 @@ function connect() {
         }
         if (data.event == "SET_CURRENT_TRACK") {
             const id = youtube_parser(data.track.url);
+            setThumbnail(id);
             player.loadVideoById(id, data.track.currentTime);
             playTrack();
             if (data.track.isPaused) {
@@ -125,6 +127,8 @@ function connect() {
                 player.stopVideo();
                 player.loadVideoById("");
                 progressBar.style.width = 0;
+                thumb.hidden = true;
+                thumb.src = "";
             }
         }
         if (data.event == "PLAY") {
@@ -144,44 +148,47 @@ function connect() {
 }
 
 function clearPlaylist() {
-    let playlist = document.getElementById("playlist");
+    let playlist = document.querySelector(".playlist");
     playlist.innerHTML = "";
 }
 
 function updatePlaylist(newPlaylist, url = "") {
     clearPlaylist();
-    let playlist = document.getElementById("playlist");
+    let playlist = $(".playlist");
     newPlaylist.forEach((track) => {
-        let trackBlock = document.createElement("p");
-        trackBlock.textContent = track.name;
-        playlist.appendChild(trackBlock);
+        let trackElement = $(`<div class="playlist__track"></div>`);
+        let playButton = $(
+            `<button class="track__playButton"><i class="fas fa-play"></i></button>`
+        );
+        let trackTitle = $(
+            `<div class="track__title" data-title="${track.name}">${track.name}</div>`
+        );
+        let deleteButton = $(
+            `<button class="track__deleteButton"><i class="fa-solid fa-trash-can"></i></button>`
+        );
         let chosenUrl = "";
         try {
             chosenUrl = youtube_parser(url);
             let trackUrl = youtube_parser(track.url);
             if (chosenUrl === trackUrl) {
-                trackBlock.style.fontWeight = "bold";
+                playButton.addClass("track__playButton_active");
             }
         } catch (error) {
             console.log(error);
         }
-        let playButton = document.createElement("button");
-        let deleteButton = document.createElement("button");
-        deleteButton.textContent = "Remove";
-        playButton.textContent = "Play";
-        trackBlock.appendChild(deleteButton);
-        trackBlock.appendChild(playButton);
         let trackData = {
             name: track.name,
             url: track.url,
         };
         let youtubeURL = "https://www.youtube.com/watch?v=" + chosenUrl;
-        deleteButton.addEventListener("click", (e) => {
+        deleteButton.on("click", (e) => {
             deleteTrack(e, trackData, youtubeURL);
         });
-        playButton.addEventListener("click", (e) => {
+        playButton.on("click", (e) => {
             changeTrack(e, track);
         });
+        trackElement.append(playButton, trackTitle, deleteButton);
+        playlist.prepend(trackElement);
     });
 }
 
@@ -223,9 +230,9 @@ function onPlayerReady(event) {
     audioPlayer.querySelector(".time .length").textContent = getTimeCodeFromNum(
         player.getDuration()
     );
+    player.setVolume(50);
     mutePlayer();
-    audioPlayer.querySelector(".name").textContent =
-        player.getVideoData().title;
+    audioPlayer.querySelector(".name .title").textContent = player.getVideoData().title;
 
     // Set click listener to the whole page
     document.addEventListener("mouseup", firstClickListener);
@@ -250,8 +257,7 @@ function onPlayerStateChange(event) {
     audioPlayer.querySelector(".time .length").textContent = getTimeCodeFromNum(
         player.getDuration()
     );
-    audioPlayer.querySelector(".name").textContent =
-        player.getVideoData().title;
+    audioPlayer.querySelector(".name .title").textContent = player.getVideoData().title;
 }
 
 //click on timeline to skip around
@@ -259,8 +265,7 @@ timeline.addEventListener(
     "click",
     (e) => {
         const timelineWidth = window.getComputedStyle(timeline).width;
-        const timeToSeek =
-            (e.offsetX / parseInt(timelineWidth)) * player.getDuration();
+        const timeToSeek = (e.offsetX / parseInt(timelineWidth)) * player.getDuration();
         player.seekTo(timeToSeek);
         roomSocket.send(
             JSON.stringify({
@@ -288,10 +293,10 @@ volumeSlider.addEventListener(
 
 //check audio percentage and update time accordingly
 setInterval(() => {
-    progressBar.style.width =
-        (player.getCurrentTime() / player.getDuration()) * 100 + "%";
-    audioPlayer.querySelector(".time .current").textContent =
-        getTimeCodeFromNum(player.getCurrentTime());
+    progressBar.style.width = (player.getCurrentTime() / player.getDuration()) * 100 + "%";
+    audioPlayer.querySelector(".time .current").textContent = getTimeCodeFromNum(
+        player.getCurrentTime()
+    );
 }, 500);
 
 //toggle between playing and pausing on button click
@@ -348,9 +353,7 @@ function getTimeCodeFromNum(num) {
     minutes -= hours * 60;
 
     if (hours === 0) return `${minutes}:${String(seconds % 60).padStart(2, 0)}`;
-    return `${String(hours).padStart(2, 0)}:${minutes}:${String(
-        seconds % 60
-    ).padStart(2, 0)}`;
+    return `${String(hours).padStart(2, 0)}:${minutes}:${String(seconds % 60).padStart(2, 0)}`;
 }
 
 function youtube_parser(url) {
@@ -361,10 +364,7 @@ function youtube_parser(url) {
 function addTrack() {
     const id = youtube_parser(urlField.value);
     fetch(
-        "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" +
-            id +
-            "&key=" +
-            ytApiKey
+        "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + id + "&key=" + ytApiKey
     ).then((response) =>
         response.json().then((data) => {
             let youtubeURL = "https://www.youtube.com/watch?v=" + id;
@@ -401,4 +401,16 @@ function playTrack() {
     playBtn.classList.remove("play");
     playBtn.classList.add("pause");
     player.playVideo();
+}
+
+function setThumbnail(id) {
+    fetch(
+        "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + id + "&key=" + ytApiKey
+    ).then((response) =>
+        response.json().then((data) => {
+            let url = data.items[0].snippet.thumbnails.default.url;
+            thumb.src = url;
+            thumb.hidden = false;
+        })
+    );
 }

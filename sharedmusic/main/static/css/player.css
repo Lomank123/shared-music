@@ -29,7 +29,7 @@
 }
 .audio-player .controls {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: stretch;
     padding: 0 20px;
 }
@@ -79,6 +79,7 @@
 }
 .audio-player .controls .time {
     display: flex;
+    margin-left: 30px;
 }
 .audio-player .controls .time > * {
     padding: 2px;
@@ -87,6 +88,7 @@
     cursor: pointer;
     position: relative;
     z-index: 2;
+    margin-left: 30px;
 }
 .audio-player .controls .volume-container .volume-button {
     height: 26px;
@@ -98,7 +100,7 @@
 }
 .audio-player .controls .volume-container .volume-slider {
     position: absolute;
-    left: -3px;
+    left: 20px;
     top: 15px;
     z-index: -1;
     width: 0;
@@ -110,9 +112,21 @@
 .audio-player .controls .volume-container .volume-slider .volume-percentage {
     background: coral;
     height: 100%;
-    width: 75%;
+    width: 50%;
+}
+.audio-player .controls .volume-container:hover {
+    margin-right: 120px;
+    transition: 0.25s;
 }
 .audio-player .controls .volume-container:hover .volume-slider {
-    left: -123px;
+    left: 36px;
     width: 120px;
+}
+
+.name .thumb {
+    margin-right: 10px;
+}
+.name {
+    margin-left: auto;
+    margin-right: 30px;
 }
