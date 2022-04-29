@@ -125,6 +125,10 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                 Soundtrack.objects.get_or_create
             )(url=url, name=title)
             await Playlist.add_track(new_track, self.playlist)
+
+            # Update last_visited
+            await database_sync_to_async(self.playlist.room.save)()
+
             playlist_tracks = await Playlist.get_playlist_tracks(self.playlist)
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
@@ -143,6 +147,10 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
             # Get new track data and send to clients
             track_data = response.get("track", None)
             playlist_tracks = await Playlist.get_playlist_tracks(self.playlist)
+
+            # Update last_visited
+            await database_sync_to_async(self.playlist.room.save)()
+
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
                 'event': consts.CHANGE_TRACK_EVENT,
@@ -162,6 +170,10 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                 'event': consts.SET_CURRENT_TRACK_EVENT,
             })
         elif event == consts.CHANGE_TIME_EVENT:
+
+            # Update last_visited
+            await database_sync_to_async(self.playlist.room.save)()
+
             time = response.get("time", None)
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
@@ -170,6 +182,10 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                 'event': event,
             })
         elif event == consts.DELETE_TRACK_EVENT:
+
+            # Update last_visited
+            await database_sync_to_async(self.playlist.room.save)()
+
             track_data = response.get("track", None)
             chosen_track_url = response.get("chosenTrackUrl", None)
             soundtrack = await database_sync_to_async(

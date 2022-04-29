@@ -9,11 +9,12 @@ from main.models import Room, Playlist
 @shared_task
 def delete_rooms_without_listeners():
     """
-    This task will delete room without listeners.
+    This task will delete room where last_visited date is >1 day.
+    So if listeners didn't perform any actions within 1 day the room will be removed.
     """
-    expiration_date = timezone.now() - timedelta(seconds=15)
+    expiration_date = timezone.now() - timedelta(days=1)
     playlists = Playlist.objects.filter(room__last_visited__lte=expiration_date)
     playlists_count = playlists.count()
-    #playlists.delete()
+    playlists.delete()
 
     return {"detail": f"{playlists_count} rooms has been deleted."}
