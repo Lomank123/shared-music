@@ -10,13 +10,13 @@ services:
         python manage.py makemigrations &&
         python manage.py migrate &&
         python manage.py collectstatic --noinput &&
-        gunicorn sharedmusic.wsgi --bind 0.0.0.0:8000 --workers=2
+        gunicorn sharedmusic.wsgi --bind 0.0.0.0:${HTTP_PORT} --workers=2
       "
     volumes:
       - ./sharedmusic:/sharedmusic
       - django:/vol/web/static
     ports:
-      - 8000:8000
+      - ${HTTP_PORT}:${HTTP_PORT}
     env_file: .env
     depends_on:
       - db
@@ -27,12 +27,12 @@ services:
       context: .
     command: >
       sh -c "
-        daphne -b 0.0.0.0 -p 8001 sharedmusic.asgi:application
+        daphne -b 0.0.0.0 -p ${WS_PORT} sharedmusic.asgi:application
       "
     volumes:
       - ./sharedmusic:/sharedmusic
     ports:
-      - 8001:8001
+      - ${WS_PORT}:${WS_PORT}
     env_file: .env
     depends_on:
       - db
@@ -41,14 +41,14 @@ services:
 
   celery-worker:
     build: .
-    command: wait-for-it.sh django:8000 -s -t 120 -- celery -A sharedmusic worker --loglevel=INFO --beat
+    command: wait-for-it.sh django:${HTTP_PORT} -s -t 120 -- celery -A sharedmusic worker --loglevel=INFO --beat
     volumes:
       - ./sharedmusic:/sharedmusic
     env_file: .env
     depends_on:
-      - django
-      - redis
       - db
+      - redis
+      - django
 
   nginx:
     build:

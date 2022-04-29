@@ -43,7 +43,10 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         for channel in user_group:
             if channel != self.channel_name:
                 # Send message to old channel to show alert
-                sync_to_async(print(len(user_group)))
+                # Actually this makes no sense to me.
+                # If you remove one of these messages no event will be sent
+                # if there is more than 1 user connected to ws.
+                # And this will send only 1 message to old connection and remove it.
                 await self.channel_layer.group_send(self.user_group_name, {
                     'type': 'send_message',
                     'message': consts.USER_ALREADY_IN_ROOM,
