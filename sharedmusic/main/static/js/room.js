@@ -87,7 +87,10 @@ function connect() {
             }
             users.forEach((user) => {
                 let node = $(
-                    `<li>` + `<div class="online"></div>` + `<div>${user.username}</div>` + `</li>`
+                    `<li>` +
+                        `<div class="online"></div>` +
+                        `<div class="username">${user.username}</div>` +
+                        `</li>`
                 );
                 $("#users-list").append(node);
             });
