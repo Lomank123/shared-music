@@ -9,7 +9,6 @@ services:
         python manage.py wait_for_db &&
         python manage.py makemigrations &&
         python manage.py migrate &&
-        python manage.py collectstatic --noinput &&
         gunicorn sharedmusic.wsgi --bind 0.0.0.0:${HTTP_PORT} --workers=2
       "
     volumes:
@@ -58,6 +57,9 @@ services:
     env_file: .env
     volumes:
       - django:/var/www/static
+      # To keep static frontend changes
+      - ./sharedmusic/main/static/js:/var/www/static/js
+      - ./sharedmusic/main/static/css:/var/www/static/css
     depends_on:
       - django
 

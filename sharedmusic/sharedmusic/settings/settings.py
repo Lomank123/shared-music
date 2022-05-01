@@ -102,17 +102,22 @@ USE_I18N = True
 USE_TZ = True
 
 # Static
-STATIC_ROOT = 'vol/web/static'
+STATIC_ROOT = '/vol/web/static'
 STATIC_URL = '/static/'
 
 # Media
-MEDIA_ROOT = 'vol/web/media'
+MEDIA_ROOT = '/vol/web/media'
 MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REDIS_HOST = 'redis'
+
+if DEBUG:
+    REDIS_HOST = '127.0.0.1'
 
 # Celery WebSocket
 CHANNEL_LAYERS = {
