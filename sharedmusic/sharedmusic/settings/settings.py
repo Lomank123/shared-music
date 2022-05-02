@@ -152,3 +152,6 @@ CHANNEL_LAYERS = {
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", 'redis://redis:6379')
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER", 'redis://redis:6379')
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# Changing referrer policy to allow all youtube videos to play 
+SECURE_REFERRER_POLICY = "no-referrer-when-downgrade"
