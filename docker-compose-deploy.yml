@@ -46,7 +46,7 @@ services:
 
   nginx:
     build:
-      context: ./nginx
+      context: ./nginx/prod
     ports:
       - 80:${PORT}
     env_file: .env

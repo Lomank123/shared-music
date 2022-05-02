@@ -129,4 +129,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Static dir
 vol
+
+# SSL Certificate
+sharedmusic.crt
+sharedmusic.key
