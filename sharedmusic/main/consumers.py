@@ -10,11 +10,11 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
 
     async def connect(self):
         self.user = self.scope.get('user')
-        self.room_name = self.scope['url_route']['kwargs']['code']
-        self.room_group_name = f'{consts.ROOM_GROUP_PREFIX}_{self.room_name}'
+        self.room_id = self.scope['url_route']['kwargs']['id']
+        self.room_group_name = f'{consts.ROOM_GROUP_PREFIX}_{self.room_id}'
         # User group must contain only one user
         self.user_group_name = f'{consts.USER_GROUP_PREFIX}_{self.user.username}'
-        self.playlist = await Room.get_room_playlist(self.room_name)
+        self.playlist = await Room.get_room_playlist(self.room_id)
         # Handle authenticated user connection
         if self.user.is_authenticated:
             await self.connect_user()
@@ -27,7 +27,7 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         for group_name in [self.room_group_name, self.user_group_name]:
             await self.channel_layer.group_add(group_name, self.channel_name)
         # Add new listener
-        await Room.add_listener(self.room_name, self.user)
+        await Room.add_listener(self.room_id, self.user)
 
     async def remove_old_connections(self):
         """
@@ -66,9 +66,9 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         if self.channel_name in self.channel_layer.groups[u]:
             # Removing listener
             if self.user.is_authenticated:
-                await Room.remove_listener(self.room_name, self.user)
+                await Room.remove_listener(self.room_id, self.user)
             # Send disconnect message to other listeners
-            listeners_data = await Room.get_listeners_info(self.room_name)
+            listeners_data = await Room.get_listeners_info(self.room_id)
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
                 'message': f"{self.user} {consts.USER_DISCONNECTED}",
@@ -87,7 +87,7 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         event = response.get("event", None)
         message = response.get("message", None)
         if event == consts.CONNECT_EVENT:
-            listeners_data = await Room.get_listeners_info(self.room_name)
+            listeners_data = await Room.get_listeners_info(self.room_id)
             playlist_tracks = await Playlist.get_playlist_tracks(self.playlist)
             data = {
                 'type': 'send_message',

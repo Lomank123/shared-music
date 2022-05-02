@@ -18,26 +18,7 @@ class HomeView(LoginRequiredMixin, CreateView):
     template_name = 'home.html'
 
     def get_success_url(self):
-        url = reverse('room', kwargs={ "code": self.object.code })
-        return url
-
-    def get_context_data(self, **kwargs):
-        # TODO: Add pre-generated name for room to create
-        context = super().get_context_data(**kwargs)
-        return context
-
-    def post(self, request, *args, **kwargs):
-        if "room_code" in request.POST:
-            # Join to existing room
-            room_code = request.POST.get("room_code")
-            room_url = reverse('room', kwargs={ "code": room_code })
-            # Check if room exists
-            room_exists = self.model.objects.filter(code=room_code).exists()
-            if room_exists:
-                return redirect(room_url)
-            else:
-                raise Http404(consts.ROOM_NOT_FOUND)
-        return super().post(request, *args, **kwargs)
+        return reverse('room', kwargs={"id": self.object.id})
 
     def form_valid(self, form):
         form.instance.host = self.request.user
@@ -52,7 +33,7 @@ class RoomView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["room"] = Room.objects.filter(code=kwargs["code"]).first()
+        context["room"] = Room.objects.filter(id=kwargs["id"]).first()
         return context
 
 

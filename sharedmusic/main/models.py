@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth import get_user_model
 from channels.db import database_sync_to_async
@@ -17,7 +18,6 @@ class CustomUser(AbstractUser):
 class Soundtrack(models.Model):
     name = models.CharField(default="Soundtrack", max_length=120, verbose_name="Name")
     url = models.URLField(max_length=2000, verbose_name="URL")
-    #playlist = models.ForeignKey(Playlist, on_delete=models.CASCADE, verbose_name="Playlist")
     creation_date = models.DateTimeField(auto_now_add=True, verbose_name="Creation date")
 
     class Meta:
@@ -66,7 +66,7 @@ class Playlist(models.Model):
 
 
 class Room(models.Model):
-    code = models.SlugField(max_length=120, unique=True, verbose_name="Code")
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     host = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="host", verbose_name="Host")
     listeners = models.ManyToManyField(get_user_model(), blank=True, related_name="listeners", verbose_name="Listeners")
     creation_date = models.DateTimeField(auto_now_add=True, verbose_name="Creation date")
@@ -75,22 +75,22 @@ class Room(models.Model):
 
     @classmethod
     @database_sync_to_async
-    def get_room_playlist(cls, room_name):
+    def get_room_playlist(cls, room_id):
         """
         Returns playlist of current room.
         """
-        room = cls.objects.filter(code=room_name).select_related("playlist").first()
+        room = cls.objects.filter(id=room_id).select_related("playlist").first()
         playlist = room.playlist
         return playlist
 
     @classmethod
     @database_sync_to_async
-    def add_listener(cls, room_name, user):
+    def add_listener(cls, room_id, user):
         """
         Attaches user to room and returns success message.
-        If no room found by room_name then an error message will be returned.
+        If no room found by room_id then an error message will be returned.
         """
-        room = cls.objects.filter(code=room_name).first()
+        room = cls.objects.filter(id=room_id).first()
         if room is not None:
             room.listeners.add(user)
             return {consts.SUCCESS_KEY: consts.LISTENER_ADDED}
@@ -98,43 +98,43 @@ class Room(models.Model):
 
     @classmethod
     @database_sync_to_async
-    def remove_listener(cls, room_name, user):
+    def remove_listener(cls, room_id, user):
         """
         Removes user from room and returns success message.
-        If no room found by room_name then an error message will be returned.
+        If no room found by room_id then an error message will be returned.
         """
-        room = cls.objects.filter(code=room_name).first()
+        room = cls.objects.filter(id=room_id).first()
         if room is not None:
             room.listeners.remove(user)
             return {consts.SUCCESS_KEY: consts.LISTENER_REMOVED}
         return {consts.ERROR_KEY: consts.ROOM_NOT_FOUND}
 
     @classmethod
-    def listeners_count(cls, room_name):
+    def listeners_count(cls, room_id):
         """
         Returns amount of listeners in the room.
         """
-        room = cls.objects.filter(code=room_name).first()
+        room = cls.objects.filter(id=room_id).first()
         if room is not None:
             return room.listeners.count()
         return {consts.ERROR_KEY: consts.ROOM_NOT_FOUND}
 
     @classmethod
-    def get_listeners(cls, room_name):
+    def get_listeners(cls, room_id):
         """
         Returns list of users who are in the room
         """
-        listeners = cls.objects.get(code=room_name).listeners.values("username")
+        listeners = cls.objects.get(id=room_id).listeners.values("username")
         return list(listeners)
 
     @classmethod
     @database_sync_to_async
-    def get_listeners_info(cls, room_name):
+    def get_listeners_info(cls, room_id):
         """
         Get all usernames and their count from room.
         """
-        count = cls.listeners_count(room_name)
-        listeners = cls.get_listeners(room_name)
+        count = cls.listeners_count(room_id)
+        listeners = cls.get_listeners(room_id)
         data = {
             'count': count,
             'users': listeners,

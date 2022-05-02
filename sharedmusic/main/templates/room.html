@@ -7,10 +7,10 @@
     <div id="mute-msg">
         <p>Player is currently muted. Click anywhere to unmute it.</p>
     </div>
-    <h1 class="room-name">Room name: {{ room.code }}</h1>
+    <h1 class="room-name">Room name: {{ room.id }}</h1>
     <div class="lobby">
         <div class="chat-container">
-            <div id="room" room_code="{{ room.code }}"></div>
+            <div id="room" room_code="{{ room.id }}"></div>
             <div id="host" host_username="{{ room.host.username }}"></div>
             <div id="user" username="{{ user.username }}"></div>
             <h6>Greetings, {{ user.username }}</h6>

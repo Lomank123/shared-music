@@ -18,4 +18,4 @@ class CustomUserChangeForm(UserChangeForm):
 class RoomCreationForm(forms.ModelForm):
     class Meta:
         model = Room
-        fields = ('code', )
+        fields = ()

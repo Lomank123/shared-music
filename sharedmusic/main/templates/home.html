@@ -1,5 +1,4 @@
 {% extends 'layout/base.html' %}
-{% load crispy_forms_tags %}
 
 {% block title %}Home page{% endblock title %}
 
@@ -9,21 +8,8 @@
     <h4>Create room</h4>
     <form id="create-room-form" class="create-room" method="POST">
       {% csrf_token %}
-      {{ form|crispy }}
+      {{ form }}
       <input class="btn home-buttons" type="submit" value="Create" />
-    </form>
-  </div>
-  <h4 class="or-seperator">OR</h4>
-  <div class="join-room-block">
-    <h4>Join room</h4>
-    <form id="join-room-form" class="join-room" method="POST">
-      {% csrf_token %}
-      <div>
-        <label for="room" class="label">
-            Code*</label>
-        <input id="room" type="text" name="room_code" required /> 
-      </div>
-      <input class="btn home-buttons" type="submit" value="Join" />
     </form>
   </div>
 </div>

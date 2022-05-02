@@ -4,7 +4,7 @@ from main.views import HomeView, CustomLoginView, CustomLogoutView, CustomUserSi
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
-    path('room/<code>', RoomView.as_view(), name='room'),
+    path('room/<id>/', RoomView.as_view(), name='room'),
     # Auth
     path('login/', CustomLoginView.as_view(), name='login'),
     path('logout/', CustomLogoutView.as_view(), name='logout'),
