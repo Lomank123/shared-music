@@ -14,8 +14,8 @@ RUN touch /etc/nginx/conf.d/default.conf && \
 
 COPY ./default.conf /etc/nginx/conf.d/default.conf
 # Copying SSL certificate
-COPY ./sharemusic.crt /etc/ssl/sharemusic.crt
-COPY ./sharemusic.key /etc/ssl/sharemusic.key
+COPY ./sharedmusic.crt /etc/ssl/sharedmusic.crt
+COPY ./sharedmusic.key /etc/ssl/sharedmusic.key
 
 USER nginx
 

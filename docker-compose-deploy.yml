@@ -49,6 +49,7 @@ services:
       context: ./nginx/prod
     ports:
       - 80:${PORT}
+      - 443:443
     env_file: .env
     volumes:
       - django:/var/www/static

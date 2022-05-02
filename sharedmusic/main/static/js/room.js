@@ -1,7 +1,8 @@
 const roomCode = $("#room").attr("room_code");
 const urlField = document.getElementById("url-field");
 const audio_tag = document.getElementById("youtube");
-const connectionString = "ws://" + window.location.host + "/ws/room/" + roomCode + "/";
+const protocol = window.location.protocol == 'https:' ? 'wss://' : 'ws://';
+const connectionString = protocol + window.location.host + "/ws/room/" + roomCode + "/";
 const roomSocket = new WebSocket(connectionString);
 const username = $("#user").attr("username");
 let hostUsername = $("#host").attr("host_username");
