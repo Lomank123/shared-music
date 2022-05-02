@@ -7,6 +7,9 @@ USER root
 
 RUN touch /etc/nginx/conf.d/default.conf && \
     chown nginx:nginx /etc/nginx/conf.d && \
+    touch /etc/ssl/sharedmusic.crt && \
+    touch /etc/ssl/sharedmusic.key && \
+    chown nginx:nginx /etc/ssl && \
     chmod +x /run.sh
 
 COPY ./default.conf /etc/nginx/conf.d/default.conf
