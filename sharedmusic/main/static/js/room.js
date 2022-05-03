@@ -40,13 +40,16 @@ function connect() {
     }
 
     roomSocket.onclose = (e) => {
-        console.log(e);
-        console.log("Closing connection... Attempting to reconnect...");
+        let text = "Closing connection...";
+        if (e.code === 1006) {
+            text += " Attempting to reconnect...";
+            setTimeout(function() {
+                connect();
+            }, 10000);
+        }
+
         pauseTrack();
         // reconnect in 10 secs (player will be reloaded correctly)
-        setTimeout(function() {
-            connect();
-        }, 10000);
     };
 
     roomSocket.onmessage = (e) => {
@@ -312,7 +315,7 @@ setInterval(() => {
     audioPlayer.querySelector(".time .current").textContent = getTimeCodeFromNum(
         player.getCurrentTime()
     );
-}, 500);
+}, 100);
 
 //toggle between playing and pausing on button click
 playBtn.addEventListener(
