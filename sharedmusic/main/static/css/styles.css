@@ -248,10 +248,16 @@ input[type="email"] {
 
 /* Room */
 .room-name {
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-size: 1.6rem;
     margin-bottom: 50px;
     margin-top: 30px;
+}
+
+.room-name .btn {
+    margin-left: 20px;
 }
 
 #users-list {
@@ -385,18 +391,14 @@ input[type="email"] {
     height: 100vh;
 }
 
-.home-buttons {
-    margin-top: 15px;
-    width: 80px;
+.home-message {
+    text-align: center;
+    font-size: 1.6rem;
+    margin-bottom: 50px;
 }
 
-.or-seperator {
-    margin: 50px 0;
-    font-size: 1.5rem;
-    text-align: center;
-}
-.label {
-    display: block;
+.home-button {
+    font-size: 1.8rem;
 }
 
 /* Loading animation */

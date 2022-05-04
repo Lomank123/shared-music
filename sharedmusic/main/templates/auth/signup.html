@@ -6,7 +6,7 @@
 {% block content %}
 
   {% if user.is_authenticated %}
-    <p class="already-logged-message">Already logged in</p>
+    <p class="already-logged-message">Already logged in. <a href="{% url 'logout' %}">Want to log out?</a></p>
   {% else %}
   <div class="sign-form">
     <div class="switch-buttons">

@@ -38,19 +38,25 @@ function connect() {
 
     roomSocket.onerror = (e) => {
         console.log("WebSocket error.");
+        const loading = $(".loading");
+        const content = $(".content");
+        // If connection error occured while in the room
+        if (loading.hasClass("hidden")) {
+            content.addClass("hidden");
+            loading.removeClass("hidden");
+        }
+        $(".loading__message").text("");
+        $(".loading__error").text("Connection lost... Trying to reconnect");
     };
 
     roomSocket.onclose = (e) => {
-        let text = "Closing connection...";
         if (e.code === 1006) {
-            text += " Attempting to reconnect...";
+            // reconnect in 5 secs (player will be reloaded correctly)
             setTimeout(function () {
                 connect();
-            }, 10000);
+            }, 5000);
         }
-
         pauseTrack();
-        // reconnect in 10 secs (player will be reloaded correctly)
     };
 
     roomSocket.onmessage = (e) => {
@@ -379,8 +385,8 @@ function getTimeCodeFromNum(num) {
 }
 
 function youtube_parser(url) {
-    var code = url.match(/v=([^&#]{5,})/);
-    return typeof code[1] == "string" ? code[1] : false;
+    let regex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
+    return regex.exec(url)[3];
 }
 
 function addTrack() {
@@ -440,4 +446,13 @@ function setThumbnail(id) {
 function showContent() {
     $(".loading").addClass("hidden");
     $(".content").removeClass("hidden");
+}
+
+function copyLinkToClipboard(btn) {
+    console.log(window.location.href);
+    navigator.clipboard.writeText(window.location.href);
+    btn.textContent = "Copied to clipboard";
+    setTimeout(() => {
+        btn.textContent = "Copy link";
+    }, 4000);
 }
