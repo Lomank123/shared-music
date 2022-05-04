@@ -55,18 +55,6 @@ cd path/to/project/shared-music
 cp .env.sample .env
 ```
 
-- venv setup:
-```
-mkdir venv
-cd venv
-py -m venv ./venv
-```
-
-- Install requirements:
-```
-pip install -r requirements.txt
-```
-
 ### Docker setup
 
 - Build everything:
@@ -79,9 +67,24 @@ For the first time it may take 5-20 minutes to build everything (depends on your
 
 ### Local setup (without Docker containers)
 
-- Create Postgres db and user (credentials should be the same as in .env file)
+- venv setup:
+```
+mkdir venv
+cd venv
+py -m venv ./venv
+```
 
-- Also change `DB_HOST` env var in `.env` file from 'db' to 'localhost'
+- Install requirements:
+```
+pip install -r requirements.txt
+```
+
+- Create Postgres db and user (credentials should be the same as in `.env` file)
+
+- Also change `DB_HOST` env var in `.env` file from `'db'` to `'localhost'`:
+```
+DB_HOST=localhost
+```
 
 - Go to `/sharedmusic` dir:
 ```
