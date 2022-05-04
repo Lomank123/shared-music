@@ -2,8 +2,8 @@ const roomCode = $("#room").attr("room_code");
 const urlField = document.getElementById("url-field");
 const audio_tag = document.getElementById("youtube");
 const protocol = window.location.protocol == "https:" ? "wss://" : "ws://";
+let roomSocket = null;
 const connectionString = protocol + window.location.host + "/ws/room/" + roomCode + "/";
-const roomSocket = new WebSocket(connectionString);
 const username = $("#user").attr("username");
 let hostUsername = $("#host").attr("host_username");
 let player;
@@ -11,6 +11,7 @@ const audioPlayer = document.querySelector(".audio-player");
 const usersList = document.getElementById("users-list");
 // Need to give host username
 let users = [];
+// Indicates whether user has clicked on window
 isFirstClick = true;
 const ytApiKey = "AIzaSyCp-e6T1qe6QqgjH6JydzBHCjB2raF6FrE";
 
@@ -23,6 +24,7 @@ const playBtn = document.querySelector(".controls .toggle-play");
 const thumb = document.querySelector(".name .thumb");
 // connect function is called only when player is ready
 function connect() {
+    roomSocket = new WebSocket(connectionString);
     roomSocket.onopen = () => {
         showContent();
         console.log("WebSocket connection created.");
@@ -34,9 +36,21 @@ function connect() {
         );
     };
 
+    roomSocket.onerror = (e) => {
+        console.log("WebSocket error.");
+    };
+
     roomSocket.onclose = (e) => {
-        console.log("Closing connection...");
+        let text = "Closing connection...";
+        if (e.code === 1006) {
+            text += " Attempting to reconnect...";
+            setTimeout(function () {
+                connect();
+            }, 10000);
+        }
+
         pauseTrack();
+        // reconnect in 10 secs (player will be reloaded correctly)
     };
 
     roomSocket.onmessage = (e) => {
@@ -98,7 +112,7 @@ function connect() {
             });
         }
         if (data.event == "ALREADY_CONNECTED") {
-            roomSocket.close();
+            roomSocket.close(1000, (reason = "qweqweqweS"));
             console.log("Closing connection. Refresh the page.");
         }
         if (data.event == "CHANGE_TRACK") {
@@ -257,8 +271,8 @@ function onPlayerReady(event) {
 }
 
 function onPlayerError(event) {
+    console.log("Player error.");
     console.log(event);
-    // Catch 101 and 150 error codes if video is unplayabled in iframe (data key in event json)
 }
 
 function onPlayerStateChange(event) {
@@ -305,7 +319,7 @@ setInterval(() => {
     audioPlayer.querySelector(".time .current").textContent = getTimeCodeFromNum(
         player.getCurrentTime()
     );
-}, 500);
+}, 100);
 
 //toggle between playing and pausing on button click
 playBtn.addEventListener(
