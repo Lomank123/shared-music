@@ -1,7 +1,7 @@
 const roomCode = $("#room").attr("room_code");
 const urlField = document.getElementById("url-field");
 const audio_tag = document.getElementById("youtube");
-const protocol = window.location.protocol == 'https:' ? 'wss://' : 'ws://';
+const protocol = window.location.protocol == "https:" ? "wss://" : "ws://";
 const connectionString = protocol + window.location.host + "/ws/room/" + roomCode + "/";
 const roomSocket = new WebSocket(connectionString);
 const username = $("#user").attr("username");
@@ -24,6 +24,7 @@ const thumb = document.querySelector(".name .thumb");
 // connect function is called only when player is ready
 function connect() {
     roomSocket.onopen = () => {
+        showContent();
         console.log("WebSocket connection created.");
         roomSocket.send(
             JSON.stringify({
@@ -159,6 +160,9 @@ function clearPlaylist() {
 function updatePlaylist(newPlaylist, url = "") {
     clearPlaylist();
     let playlist = $(".playlist");
+    if (newPlaylist.length === 0) {
+        playlist.text("No tracks in playlist :(");
+    }
     newPlaylist.forEach((track) => {
         let trackElement = $(`<div class="playlist__track"></div>`);
         let playButton = $(
@@ -417,4 +421,9 @@ function setThumbnail(id) {
             thumb.hidden = false;
         })
     );
+}
+
+function showContent() {
+    $(".loading").addClass("hidden");
+    $(".content").removeClass("hidden");
 }

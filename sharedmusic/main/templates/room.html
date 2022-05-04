@@ -4,6 +4,12 @@
 {% block title %}Room{% endblock title %}
 
 {% block content %}
+<div class="loading">
+    <div class="lds-ripple"><div></div><div></div></div>
+    <div class="loading__message">If loading takes too long, try refreshing the page</div>
+    <div class="loading__error"></div>
+</div>
+<div class="content hidden">
     <div id="mute-msg">
         <p>Player is currently muted. Click anywhere to unmute it.</p>
     </div>
@@ -62,6 +68,7 @@
             </div>
         </div>
     </div>
+</div>
 {% endblock content %}
 
 {% block scripts %}
