@@ -1,7 +1,7 @@
 const roomCode = $("#room").attr("room_code");
 const urlField = document.getElementById("url-field");
 const audio_tag = document.getElementById("youtube");
-const protocol = window.location.protocol == 'https:' ? 'wss://' : 'ws://';
+const protocol = window.location.protocol == "https:" ? "wss://" : "ws://";
 let roomSocket = null;
 const connectionString = protocol + window.location.host + "/ws/room/" + roomCode + "/";
 const username = $("#user").attr("username");
@@ -26,6 +26,7 @@ const thumb = document.querySelector(".name .thumb");
 function connect() {
     roomSocket = new WebSocket(connectionString);
     roomSocket.onopen = () => {
+        showContent();
         console.log("WebSocket connection created.");
         roomSocket.send(
             JSON.stringify({
@@ -36,20 +37,26 @@ function connect() {
     };
 
     roomSocket.onerror = (e) => {
-        console.log("WebSocket error.")
-    }
+        console.log("WebSocket error.");
+        const loading = $(".loading");
+        const content = $(".content");
+        // If connection error occured while in the room
+        if (loading.hasClass("hidden")) {
+            content.addClass("hidden");
+            loading.removeClass("hidden");
+        }
+        $(".loading__message").text("");
+        $(".loading__error").text("Connection lost... Trying to reconnect");
+    };
 
     roomSocket.onclose = (e) => {
-        let text = "Closing connection...";
         if (e.code === 1006) {
-            text += " Attempting to reconnect...";
-            setTimeout(function() {
+            // reconnect in 5 secs (player will be reloaded correctly)
+            setTimeout(function () {
                 connect();
-            }, 10000);
+            }, 5000);
         }
-
         pauseTrack();
-        // reconnect in 10 secs (player will be reloaded correctly)
     };
 
     roomSocket.onmessage = (e) => {
@@ -111,7 +118,7 @@ function connect() {
             });
         }
         if (data.event == "ALREADY_CONNECTED") {
-            roomSocket.close(1000, reason="qweqweqweS");
+            roomSocket.close(1000, (reason = "qweqweqweS"));
             console.log("Closing connection. Refresh the page.");
         }
         if (data.event == "CHANGE_TRACK") {
@@ -173,6 +180,9 @@ function clearPlaylist() {
 function updatePlaylist(newPlaylist, url = "") {
     clearPlaylist();
     let playlist = $(".playlist");
+    if (newPlaylist.length === 0) {
+        playlist.text("No tracks in playlist :(");
+    }
     newPlaylist.forEach((track) => {
         let trackElement = $(`<div class="playlist__track"></div>`);
         let playButton = $(
@@ -375,8 +385,8 @@ function getTimeCodeFromNum(num) {
 }
 
 function youtube_parser(url) {
-    var code = url.match(/v=([^&#]{5,})/);
-    return typeof code[1] == "string" ? code[1] : false;
+    let regex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
+    return regex.exec(url)[3];
 }
 
 function addTrack() {
@@ -431,4 +441,18 @@ function setThumbnail(id) {
             thumb.hidden = false;
         })
     );
+}
+
+function showContent() {
+    $(".loading").addClass("hidden");
+    $(".content").removeClass("hidden");
+}
+
+function copyLinkToClipboard(btn) {
+    console.log(window.location.href);
+    navigator.clipboard.writeText(window.location.href);
+    btn.textContent = "Copied to clipboard";
+    setTimeout(() => {
+        btn.textContent = "Copy link";
+    }, 4000);
 }

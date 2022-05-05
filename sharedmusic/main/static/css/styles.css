@@ -73,11 +73,12 @@ input[type="email"] {
 
 .container {
     max-width: 1400px;
-    margin: 30px auto;
+    margin: 0 auto;
 }
 
 .hidden {
     display: none !important;
+    visibility: hidden !important;
 }
 
 .overlay {
@@ -196,7 +197,7 @@ input[type="email"] {
 .sign-form {
     width: 50%;
     border: 1px solid white;
-    margin: 0 auto;
+    margin: 30px auto;
     padding: 20px;
 }
 
@@ -226,6 +227,7 @@ input[type="email"] {
 
 .already-logged-message {
     text-align: center;
+    margin-top: 30px;
 }
 
 .help-block,
@@ -246,9 +248,16 @@ input[type="email"] {
 
 /* Room */
 .room-name {
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-size: 1.6rem;
     margin-bottom: 50px;
+    margin-top: 30px;
+}
+
+.room-name .btn {
+    margin-left: 20px;
 }
 
 #users-list {
@@ -379,19 +388,75 @@ input[type="email"] {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 90vh;
+    height: 100vh;
 }
 
-.home-buttons {
-    margin-top: 15px;
-    width: 80px;
-}
-
-.or-seperator {
-    margin: 50px 0;
-    font-size: 1.5rem;
+.home-message {
     text-align: center;
+    font-size: 1.6rem;
+    margin-bottom: 50px;
 }
-.label {
-    display: block;
+
+.home-button {
+    font-size: 1.8rem;
+}
+
+/* Loading animation */
+.lds-ripple {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+.lds-ripple div {
+    position: absolute;
+    border: 4px solid var(--primary-color);
+    opacity: 1;
+    border-radius: 50%;
+    animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+.lds-ripple div:nth-child(2) {
+    animation-delay: -0.5s;
+}
+@keyframes lds-ripple {
+    0% {
+        top: 36px;
+        left: 36px;
+        width: 0;
+        height: 0;
+        opacity: 0;
+    }
+    4.9% {
+        top: 36px;
+        left: 36px;
+        width: 0;
+        height: 0;
+        opacity: 0;
+    }
+    5% {
+        top: 36px;
+        left: 36px;
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        top: 0px;
+        left: 0px;
+        width: 72px;
+        height: 72px;
+        opacity: 0;
+    }
+}
+
+.loading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.loading__error {
+    color: red;
 }
