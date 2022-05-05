@@ -24,10 +24,7 @@ services:
   daphne-ws:
     build:
       context: .
-    command: >
-      sh -c "
-        daphne -b 0.0.0.0 -p ${WS_PORT} sharedmusic.asgi:application
-      "
+    command: wait-for-it.sh django:${HTTP_PORT} -s -t 120 -- daphne -b 0.0.0.0 -p ${WS_PORT} sharedmusic.asgi:application
     volumes:
       - ./sharedmusic:/sharedmusic
     ports:

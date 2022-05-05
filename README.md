@@ -1,17 +1,20 @@
 # shared-music
-Shared Music service provides you comfortable rooms where you can listen to music with friends or anyone else who wants to come in. All you have to do is click create room button and share the link. It's that simple! See all the features below.
+**Shared Music** service provides you rooms where you can listen to music with friends or anyone else who wants to come in. All you have to do is click create room button and share the link. It's that simple! See all the features below.
 
-The main goal was to use WebSocket protocol with Django web framework and channels lib.
+**Main goals:**
+- Provide a useful service which will allow anyone listen to music, share it and play at the same time
+- Construct WebSocket-based application
+- Gain team work experience
 
-## Badges
+Live version can be visited at: [sharedmusic.live](https://sharedmusic.live/)
 
-Here should be some badges... (WIP)
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 
 ## Table of contents
 
 - [shared-music](#shared-music)
-  - [Badges](#badges)
   - [Table of contents](#table-of-contents)
   - [Requirements (Prerequisites)](#requirements-prerequisites)
   - [Installation](#installation)
@@ -67,7 +70,18 @@ For the first time it may take 5-20 minutes to build everything (depends on your
 
 ### Local setup (without Docker containers)
 
-- venv setup:
+- First of all you have to install Redis server. [Here](https://redis.io/docs/getting-started/) you can find related information.
+
+- After that, open `settings.py` and find `CHANNEL_LAYERS` variable. Use method 2 as described in the comments and replace
+```
+"hosts": [('redis', 6379)],
+```
+with
+```
+"hosts": [('127.0.0.1', 6379)], OR "hosts": [(REDIS_HOST, 6379)],
+```
+
+- Next is `venv` setup:
 ```
 mkdir venv
 cd venv
@@ -114,14 +128,19 @@ Insert some screenshots
 - Create room in one click
 - Invite anyone by sharing the link
 - Load tracks from YouTube (other services WIP)
-- User's playlist (WIP)
+- User playlist (WIP)
 - Save/Load room playlist (WIP)
-- Download urls from room's or user's playlist (WIP)
+- Download urls from room or user playlist (WIP)
 - Communicate by sending messages to in-room chat (WIP)
     - Private messages included
 
 ### Tech features
+- Both asgi and wsgi apps (daphne and gunicorn) to serve `http` and `WebSocket` connections.
 - WebSocket protocol to keep changes in rooms
+- Celery tasks
+    -  To remove abandoned rooms (periodically)
+- CI/CD with the help of GitHub Actions (tests and linter) (WIP)
+- Nginx reverse proxy to serve static files and WebSockets
 
 ### Room owner features:
 - Set permissions to limit some actions (WIP)
@@ -193,7 +212,7 @@ docker-compose -f docker-compose-deploy.yml up
 ## Tech stack
 
 - **Backend**:
-    - Django
+    - Django 3
     - channels
     - Redis
     - Gunicorn
