@@ -85,7 +85,6 @@
     padding: 2px;
 }
 .audio-player .controls .volume-container {
-    cursor: pointer;
     position: relative;
     z-index: 2;
     margin-left: 30px;
@@ -95,31 +94,20 @@
     height: 26px;
     display: flex;
     align-items: center;
+    cursor: pointer;
 }
 .audio-player .controls .volume-container .volume-button .volume {
     transform: scale(0.7);
 }
 .audio-player .controls .volume-container .volume-slider {
-    position: absolute;
-    left: 20px;
-    top: 15px;
-    z-index: -1;
     width: 0;
     height: 15px;
-    background: white;
     box-shadow: 0 0 20px #000a;
-    transition: 0.3s;
+    transition: width 0.3s;
+    cursor: pointer;
 }
-.audio-player .controls .volume-container .volume-slider .volume-percentage {
-    background: coral;
-    height: 100%;
-    width: 50%;
-}
-.audio-player .controls .volume-container:hover {
-    margin-right: 120px;
-}
+
 .audio-player .controls .volume-container:hover .volume-slider {
-    left: 36px;
     width: 120px;
 }
 
@@ -129,4 +117,54 @@
 .name {
     margin-left: auto;
     margin-right: 30px;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 5px;
+    background-image: linear-gradient(#ff4500, #ff4500);
+    background-size: 50% 100%;
+    background-repeat: no-repeat;
+}
+
+/* Input Thumb */
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 0;
+    width: 0;
+}
+
+input[type="range"]::-moz-range-thumb {
+    -webkit-appearance: none;
+    height: 0;
+    width: 0;
+}
+
+input[type="range"]::-ms-thumb {
+    -webkit-appearance: none;
+    height: 0;
+    width: 0;
+}
+
+/* Input Track */
+input[type="range"]::-webkit-slider-runnable-track {
+    -webkit-appearance: none;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+}
+
+input[type="range"]::-moz-range-track {
+    -webkit-appearance: none;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+}
+
+input[type="range"]::-ms-track {
+    -webkit-appearance: none;
+    box-shadow: none;
+    border: none;
+    background: transparent;
 }

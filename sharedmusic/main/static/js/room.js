@@ -274,35 +274,33 @@ function onPlayerReady(event) {
     }
 
     //click on timeline to skip around
-    timeline.addEventListener(
-        "click",
-        (e) => {
-            const timelineWidth = window.getComputedStyle(timeline).width;
-            const timeToSeek = (e.offsetX / parseInt(timelineWidth)) * player.getDuration();
-            //player.seekTo(timeToSeek);
-            roomSocket.send(
-                JSON.stringify({
-                    event: "CHANGE_TIME",
-                    time: timeToSeek,
-                    message: "Change time.",
-                })
-            );
-        },
-        false
-    );
+    timeline.addEventListener("click", (e) => {
+        const timelineWidth = window.getComputedStyle(timeline).width;
+        const timeToSeek = (e.offsetX / parseInt(timelineWidth)) * player.getDuration();
+        //player.seekTo(timeToSeek);
+        roomSocket.send(
+            JSON.stringify({
+                event: "CHANGE_TIME",
+                time: timeToSeek,
+                message: "Change time.",
+            })
+        );
+    });
 
-    //click volume slider to change volume
-    volumeSlider.addEventListener(
-        "click",
-        (e) => {
-            const sliderWidth = window.getComputedStyle(volumeSlider).width;
-            const newVolume = e.offsetX / parseInt(sliderWidth);
-            player.setVolume(newVolume * 100);
-            audioPlayer.querySelector(".controls .volume-percentage").style.width =
-                newVolume * 100 + "%";
-        },
-        false
-    );
+    //click (or hold) volume slider to change volume
+    volumeSlider.addEventListener("input", (e) => {
+        renderVolumeSlider();
+        newVolume = volumeSlider.value;
+        player.setVolume(newVolume);
+        if (newVolume == 0) {
+            mutePlayer();
+        } else if (player.isMuted() && newVolume != 0) {
+            // Just change the icon and unmute
+            player.unMute();
+            volumeEl.classList.add("icono-volumeMedium");
+            volumeEl.classList.remove("icono-volumeMute");
+        }
+    });
 
     //check audio percentage and update time accordingly
     setInterval(() => {
@@ -313,29 +311,25 @@ function onPlayerReady(event) {
     }, 100);
 
     //toggle between playing and pausing on button click
-    playBtn.addEventListener(
-        "click",
-        () => {
-            if (player.getPlayerState() === 1) {
-                //pauseTrack();
-                roomSocket.send(
-                    JSON.stringify({
-                        event: "PAUSE",
-                        message: "Track is now paused.",
-                    })
-                );
-            } else {
-                //playTrack();
-                roomSocket.send(
-                    JSON.stringify({
-                        event: "PLAY",
-                        message: "Track is now playing",
-                    })
-                );
-            }
-        },
-        false
-    );
+    playBtn.addEventListener("click", () => {
+        if (player.getPlayerState() === 1) {
+            //pauseTrack();
+            roomSocket.send(
+                JSON.stringify({
+                    event: "PAUSE",
+                    message: "Track is now paused.",
+                })
+            );
+        } else {
+            //playTrack();
+            roomSocket.send(
+                JSON.stringify({
+                    event: "PLAY",
+                    message: "Track is now playing",
+                })
+            );
+        }
+    });
 
     audioPlayer.querySelector(".volume-button").addEventListener("click", () => {
         if (!player.isMuted()) {
@@ -362,12 +356,25 @@ function onPlayerStateChange(event) {
 
 function mutePlayer() {
     player.mute();
+    // Change the volume percentage to zero
+    //audioPlayer.querySelector(".controls .volume-percentage").style.width = 0;
+    volumeSlider.value = 0;
+    renderVolumeSlider();
     volumeEl.classList.remove("icono-volumeMedium");
     volumeEl.classList.add("icono-volumeMute");
 }
 
 function unMutePlayer() {
     player.unMute();
+    // Restore the volume percentage as it was before mute
+    let newVolume = player.getVolume();
+    if (newVolume == 0) {
+        // Restore to default value it was zero
+        newVolume = 50;
+        player.setVolume(50);
+    }
+    volumeSlider.value = newVolume;
+    renderVolumeSlider();
     volumeEl.classList.add("icono-volumeMedium");
     volumeEl.classList.remove("icono-volumeMute");
 }
@@ -466,4 +473,11 @@ function copyLinkToClipboard(btn) {
     setTimeout(() => {
         btn.textContent = "Copy link";
     }, 4000);
+}
+
+function renderVolumeSlider() {
+    const min = volumeSlider.min;
+    const max = volumeSlider.max;
+    const value = volumeSlider.value;
+    volumeSlider.style.backgroundSize = ((value - min) * 100) / (max - min) + "% 100%";
 }
