@@ -57,6 +57,7 @@ services:
       # To keep static frontend changes
       - ./sharedmusic/main/static/js:/var/www/static/js
       - ./sharedmusic/main/static/css:/var/www/static/css
+      - ./sharedmusic/main/static/images:/var/www/static/images
     depends_on:
       - django
 
