@@ -302,6 +302,11 @@ input[type="email"] {
     overflow-y: auto;
 }
 
+.playlist-error {
+    color: red;
+    margin-top: 5px;
+}
+
 .playlist__track {
     display: flex;
     align-items: center;

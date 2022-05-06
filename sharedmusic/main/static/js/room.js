@@ -273,6 +273,78 @@ function onPlayerReady(event) {
         }
     }
 
+    //click on timeline to skip around
+    timeline.addEventListener(
+        "click",
+        (e) => {
+            const timelineWidth = window.getComputedStyle(timeline).width;
+            const timeToSeek = (e.offsetX / parseInt(timelineWidth)) * player.getDuration();
+            //player.seekTo(timeToSeek);
+            roomSocket.send(
+                JSON.stringify({
+                    event: "CHANGE_TIME",
+                    time: timeToSeek,
+                    message: "Change time.",
+                })
+            );
+        },
+        false
+    );
+
+    //click volume slider to change volume
+    volumeSlider.addEventListener(
+        "click",
+        (e) => {
+            const sliderWidth = window.getComputedStyle(volumeSlider).width;
+            const newVolume = e.offsetX / parseInt(sliderWidth);
+            player.setVolume(newVolume * 100);
+            audioPlayer.querySelector(".controls .volume-percentage").style.width =
+                newVolume * 100 + "%";
+        },
+        false
+    );
+
+    //check audio percentage and update time accordingly
+    setInterval(() => {
+        progressBar.style.width = (player.getCurrentTime() / player.getDuration()) * 100 + "%";
+        audioPlayer.querySelector(".time .current").textContent = getTimeCodeFromNum(
+            player.getCurrentTime()
+        );
+    }, 100);
+
+    //toggle between playing and pausing on button click
+    playBtn.addEventListener(
+        "click",
+        () => {
+            if (player.getPlayerState() === 1) {
+                //pauseTrack();
+                roomSocket.send(
+                    JSON.stringify({
+                        event: "PAUSE",
+                        message: "Track is now paused.",
+                    })
+                );
+            } else {
+                //playTrack();
+                roomSocket.send(
+                    JSON.stringify({
+                        event: "PLAY",
+                        message: "Track is now playing",
+                    })
+                );
+            }
+        },
+        false
+    );
+
+    audioPlayer.querySelector(".volume-button").addEventListener("click", () => {
+        if (!player.isMuted()) {
+            mutePlayer();
+        } else {
+            unMutePlayer();
+        }
+    });
+
     connect();
 }
 
@@ -287,78 +359,6 @@ function onPlayerStateChange(event) {
     );
     audioPlayer.querySelector(".name .title").textContent = player.getVideoData().title;
 }
-
-//click on timeline to skip around
-timeline.addEventListener(
-    "click",
-    (e) => {
-        const timelineWidth = window.getComputedStyle(timeline).width;
-        const timeToSeek = (e.offsetX / parseInt(timelineWidth)) * player.getDuration();
-        player.seekTo(timeToSeek);
-        roomSocket.send(
-            JSON.stringify({
-                event: "CHANGE_TIME",
-                time: timeToSeek,
-                message: "Change time.",
-            })
-        );
-    },
-    false
-);
-
-//click volume slider to change volume
-volumeSlider.addEventListener(
-    "click",
-    (e) => {
-        const sliderWidth = window.getComputedStyle(volumeSlider).width;
-        const newVolume = e.offsetX / parseInt(sliderWidth);
-        player.setVolume(newVolume * 100);
-        audioPlayer.querySelector(".controls .volume-percentage").style.width =
-            newVolume * 100 + "%";
-    },
-    false
-);
-
-//check audio percentage and update time accordingly
-setInterval(() => {
-    progressBar.style.width = (player.getCurrentTime() / player.getDuration()) * 100 + "%";
-    audioPlayer.querySelector(".time .current").textContent = getTimeCodeFromNum(
-        player.getCurrentTime()
-    );
-}, 100);
-
-//toggle between playing and pausing on button click
-playBtn.addEventListener(
-    "click",
-    () => {
-        if (player.getPlayerState() === 1) {
-            pauseTrack();
-            roomSocket.send(
-                JSON.stringify({
-                    event: "PAUSE",
-                    message: "Track is now paused.",
-                })
-            );
-        } else {
-            playTrack();
-            roomSocket.send(
-                JSON.stringify({
-                    event: "PLAY",
-                    message: "Track is now playing",
-                })
-            );
-        }
-    },
-    false
-);
-
-audioPlayer.querySelector(".volume-button").addEventListener("click", () => {
-    if (!player.isMuted()) {
-        mutePlayer();
-    } else {
-        unMutePlayer();
-    }
-});
 
 function mutePlayer() {
     player.mute();
@@ -385,16 +385,20 @@ function getTimeCodeFromNum(num) {
 }
 
 function youtube_parser(url) {
-    let regex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
-    return regex.exec(url)[3];
+    let regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    let match = url.match(regExp);
+    if (match && match[2].length == 11) {
+        return match[2];
+    } else {
+        return "";
+    }
 }
 
 function addTrack() {
     const id = youtube_parser(urlField.value);
-    fetch(
-        "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + id + "&key=" + ytApiKey
-    ).then((response) =>
-        response.json().then((data) => {
+    fetch("https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + id + "&key=" + ytApiKey)
+        .then((response) => response.json())
+        .then((data) => {
             let youtubeURL = "https://www.youtube.com/watch?v=" + id;
             let title = data.items[0].snippet.title;
             if (id) {
@@ -416,7 +420,13 @@ function addTrack() {
             }
             urlField.value = "";
         })
-    );
+        .catch((err) => {
+            console.log(`Track with id=${id} not found`);
+            $(".playlist-error").text("Track not found");
+            setTimeout(() => {
+                $(".playlist-error").text("");
+            }, 5000);
+        });
 }
 
 function pauseTrack() {
@@ -432,15 +442,16 @@ function playTrack() {
 }
 
 function setThumbnail(id) {
-    fetch(
-        "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + id + "&key=" + ytApiKey
-    ).then((response) =>
-        response.json().then((data) => {
+    fetch("https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + id + "&key=" + ytApiKey)
+        .then((response) => response.json())
+        .then((data) => {
             let url = data.items[0].snippet.thumbnails.default.url;
             thumb.src = url;
             thumb.hidden = false;
         })
-    );
+        .catch((err) => {
+            console.log(`Failed to get video thumbnail from id=${id}`);
+        });
 }
 
 function showContent() {

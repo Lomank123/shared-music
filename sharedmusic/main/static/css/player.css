@@ -89,6 +89,7 @@
     position: relative;
     z-index: 2;
     margin-left: 30px;
+    transition: 0.3s;
 }
 .audio-player .controls .volume-container .volume-button {
     height: 26px;
@@ -107,7 +108,7 @@
     height: 15px;
     background: white;
     box-shadow: 0 0 20px #000a;
-    transition: 0.25s;
+    transition: 0.3s;
 }
 .audio-player .controls .volume-container .volume-slider .volume-percentage {
     background: coral;
@@ -116,7 +117,6 @@
 }
 .audio-player .controls .volume-container:hover {
     margin-right: 120px;
-    transition: 0.25s;
 }
 .audio-player .controls .volume-container:hover .volume-slider {
     left: 36px;
