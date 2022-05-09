@@ -203,6 +203,26 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                 'chosenTrackUrl': chosen_track_url,
                 'deletedTrackInfo': track_data,
             })
+        elif event == consts.TRACK_ENDED_EVENT:
+            # Get current playlist and current track
+            playlist_tracks = await Playlist.get_playlist_tracks(self.playlist)
+            current_track_data = response.get("track", None)
+            # We need reverse playlist (on client side it is reversed)
+            rev_tracks = playlist_tracks.copy()
+            rev_tracks.reverse()
+            # Find next track from playlist
+            next_track_index = rev_tracks.index(current_track_data) + 1
+            next_track = rev_tracks[0]
+            if next_track_index < len(rev_tracks):
+                next_track = rev_tracks[next_track_index]
+            # Send change track event with next track
+            await self.channel_layer.group_send(self.room_group_name, {
+                'type': 'send_message',
+                'event': consts.CHANGE_TRACK_EVENT,
+                'message': 'New current track set.',
+                'playlist': playlist_tracks,
+                'track': {'url': next_track['url']},
+            })
         else:
             # Send message to room group
             await self.channel_layer.group_send(self.room_group_name, {
@@ -212,9 +232,6 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
             })
 
     async def send_message(self, res):
-        """
-        Receive message from room group
-        """
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             "payload": res,

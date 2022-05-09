@@ -14,6 +14,7 @@ let users = [];
 // Indicates whether user has clicked on window
 isFirstClick = true;
 const ytApiKey = "AIzaSyCp-e6T1qe6QqgjH6JydzBHCjB2raF6FrE";
+const youtubeRawLink = "https://www.youtube.com/watch?v=";
 
 // Player elements
 const timeline = document.querySelector(".timeline");
@@ -65,7 +66,6 @@ function connect() {
         console.log(data);
 
         if (data.event == "CONNECT") {
-            //document.getElementById("users-count").innerHTML = data.listeners.count.toString();
             users = data.listeners.users;
             while (usersList.hasChildNodes()) {
                 usersList.removeChild(usersList.firstChild);
@@ -102,7 +102,6 @@ function connect() {
             );
         }
         if (data.event == "DISCONNECT") {
-            //document.getElementById("users-count").innerHTML = data.listeners.count.toString();
             users = data.listeners.users;
             while (usersList.hasChildNodes()) {
                 usersList.removeChild(usersList.firstChild);
@@ -208,7 +207,7 @@ function updatePlaylist(newPlaylist, url = "") {
             name: track.name,
             url: track.url,
         };
-        let youtubeURL = "https://www.youtube.com/watch?v=" + chosenUrl;
+        let youtubeURL = youtubeRawLink + chosenUrl;
         deleteButton.on("click", (e) => {
             deleteTrack(e, trackData, youtubeURL);
         });
@@ -352,6 +351,23 @@ function onPlayerStateChange(event) {
         player.getDuration()
     );
     audioPlayer.querySelector(".name .title").textContent = player.getVideoData().title;
+
+    // For now only host can send this event otherwise it will cause error
+    // The event will be sent from all listeners and in some cases title will not be loaded
+    if (event.data == YT.PlayerState.ENDED && username == users[0].username) {
+        const id = youtube_parser(player.getVideoUrl());
+        const trackData = {
+            url: youtubeRawLink + id,
+            name: player.getVideoData().title,
+        }
+        roomSocket.send(
+            JSON.stringify({
+                event: "TRACK_ENDED",
+                message: "Track has ended. Need new one.",
+                track: trackData,
+            })
+        );
+    }
 }
 
 function mutePlayer() {
