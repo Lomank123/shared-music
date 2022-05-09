@@ -1,6 +1,6 @@
 import json
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from main.models import Room, Soundtrack, Playlist
+from main.models import Room, Soundtrack, Playlist, PlaylistTrack
 from main import consts
 from channels.db import database_sync_to_async
 from asgiref.sync import sync_to_async
@@ -121,10 +121,14 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
             url = response.get("url", None)
             title = response.get("name", None)
             # Get new track and updated tracks list
-            new_track, created = await database_sync_to_async(
+            new_track, _ = await database_sync_to_async(
                 Soundtrack.objects.get_or_create
             )(url=url, name=title)
-            await Playlist.add_track(new_track, self.playlist)
+            # Create new PlaylistTrack
+            playlist_track, created = await database_sync_to_async(
+                PlaylistTrack.objects.get_or_create
+            )(track=new_track, playlist=self.playlist)
+            #await Playlist.add_track(new_track, self.playlist)
 
             # Update last_visited
             await database_sync_to_async(self.playlist.room.save)()
@@ -191,8 +195,11 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
             soundtrack = await database_sync_to_async(
                 Soundtrack.objects.get
             )(url=track_data["url"], name=track_data["name"])
-            #await database_sync_to_async(soundtrack.delete)()
-            await Playlist.remove_track(self.playlist, soundtrack)
+            playlist_track = await database_sync_to_async(
+                PlaylistTrack.objects.get
+            )(track=soundtrack, playlist=self.playlist)
+            await database_sync_to_async(playlist_track.delete)()
+            #await Playlist.remove_track(self.playlist, soundtrack)
             # Get updated playlist
             playlist_tracks = await Playlist.get_playlist_tracks(self.playlist)
             await self.channel_layer.group_send(self.room_group_name, {
@@ -203,6 +210,26 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                 'chosenTrackUrl': chosen_track_url,
                 'deletedTrackInfo': track_data,
             })
+        elif event == consts.TRACK_ENDED_EVENT:
+            # Get current playlist and current track
+            playlist_tracks = await Playlist.get_playlist_tracks(self.playlist)
+            current_track_data = response.get("track", None)
+            # We need reverse playlist (on client side it is reversed)
+            rev_tracks = playlist_tracks.copy()
+            rev_tracks.reverse()
+            # Find next track from playlist
+            next_track_index = rev_tracks.index(current_track_data) + 1
+            next_track = rev_tracks[0]
+            if next_track_index < len(rev_tracks):
+                next_track = rev_tracks[next_track_index]
+            # Send change track event with next track
+            await self.channel_layer.group_send(self.room_group_name, {
+                'type': 'send_message',
+                'event': consts.CHANGE_TRACK_EVENT,
+                'message': 'New current track set.',
+                'playlist': playlist_tracks,
+                'track': {'url': next_track['url']},
+            })
         else:
             # Send message to room group
             await self.channel_layer.group_send(self.room_group_name, {
@@ -212,9 +239,6 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
             })
 
     async def send_message(self, res):
-        """
-        Receive message from room group
-        """
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             "payload": res,

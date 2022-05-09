@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from django.contrib.auth import get_user_model
 from channels.db import database_sync_to_async
+from django.db.models import F
 from django.db import connection
 from django.core import validators
 from django.contrib.auth.models import AbstractUser
@@ -29,7 +30,6 @@ class Soundtrack(models.Model):
 class Playlist(models.Model):
     name = models.CharField(default="Playlist", max_length=120, verbose_name="Name")
     creation_date = models.DateTimeField(auto_now_add=True, verbose_name="Creation date")
-    tracks = models.ManyToManyField(Soundtrack, blank=True, related_name='tracks', verbose_name="Tracks")
 
     def __str__(self):
         return f"{self.name} ({self.id})"
@@ -40,28 +40,26 @@ class Playlist(models.Model):
         """
         Returns list of urls and names of tracks which are in given playlist.
         """
-        soundtracks = cls.objects.filter(id=playlist.id).first().tracks.values("url", "name")
+        soundtracks = cls.objects.filter(id=playlist.id).first() \
+            .tracks.annotate(name=F('track__name'), url=F('track__url')).values("url", "name")
         return list(soundtracks)
-
-    @classmethod
-    @database_sync_to_async
-    def remove_track(cls, playlist, track):
-        """
-        Removes track from given playlist.
-        """
-        playlist.tracks.remove(track)
-
-    @classmethod
-    @database_sync_to_async
-    def add_track(cls, playlist, track):
-        """
-        Adds track to given playlist.
-        """
-        playlist.tracks.add(track)
 
     class Meta:
         verbose_name_plural = 'Playlists'
         verbose_name = 'Playlist'
+        ordering = ['-id']
+
+
+class PlaylistTrack(models.Model):
+    """
+    Represents track in current playlist.
+    """
+    track = models.ForeignKey(Soundtrack, on_delete=models.CASCADE, verbose_name="Soundtrack")
+    playlist = models.ForeignKey(Playlist, on_delete=models.CASCADE, related_name='tracks', verbose_name="Playlist")
+
+    class Meta:
+        verbose_name_plural = 'Playlist tracks'
+        verbose_name = 'Playlist track'
         ordering = ['-id']
 
 
