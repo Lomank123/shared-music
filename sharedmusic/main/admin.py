@@ -7,7 +7,7 @@ from django.contrib.auth.admin import UserAdmin
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
     # Controls which fields are displayed on the change list(!) page of the admin.
-    list_display = ('username','email', 'is_staff', 'is_superuser', 'is_active', 'date_joined',)
+    list_display = ('username', 'email', 'is_staff', 'is_superuser', 'is_active', 'date_joined',)
     # Controls what filters are available
     list_filter = ('is_staff', 'is_active',)
     # When editing user

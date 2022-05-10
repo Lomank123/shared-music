@@ -1,15 +1,12 @@
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import reverse
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
-from django.views.generic import DetailView
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.views import LoginView, LogoutView
-from django.http import Http404
-from main.models import Room, Soundtrack, Playlist
+from main.models import Room, Playlist
 from main.forms import CustomUserCreationForm, RoomCreationForm
-from main import consts
 
 
 class HomeView(LoginRequiredMixin, CreateView):

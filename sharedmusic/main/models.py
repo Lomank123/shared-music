@@ -3,8 +3,6 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from channels.db import database_sync_to_async
 from django.db.models import F
-from django.db import connection
-from django.core import validators
 from django.contrib.auth.models import AbstractUser
 
 from main import consts

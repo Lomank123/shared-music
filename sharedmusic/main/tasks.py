@@ -2,8 +2,7 @@ from __future__ import absolute_import, unicode_literals
 from celery import shared_task
 from datetime import timedelta
 from django.utils import timezone
-import main.consts as consts
-from main.models import Room, Playlist
+from main.models import Playlist
 
 
 @shared_task

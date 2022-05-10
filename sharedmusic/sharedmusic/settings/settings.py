@@ -127,23 +127,22 @@ if DEBUG:
 # Celery WebSocket
 CHANNEL_LAYERS = {
     'default': {
-        ### Method 1: Via redis lab
+        # Method 1: Via redis lab
         # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
         # 'CONFIG': {
         #     "hosts": [
-        #       'redis://h:<password>;@<redis Endpoint>:<port>' 
+        #       'redis://h:<password>;@<redis Endpoint>:<port>'
         #     ],
         # },
 
-        ### Method 2: Via local Redis
+        # Method 2: Via local Redis
         'BACKEND': 'channels_redis.pubsub.RedisPubSubChannelLayer',
         'CONFIG': {
             "hosts": [('redis', 6379)],
         },
 
-        ### Method 3: Via In-memory channel layer
-        ## Using this method.
-        #"BACKEND": "channels.layers.InMemoryChannelLayer"
+        # Method 3: Via In-memory channel layer
+        # "BACKEND": "channels.layers.InMemoryChannelLayer"
     },
 }
 
@@ -153,5 +152,5 @@ CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", 'redis://redis:6379')
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER", 'redis://redis:6379')
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
-# Changing referrer policy to allow all youtube videos to play 
+# Changing referrer policy to allow all youtube videos to play
 SECURE_REFERRER_POLICY = "no-referrer-when-downgrade"

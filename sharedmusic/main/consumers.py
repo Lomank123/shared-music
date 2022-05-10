@@ -3,7 +3,6 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from main.models import Room, Soundtrack, Playlist, PlaylistTrack
 from main import consts
 from channels.db import database_sync_to_async
-from asgiref.sync import sync_to_async
 
 
 class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
@@ -128,7 +127,6 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
             playlist_track, created = await database_sync_to_async(
                 PlaylistTrack.objects.get_or_create
             )(track=new_track, playlist=self.playlist)
-            #await Playlist.add_track(new_track, self.playlist)
 
             # Update last_visited
             await database_sync_to_async(self.playlist.room.save)()
@@ -183,7 +181,7 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
             time = response.get("time", None)
             await self.channel_layer.group_send(self.room_group_name, {
                 'type': 'send_message',
-                'message': f"Set current track data.",
+                'message': "Set current track data.",
                 'time': time,
                 'event': event,
             })
@@ -201,7 +199,6 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
                 PlaylistTrack.objects.get
             )(track=soundtrack, playlist=self.playlist)
             await database_sync_to_async(playlist_track.delete)()
-            #await Playlist.remove_track(self.playlist, soundtrack)
             # Get updated playlist
             playlist_tracks = await Playlist.get_playlist_tracks(self.playlist)
             await self.channel_layer.group_send(self.room_group_name, {
