@@ -168,3 +168,24 @@ input[type="range"]::-ms-track {
     border: none;
     background: transparent;
 }
+
+.progress-tooltip {
+    position: fixed;
+    bottom: 60px;
+    opacity: 0;
+}
+
+.audio-player .timeline:hover .progress-tooltip {
+    opacity: 1;
+}
+
+.repeat-btn {
+    border: none;
+    background-color: inherit;
+    margin-left: 30px;
+    cursor: pointer;
+}
+
+.repeat-active {
+    color: var(--primary-color);
+}

@@ -165,11 +165,13 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         elif event == consts.NEW_USER_JOINED_EVENT:
             new_user = response.get("user", None)
             track_data = response.get("track", None)
+            loop = response.get("loop", None)
             playlist_tracks = await Playlist.get_playlist_tracks(self.playlist)
             await self.channel_layer.group_send(f"{consts.USER_GROUP_PREFIX}_{new_user}", {
                 'type': 'send_message',
                 'message': f"Set current track data. {self.user.username}",
                 'track': track_data,
+                'loop': loop,
                 'playlist': playlist_tracks,
                 'event': consts.SET_CURRENT_TRACK_EVENT,
             })

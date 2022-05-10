@@ -11,6 +11,7 @@ const audioPlayer = document.querySelector(".audio-player");
 const usersList = document.getElementById("users-list");
 // Need to give host username
 let users = [];
+let loop = false;
 // Indicates whether user has clicked on window
 isFirstClick = true;
 const ytApiKey = "AIzaSyCp-e6T1qe6QqgjH6JydzBHCjB2raF6FrE";
@@ -98,6 +99,7 @@ function connect() {
                     message: "New user joined.",
                     user: data.receiver,
                     track: trackData,
+                    loop: loop,
                 })
             );
         }
@@ -144,6 +146,10 @@ function connect() {
                 }, 500);
             }
             updatePlaylist(data.playlist, data.track.url);
+            if (data.loop) {
+                $(".repeat-btn").children().toggleClass("repeat-active");
+                loop = data.loop;
+            }
         }
         if (data.event == "DELETE_TRACK") {
             updatePlaylist(data.playlist, data.chosenTrackUrl);
@@ -163,6 +169,10 @@ function connect() {
         }
         if (data.event == "CHANGE_TIME") {
             player.seekTo(data.time);
+        }
+        if (data.event == "CHANGE_LOOP") {
+            $(".repeat-btn").children().toggleClass("repeat-active");
+            loop = !loop;
         }
     };
 
@@ -257,7 +267,12 @@ function onPlayerReady(event) {
     audioPlayer.querySelector(".time .length").textContent = getTimeCodeFromNum(
         player.getDuration()
     );
-    player.setVolume(50);
+    if (localStorage.getItem("volume") === null) {
+        player.setVolume(50);
+        localStorage.setItem("volume", 50);
+    } else {
+        player.setVolume(localStorage.getItem("volume"));
+    }
     mutePlayer();
     audioPlayer.querySelector(".name .title").textContent = player.getVideoData().title;
 
@@ -286,11 +301,24 @@ function onPlayerReady(event) {
         );
     });
 
+    //hover over timeline to see time in current mouse position
+    timeline.addEventListener("mousemove", (e) => {
+        const timelineWidth = window.getComputedStyle(timeline).width;
+        const timeToSeek = (e.offsetX / parseInt(timelineWidth)) * player.getDuration();
+        let tooltip = $(".progress-tooltip");
+        tooltip.text(getTimeCodeFromNum(timeToSeek));
+        tooltip.get(0).style.left =
+            e.pageX + tooltip.get(0).clientWidth + 15 < document.body.clientWidth
+                ? e.pageX + 10 + "px"
+                : document.body.clientWidth - tooltip.get(0).clientWidth - 5 + "px";
+    });
+
     //click (or hold) volume slider to change volume
     volumeSlider.addEventListener("input", (e) => {
         renderVolumeSlider();
         newVolume = volumeSlider.value;
         player.setVolume(newVolume);
+        localStorage.setItem("volume", newVolume);
         if (newVolume == 0) {
             mutePlayer();
         } else if (player.isMuted() && newVolume != 0) {
@@ -352,6 +380,17 @@ function onPlayerStateChange(event) {
     );
     audioPlayer.querySelector(".name .title").textContent = player.getVideoData().title;
 
+    // If track in on loop, send CHANGE_TRACK event with the same track
+    if (event.data == YT.PlayerState.ENDED && username == users[0].username && loop) {
+        const id = youtube_parser(player.getVideoUrl());
+        const trackData = {
+            url: youtubeRawLink + id,
+            name: player.getVideoData().title,
+        };
+        changeTrack(event, trackData);
+        return;
+    }
+
     // For now only host can send this event otherwise it will cause error
     // The event will be sent from all listeners and in some cases title will not be loaded
     if (event.data == YT.PlayerState.ENDED && username == users[0].username) {
@@ -359,7 +398,7 @@ function onPlayerStateChange(event) {
         const trackData = {
             url: youtubeRawLink + id,
             name: player.getVideoData().title,
-        }
+        };
         roomSocket.send(
             JSON.stringify({
                 event: "TRACK_ENDED",
@@ -483,7 +522,6 @@ function showContent() {
 }
 
 function copyLinkToClipboard(btn) {
-    console.log(window.location.href);
     navigator.clipboard.writeText(window.location.href);
     btn.textContent = "Copied to clipboard";
     setTimeout(() => {
@@ -496,4 +534,13 @@ function renderVolumeSlider() {
     const max = volumeSlider.max;
     const value = volumeSlider.value;
     volumeSlider.style.backgroundSize = ((value - min) * 100) / (max - min) + "% 100%";
+}
+
+function changeLoop() {
+    roomSocket.send(
+        JSON.stringify({
+            event: "CHANGE_LOOP",
+            message: "Loop settings changed",
+        })
+    );
 }

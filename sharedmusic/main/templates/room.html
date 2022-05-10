@@ -46,6 +46,7 @@
     <!--Player-->
     <div class="audio-player">
         <div class="timeline">
+            <div class="progress-tooltip"></div>
             <div class="progress"></div>
         </div>
         <div class="controls">
@@ -63,6 +64,9 @@
                 <div class="divider">/</div>
                 <div class="length"></div>
             </div>
+            <button onclick="changeLoop()" class="repeat-btn">
+                <i class="fa-solid fa-arrow-rotate-left"></i>
+            </button>
             <div class="name">
                 <img class="thumb" src="" width="45" height="45" hidden>
                 <div class="title"></div>
