@@ -1,4 +1,5 @@
-from main.repositories import RoomRepository, PlaylistRepository, SoundtrackRepository, PlaylistTrackRepository
+from main.repositories import RoomRepository, PlaylistRepository, SoundtrackRepository, \
+    PlaylistTrackRepository, CustomUserRepository
 from main import consts
 from main.decorators import update_room_expiration_time
 
@@ -211,6 +212,21 @@ class MusicRoomConsumerService():
             "track": {'url': next_track['url']},
         })
         await self.channel_layer.group_send(self.room_group_name, data)
+
+    async def handle_change_host(self, response):
+        """
+        Changes host to new one by it's username.
+        """
+        new_host_username = response.get("new_host", None)
+        new_host = await CustomUserRepository.get_by_username_or_none(new_host_username)
+        await RoomRepository.change_host(self.room_id, new_host)
+        data = self._build_context_data(consts.HOST_CHANGED_EVENT, consts.HOST_CHANGED, {
+            "new_host": new_host_username,
+        })
+        await self.channel_layer.group_send(self.room_group_name, data)
+
+    async def handle_change_room_settings(self, response):
+        pass
 
     async def handle_default(self, response):
         event = response.get("event", None)

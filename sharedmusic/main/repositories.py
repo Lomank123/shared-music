@@ -1,4 +1,4 @@
-from main.models import Room, Playlist, Soundtrack, PlaylistTrack
+from main.models import Room, Playlist, Soundtrack, PlaylistTrack, CustomUser
 from channels.db import database_sync_to_async
 from django.db.models import F
 
@@ -63,6 +63,16 @@ class RoomRepository():
         }
         return data
 
+    @staticmethod
+    @database_sync_to_async
+    def change_host(room_id, new_host):
+        """
+        Changes host of room.
+        """
+        room = Room.objects.get(id=room_id)
+        room.host = new_host
+        room.save()
+
 
 class PlaylistRepository():
 
@@ -112,3 +122,15 @@ class PlaylistTrackRepository():
     @database_sync_to_async
     def delete(playlist_track):
         playlist_track.delete()
+
+
+class CustomUserRepository():
+
+    @staticmethod
+    @database_sync_to_async
+    def get_by_username_or_none(username):
+        """
+        Returns user by it's username or None.
+        """
+        user = CustomUser.objects.filter(username=username).first()
+        return user

@@ -74,11 +74,21 @@ function connect() {
             users.forEach((user) => {
                 let node = $(
                     `<li>` +
-                        `<div class="online"></div>` +
-                        `<div class="username">${user.username}</div>` +
-                        `</li>`
+                    `<div class="online"></div>` +
+                    `<div class="username">${user.username}</div>` +
+                    `</li>`
                 );
+                if (user.username != hostUsername && username == hostUsername) {
+                    let changeHostButton = $(
+                        `<button onClick="changeHost('${user.username}')">Change</button>`
+                    )
+                    node.append(changeHostButton);
+                }
                 $("#users-list").append(node);
+                if (user.username == hostUsername) {
+                    // TODO: Need to make host's username bold
+                    $('#username').css({ 'font-weight': 'bold' });
+                }
             });
             if (username === data.user) {
                 updatePlaylist(data.playlist);
@@ -174,11 +184,27 @@ function connect() {
             $(".repeat-btn").children().toggleClass("repeat-active");
             loop = !loop;
         }
+        if (data.event == "HOST_CHANGED") {
+            $("#host").attr("host_username", data.new_host);
+            hostUsername = $("#host").attr("host_username");
+            console.log(hostUsername);
+            // TODO: Here we need to call updateUserList function
+        }
     };
 
     if (roomSocket.readyState == WebSocket.OPEN) {
         roomSocket.onopen();
     }
+}
+
+function changeHost(newHost) {
+    roomSocket.send(
+        JSON.stringify({
+            event: "CHANGE_HOST",
+            message: "Change host.",
+            new_host: newHost,
+        })
+    );
 }
 
 function clearPlaylist() {
