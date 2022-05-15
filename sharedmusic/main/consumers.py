@@ -29,8 +29,8 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
             await self.service.handle_add_track(response)
         elif event == consts.CHANGE_TRACK_EVENT:
             await self.service.handle_change_track(response)
-        elif event == consts.NEW_USER_JOINED_EVENT:
-            await self.service.handle_new_user_joined(response)
+        elif event == consts.SEND_TRACK_TO_NEW_USER:
+            await self.service.handle_send_track_to_new_user(response)
         elif event == consts.CHANGE_TIME_EVENT:
             await self.service.handle_change_time(response)
         elif event == consts.DELETE_TRACK_EVENT:

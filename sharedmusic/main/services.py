@@ -101,9 +101,9 @@ class MusicRoomConsumerService():
         })
         await self.channel_layer.group_send(self.room_group_name, data)
         # Here we need to send event from another user to new one
-        await self._send_track_to_new_user(listeners_data)
+        await self._get_track_from_listeners(listeners_data)
 
-    async def _send_track_to_new_user(self, listeners):
+    async def _get_track_from_listeners(self, listeners):
         another_user = None
         if len(listeners['users']) > 1:
             for listener in listeners['users']:
@@ -111,10 +111,11 @@ class MusicRoomConsumerService():
                     another_user = listener['username']
                     break
         if another_user is not None:
-            new_message = "Need to set current track."
-            track_sender_data = self._build_context_data(consts.SEND_TRACK_TO_NEW_USER, new_message, {
-                "receiver": self.user.username,
-            })
+            track_sender_data = self._build_context_data(
+                consts.GET_TRACK_FROM_LISTENERS_EVENT,
+                consts.GET_TRACK_FROM_LISTENERS,
+                {"receiver": self.user.username, }
+            )
             await self.channel_layer.group_send(
                 f"{consts.USER_GROUP_PREFIX}_{another_user}",
                 track_sender_data
@@ -169,7 +170,7 @@ class MusicRoomConsumerService():
         })
         await self.channel_layer.group_send(self.room_group_name, data)
 
-    async def handle_new_user_joined(self, response):
+    async def handle_send_track_to_new_user(self, response):
         new_user = response.get("user", None)
         track_data = response.get("track", None)
         loop = response.get("loop", None)

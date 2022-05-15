@@ -84,7 +84,7 @@ function connect() {
                 updatePlaylist(data.playlist);
             }
         }
-        if (data.event == "SEND_TRACK_TO_NEW_USER") {
+        if (data.event == "GET_TRACK_FROM_LISTENERS") {
             let state = player.getPlayerState();
             const trackData = {
                 name: player.getVideoData().title,
@@ -95,8 +95,8 @@ function connect() {
             };
             roomSocket.send(
                 JSON.stringify({
-                    event: "NEW_USER_JOINED",
-                    message: "New user joined.",
+                    event: "SEND_TRACK_TO_NEW_USER",
+                    message: "Send track to new user.",
                     user: data.receiver,
                     track: trackData,
                     loop: loop,
@@ -122,16 +122,16 @@ function connect() {
             roomSocket.close(1000, (reason = "qweqweqweS"));
             console.log("Closing connection. Refresh the page.");
         }
+        if (data.event == "ADD_TRACK") {
+            // display new track in playlist with buttons
+            updatePlaylist(data.playlist, player.getVideoUrl());
+        }
         if (data.event == "CHANGE_TRACK") {
             const id = youtube_parser(data.track.url);
             setThumbnail(id);
             player.loadVideoById(id);
             playTrack();
             updatePlaylist(data.playlist, data.track.url);
-        }
-        if (data.event == "ADD_TRACK") {
-            // display new track in playlist with buttons
-            updatePlaylist(data.playlist, player.getVideoUrl());
         }
         if (data.event == "SET_CURRENT_TRACK") {
             const id = youtube_parser(data.track.url);
