@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
+from main import consts
 
 
 class CustomUser(AbstractUser):
@@ -47,6 +48,17 @@ class PlaylistTrack(models.Model):
         ordering = ['-id']
 
 
+def permissions_jsonfield_default():
+    return dict([
+            (consts.CHANGE_TRACK_EVENT, consts.ROOM_ALLOW_ANY),
+            (consts.CHANGE_TIME_EVENT, consts.ROOM_ALLOW_ANY),
+            (consts.ADD_TRACK_EVENT, consts.ROOM_ALLOW_ANY),
+            (consts.DELETE_TRACK_EVENT, consts.ROOM_ALLOW_ANY),
+            (consts.PAUSE_TRACK_EVENT, consts.ROOM_ALLOW_ANY),
+            (consts.VOTE_FOR_SKIP_EVENT, consts.ROOM_ALLOW_ANY),
+        ])
+
+
 class Room(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     host = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="host", verbose_name="Host")
@@ -54,6 +66,7 @@ class Room(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True, verbose_name="Creation date")
     last_visited = models.DateTimeField(auto_now=True, verbose_name="Last visited")
     playlist = models.OneToOneField(Playlist, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Playlist")
+    permissions = models.JSONField(default=permissions_jsonfield_default, verbose_name="Permissions")
 
     class Meta:
         verbose_name_plural = "Rooms"

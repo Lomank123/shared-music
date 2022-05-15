@@ -1,5 +1,4 @@
 from main.repositories import RoomRepository
-# from asgiref.sync import sync_to_async
 
 
 def update_room_expiration_time(func):
@@ -12,8 +11,4 @@ def update_room_expiration_time(func):
         # Update room's last_visited field
         room = await RoomRepository.get_room_by_id_or_none(self.room_id)
         await RoomRepository.save_room(room)
-        # TODO: Remove later
-        # For testing
-        # room = await RoomRepository.get_room_by_id_or_none(self.room_id)
-        # await sync_to_async(print)("Inside decorator, after func", room.last_visited)
     return wrapper

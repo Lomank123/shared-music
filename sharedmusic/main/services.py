@@ -38,6 +38,14 @@ class MusicRoomConsumerService():
         context_data.update(extra_data)
         return context_data
 
+    async def _check_permission(self, event):
+        room = await RoomRepository.get_room_by_id_or_none(self.room_id)
+        # For now it checks only for admin permissions
+        if event in room.permissions.keys():
+            if room.permissions[event] > consts.ROOM_ALLOW_ANY:
+                return self.user.is_superuser
+        return True
+
     async def connect_user(self):
         if self.user.is_authenticated:
             # Remove all previous connections of the same user if they exist
@@ -95,10 +103,12 @@ class MusicRoomConsumerService():
         listeners_data = await RoomRepository.get_listeners_info(self.room_id)
         room_playlist = await RoomRepository.get_room_playlist(self.room_id)
         playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist)
+        room = await RoomRepository.get_room_by_id_or_none(self.room_id)
         data = self._build_context_data(consts.CONNECT_EVENT, message, {
             "user": self.user.username,
             "listeners": listeners_data,
             "playlist": playlist_tracks,
+            "permissions": room.permissions,
         })
         await self.channel_layer.group_send(self.room_group_name, data)
         # Here we need to send event from another user to new one
@@ -233,3 +243,7 @@ class MusicRoomConsumerService():
         message = response.get("message", None)
         data = self._build_context_data(event, message)
         await self.channel_layer.group_send(self.room_group_name, data)
+
+    async def handle_not_allowed(self, response):
+        data = self._build_context_data(consts.ROOM_NOT_ALLOWED_EVENT, consts.ROOM_NOT_ALLOWED_MSG)
+        await self.channel_layer.group_send(self.user_group_name, data)

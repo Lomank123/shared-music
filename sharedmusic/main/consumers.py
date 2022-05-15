@@ -22,6 +22,13 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         """
         response = json.loads(text_data)
         event = response.get("event", None)
+
+        # Check permission before handling event
+        allowed = await self.service._check_permission(event)
+        if not allowed:
+            await self.service.handle_not_allowed(response)
+            return
+
         # Event handlers
         if event == consts.CONNECT_EVENT:
             await self.service.handle_connect(response)
