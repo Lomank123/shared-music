@@ -7,6 +7,15 @@ class RoomRepository():
 
     @staticmethod
     @database_sync_to_async
+    def get_room_by_id_or_none(room_id):
+        """
+        Returns room by it's id or None.
+        """
+        room = Room.objects.filter(id=room_id).first()
+        return room
+
+    @staticmethod
+    @database_sync_to_async
     def save_room(room):
         """
         Saves room.

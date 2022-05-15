@@ -1,5 +1,6 @@
 from main.repositories import RoomRepository, PlaylistRepository, SoundtrackRepository, PlaylistTrackRepository
 from main import consts
+from main.decorators import update_room_expiration_time
 
 
 class MusicRoomConsumerService():
@@ -119,15 +120,12 @@ class MusicRoomConsumerService():
                 track_sender_data
             )
 
+    @update_room_expiration_time
     async def handle_change_track(self, response):
         # Get new track data and send to clients
         track_data = response.get("track", None)
         room_playlist = await RoomRepository.get_room_playlist(self.room_id)
         playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist)
-
-        # Update last_visited
-        await RoomRepository.save_room(room_playlist.room)
-
         message = f"Track changed by {self.user.username}."
         data = self._build_context_data(consts.CHANGE_TRACK_EVENT, message, {
             "playlist": playlist_tracks,
@@ -135,6 +133,7 @@ class MusicRoomConsumerService():
         })
         await self.channel_layer.group_send(self.room_group_name, data)
 
+    @update_room_expiration_time
     async def handle_add_track(self, response):
         url = response.get("url", None)
         name = response.get("name", None)
@@ -142,10 +141,6 @@ class MusicRoomConsumerService():
         # We need to know whether new PlaylistTrack instance has been created
         room_playlist = await RoomRepository.get_room_playlist(self.room_id)
         _, created = await PlaylistTrackRepository.get_or_create(new_track, room_playlist)
-
-        # Update last_visited
-        await RoomRepository.save_room(room_playlist.room)
-
         # Send message
         playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist)
         message = f"New track added by {self.user.username}."
@@ -155,11 +150,9 @@ class MusicRoomConsumerService():
         })
         await self.channel_layer.group_send(self.room_group_name, data)
 
+    @update_room_expiration_time
     async def handle_delete_track(self, response):
         room_playlist = await RoomRepository.get_room_playlist(self.room_id)
-        # Update last_visited
-        await RoomRepository.save_room(room_playlist.room)
-
         track_data = response.get("track", None)
         chosen_track_url = response.get("chosenTrackUrl", None)
         # Delete playlist track
@@ -190,11 +183,8 @@ class MusicRoomConsumerService():
         })
         await self.channel_layer.group_send(f"{consts.USER_GROUP_PREFIX}_{new_user}", data)
 
+    @update_room_expiration_time
     async def handle_change_time(self, response):
-        room_playlist = await RoomRepository.get_room_playlist(self.room_id)
-        # Update last_visited
-        await RoomRepository.save_room(room_playlist.room)
-
         time = response.get("time", None)
         message = "Set current time."
         data = self._build_context_data(consts.CHANGE_TIME_EVENT, message, {"time": time})
