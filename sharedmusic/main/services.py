@@ -43,7 +43,7 @@ class MusicRoomConsumerService():
         # For now it checks only for admin permissions
         if event in room.permissions.keys():
             if room.permissions[event] > consts.ROOM_ALLOW_ANY:
-                return self.user.is_superuser
+                return self.user == room.host
         return True
 
     async def connect_user(self):
