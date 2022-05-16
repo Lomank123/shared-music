@@ -25,6 +25,26 @@ const volumeEl = document.querySelector(".volume-container .volume");
 const volumeSlider = document.querySelector(".controls .volume-slider");
 const playBtn = document.querySelector(".controls .toggle-play");
 const thumb = document.querySelector(".name .thumb");
+
+// Notification settings
+toastr.options = {
+    closeButton: true,
+    debug: false,
+    newestOnTop: false,
+    progressBar: true,
+    positionClass: "toast-top-right",
+    preventDuplicates: true,
+    onclick: null,
+    showDuration: "300",
+    hideDuration: "1000",
+    timeOut: "5000",
+    extendedTimeOut: "1000",
+    showEasing: "swing",
+    hideEasing: "linear",
+    showMethod: "fadeIn",
+    hideMethod: "fadeOut",
+};
+
 // connect function is called only when player is ready
 function connect() {
     roomSocket = new WebSocket(connectionString);
@@ -71,6 +91,7 @@ function connect() {
             users = data.listeners.users;
             permissions = data.permissions;
             console.log(permissions);
+            setPermissions(permissions);
             updateUserList(users);
             if (username === data.user) {
                 updatePlaylist(data.playlist);
@@ -161,6 +182,10 @@ function connect() {
             console.log(hostUsername);
             // TODO: Here we need to call updateUserList function
             updateUserList(users);
+            setPermissions(permissions);
+        }
+        if (data.event == "ROOM_NOT_ALLOWED") {
+            toastr["error"]("Insufficient permissions", "Error");
         }
     };
 
@@ -566,4 +591,30 @@ function updateUserList(users) {
         }
         $("#users-list").append(node);
     });
+}
+
+function setPermissions(permsList) {
+    let dict = {
+        PAUSE: "Pause track",
+        ADD_TRACK: "Add track",
+        CHANGE_TIME: "Change time",
+        CHANGE_TRACK: "Change track",
+        DELETE_TRACK: "Delete track",
+        VOTE_FOR_SKIP: "Vote for skip",
+    };
+    let allow = 1;
+    if (username === hostUsername) {
+        allow = 5;
+    }
+    let permsBlock = $(".permissions");
+    permsBlock.text("");
+    for (perm in permsList) {
+        let sign = '<i class="fa-solid fa-xmark"></i>';
+        // if allowed
+        if (permsList[perm] <= allow) {
+            sign = '<i class="fa-solid fa-check"></i>';
+        }
+        let node = `<div>${dict[perm]}: ${sign}</div>`;
+        permsBlock.append(node);
+    }
 }

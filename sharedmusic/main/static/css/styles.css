@@ -115,6 +115,10 @@ input[type="email"] {
     background-color: var(--primary-color);
 }
 
+#toast-container > div {
+    width: 400px;
+}
+
 /* Sidebar */
 .sidebar {
     background-color: var(--sidebar-bg-color);

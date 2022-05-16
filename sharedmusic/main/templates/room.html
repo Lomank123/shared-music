@@ -22,9 +22,9 @@
             <div id="room" room_code="{{ room.id }}"></div>
             <div id="host" host_username="{{ room.host.username }}"></div>
             <div id="user" username="{{ user.username }}"></div>
-            <h6>Greetings, {{ user.username }}</h6>
-            <h5 style="color: red">Work in progress (chat)</h5>
-            <img src="https://1.bp.blogspot.com/-jvY1TIs1VwY/XcTci88_MLI/AAAAAAAADRo/jXDYe2RstFwVaW5DHK22D2LHF8tBUkmbgCLcBGAsYHQ/s320/images.jpg">
+            <h6 style="font-weight: bold;">Greetings, {{ user.username }}</h6>
+            <h5>Your permissions:</h5>
+            <div class="permissions"></div>
         </div>
         <div class="playlist-container">
             <h6>Playlist:</h6>
