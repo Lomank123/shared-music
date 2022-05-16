@@ -11,6 +11,7 @@ const audioPlayer = document.querySelector(".audio-player");
 const usersList = document.getElementById("users-list");
 // Need to give host username
 let users = [];
+let permissions = {};
 let loop = false;
 // Indicates whether user has clicked on window
 isFirstClick = true;
@@ -68,28 +69,9 @@ function connect() {
 
         if (data.event == "CONNECT") {
             users = data.listeners.users;
-            while (usersList.hasChildNodes()) {
-                usersList.removeChild(usersList.firstChild);
-            }
-            users.forEach((user) => {
-                let node = $(
-                    `<li>` +
-                    `<div class="online"></div>` +
-                    `<div class="username">${user.username}</div>` +
-                    `</li>`
-                );
-                if (user.username != hostUsername && username == hostUsername) {
-                    let changeHostButton = $(
-                        `<button onClick="changeHost('${user.username}')">Change</button>`
-                    )
-                    node.append(changeHostButton);
-                }
-                $("#users-list").append(node);
-                if (user.username == hostUsername) {
-                    // TODO: Need to make host's username bold
-                    $('#username').css({ 'font-weight': 'bold' });
-                }
-            });
+            permissions = data.permissions;
+            console.log(permissions);
+            updateUserList(users);
             if (username === data.user) {
                 updatePlaylist(data.playlist);
             }
@@ -115,18 +97,7 @@ function connect() {
         }
         if (data.event == "DISCONNECT") {
             users = data.listeners.users;
-            while (usersList.hasChildNodes()) {
-                usersList.removeChild(usersList.firstChild);
-            }
-            users.forEach((user) => {
-                let node = $(
-                    `<li>` +
-                        `<div class="online"></div>` +
-                        `<div class="username">${user.username}</div>` +
-                        `</li>`
-                );
-                $("#users-list").append(node);
-            });
+            updateUserList(users);
         }
         if (data.event == "ALREADY_CONNECTED") {
             roomSocket.close(1000, (reason = "qweqweqweS"));
@@ -189,6 +160,7 @@ function connect() {
             hostUsername = $("#host").attr("host_username");
             console.log(hostUsername);
             // TODO: Here we need to call updateUserList function
+            updateUserList(users);
         }
     };
 
@@ -569,4 +541,29 @@ function changeLoop() {
             message: "Loop settings changed",
         })
     );
+}
+
+function updateUserList(users) {
+    while (usersList.hasChildNodes()) {
+        usersList.removeChild(usersList.firstChild);
+    }
+    users.forEach((user) => {
+        let node = $(
+            `<li>` +
+                `<div class="online"></div>` +
+                `<div class="username">${user.username}</div>` +
+                `</li>`
+        );
+        if (user.username != hostUsername && username == hostUsername) {
+            let changeHostButton = $(
+                `<button onClick="changeHost('${user.username}')">Change</button>`
+            );
+            node.append(changeHostButton);
+        }
+        if (user.username == hostUsername) {
+            let icon = '<i class="fa-solid fa-crown"></i>';
+            node.append(icon);
+        }
+        $("#users-list").append(node);
+    });
 }

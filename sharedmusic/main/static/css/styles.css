@@ -272,6 +272,10 @@ input[type="email"] {
     align-items: center;
 }
 
+#users-list li .username {
+    margin-right: 10px;
+}
+
 .users-container {
     margin-bottom: 30px;
     max-width: 325px;
