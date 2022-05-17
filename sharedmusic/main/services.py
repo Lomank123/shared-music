@@ -41,7 +41,7 @@ class MusicRoomConsumerService():
     async def _check_permission(self, event):
         room = await RoomRepository.get_room_by_id_or_none(self.room_id)
         if event in room.permissions.keys():
-            if room.permissions[event] > consts.ROOM_ALLOW_ANY:
+            if int(room.permissions[event]) > consts.ROOM_ALLOW_ANY:
                 return self.user.id == room.host_id
         return True
 
