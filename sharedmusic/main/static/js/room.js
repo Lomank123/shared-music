@@ -179,13 +179,16 @@ function connect() {
         if (data.event == "HOST_CHANGED") {
             $("#host").attr("host_username", data.new_host);
             hostUsername = $("#host").attr("host_username");
-            console.log(hostUsername);
-            // TODO: Here we need to call updateUserList function
             updateUserList(users);
             setPermissions(permissions);
         }
+        if (data.event == "CHANGE_PERMISSIONS") {
+            //permissions = data.permissions;
+            //setPermissions(permissions)
+            toastr["info"]("Room permissions have been changed");
+        }
         if (data.event == "ROOM_NOT_ALLOWED") {
-            toastr["error"]("Insufficient permissions", "Error");
+            toastr["error"]("Insufficient permissions");
         }
     };
 
@@ -217,12 +220,8 @@ function updatePlaylist(newPlaylist, url = "") {
     }
     newPlaylist.forEach((track) => {
         let trackElement = $(`<div class="playlist__track"></div>`);
-        let playButton = $(
-            `<button class="track__playButton"><i class="fas fa-play"></i></button>`
-        );
-        let trackTitle = $(
-            `<div class="track__title" data-title="${track.name}">${track.name}</div>`
-        );
+        let playButton = $(`<button class="track__playButton"><i class="fas fa-play"></i></button>`);
+        let trackTitle = $(`<div class="track__title" data-title="${track.name}">${track.name}</div>`);
         let deleteButton = $(
             `<button class="track__deleteButton"><i class="fa-solid fa-trash-can"></i></button>`
         );
@@ -287,9 +286,7 @@ function onYouTubeIframeAPIReady() {
 }
 
 function onPlayerReady(event) {
-    audioPlayer.querySelector(".time .length").textContent = getTimeCodeFromNum(
-        player.getDuration()
-    );
+    audioPlayer.querySelector(".time .length").textContent = getTimeCodeFromNum(player.getDuration());
     if (localStorage.getItem("volume") === null) {
         player.setVolume(50);
         localStorage.setItem("volume", 50);
@@ -355,9 +352,7 @@ function onPlayerReady(event) {
     //check audio percentage and update time accordingly
     setInterval(() => {
         progressBar.style.width = (player.getCurrentTime() / player.getDuration()) * 100 + "%";
-        audioPlayer.querySelector(".time .current").textContent = getTimeCodeFromNum(
-            player.getCurrentTime()
-        );
+        audioPlayer.querySelector(".time .current").textContent = getTimeCodeFromNum(player.getCurrentTime());
     }, 100);
 
     //toggle between playing and pausing on button click
@@ -398,9 +393,7 @@ function onPlayerError(event) {
 }
 
 function onPlayerStateChange(event) {
-    audioPlayer.querySelector(".time .length").textContent = getTimeCodeFromNum(
-        player.getDuration()
-    );
+    audioPlayer.querySelector(".time .length").textContent = getTimeCodeFromNum(player.getDuration());
     audioPlayer.querySelector(".name .title").textContent = player.getVideoData().title;
 
     // If track in on loop, send CHANGE_TRACK event with the same track
@@ -574,15 +567,10 @@ function updateUserList(users) {
     }
     users.forEach((user) => {
         let node = $(
-            `<li>` +
-                `<div class="online"></div>` +
-                `<div class="username">${user.username}</div>` +
-                `</li>`
+            `<li>` + `<div class="online"></div>` + `<div class="username">${user.username}</div>` + `</li>`
         );
         if (user.username != hostUsername && username == hostUsername) {
-            let changeHostButton = $(
-                `<button onClick="changeHost('${user.username}')">Change</button>`
-            );
+            let changeHostButton = $(`<button onClick="changeHost('${user.username}')">Change</button>`);
             node.append(changeHostButton);
         }
         if (user.username == hostUsername) {
@@ -591,8 +579,15 @@ function updateUserList(users) {
         }
         $("#users-list").append(node);
     });
+    // Hide all elements with attribute "host-only", if user is not host
+    if (username == hostUsername) {
+        $("[host-only]").css("visibility", "visible");
+    } else {
+        $("[host-only]").css("visibility", "hidden");
+    }
 }
 
+// Visual permission display
 function setPermissions(permsList) {
     let dict = {
         PAUSE: "Pause track",
@@ -617,4 +612,90 @@ function setPermissions(permsList) {
         let node = `<div>${dict[perm]}: ${sign}</div>`;
         permsBlock.append(node);
     }
+}
+
+let modal = $modal({
+    title: "Change room permissions",
+    content: `<div class="perms-menu"><div class="grid-wrapper" data="title">
+        <div class="perms-menu__name">Permissions</div>
+        <div class="perms-menu__option">Any user</div>
+        <div class="perms-menu__option">Host only</div>
+    </div>
+    <div class="grid-wrapper" data="PAUSE">
+        <div class="perms-menu__name">Pause track</div>
+        <input type="radio" name="pause" value="1" class="perms-menu__option" />
+        <input type="radio" name="pause" value="5" class="perms-menu__option" />
+    </div>
+    <div class="grid-wrapper" data="ADD_TRACK">
+        <div class="perms-menu__name">Add track</div>
+        <input type="radio" name="add" value="1" class="perms-menu__option" />
+        <input type="radio" name="add" value="5" class="perms-menu__option" />
+    </div>
+    <div class="grid-wrapper" data="CHANGE_TIME">
+        <div class="perms-menu__name">Change time</div>
+        <input type="radio" name="change_time" value="1" class="perms-menu__option" />
+        <input type="radio" name="change_time" value="5" class="perms-menu__option" />
+    </div>
+    <div class="grid-wrapper" data="CHANGE_TRACK">
+        <div class="perms-menu__name">Change track</div>
+        <input type="radio" name="change_track" value="1" class="perms-menu__option" />
+        <input type="radio" name="change_track" value="5" class="perms-menu__option" />
+    </div>
+    <div class="grid-wrapper" data="DELETE_TRACK">
+        <div class="perms-menu__name">Delete track</div>
+        <input type="radio" name="delete" value="1" class="perms-menu__option" />
+        <input type="radio" name="delete" value="5" class="perms-menu__option" />
+    </div>
+    <div class="grid-wrapper" data="VOTE_FOR_SKIP">
+        <div class="perms-menu__name">Vote for skip</div>
+        <input type="radio" name="vote" value="1" class="perms-menu__option" />
+        <input type="radio" name="vote" value="5" class="perms-menu__option" />
+    </div>
+</div>`,
+    footerButtons: [
+        { class: "btn btn__ok", text: "Save", handler: "savePerms()" },
+        { class: "btn btn__cancel", text: "Cancel", handler: "closeModal()" },
+    ],
+});
+
+function showModal() {
+    modal.show();
+    let settings = $(".perms-menu").children();
+    settings.each((idx, setting) => {
+        setting = $(setting);
+        if (setting.attr("data") == "title") {
+            return;
+        }
+        let currentValue = permissions[setting.attr("data")];
+        setting.find(`input[type="radio"][value="${currentValue}"]`).prop("checked", true);
+    });
+}
+function closeModal() {
+    modal.hide();
+}
+function savePerms() {
+    if (username != hostUsername) {
+        return;
+    }
+    let settings = $(".perms-menu").children();
+    settings.each((idx, setting) => {
+        setting = $(setting);
+        if (setting.attr("data") == "title") {
+            return;
+        }
+        let perm = setting.attr("data");
+        let newValue = setting.find('input[type="radio"]:checked').val();
+        permissions[perm] = newValue;
+    });
+    console.log("Permissions saved, boss");
+    console.log(permissions);
+    roomSocket.send(
+        JSON.stringify({
+            event: "CHANGE_PERMISSIONS",
+            message: "Room permissions changed",
+            permissions: permissions,
+        })
+    );
+    // Also modal button should be visible only to host
+    modal.hide();
 }
