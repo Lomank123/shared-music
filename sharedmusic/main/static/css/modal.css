@@ -11,10 +11,6 @@
     /*transition: opacity 0.1s ease-in;*/
 }
 
-.modal__content * {
-    color: black;
-}
-
 .modal__content {
     position: relative;
     width: auto;
@@ -23,7 +19,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #fff;
+    background-color: rgb(50, 50, 50);
     background-clip: padding-box;
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 0.3rem;
@@ -50,7 +46,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 15px;
-    border-bottom: 1px solid #eceeef;
+    border-bottom: 1px solid var(--primary-color);
 }
 
 .modal__title {
@@ -93,7 +89,7 @@
     align-items: center;
     justify-content: flex-end;
     padding: 1rem;
-    border-top: 1px solid #e9ecef;
+    border-top: 1px solid var(--primary-color);
     border-bottom-right-radius: 0.3rem;
     border-bottom-left-radius: 0.3rem;
 }
