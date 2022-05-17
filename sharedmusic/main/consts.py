@@ -8,6 +8,7 @@ LISTENER_ADDED = "Listener added."
 LISTENER_REMOVED = "Listener removed."
 USER_ALREADY_IN_ROOM = "User has already connected. Refresh the page."
 ROOM_NOT_ALLOWED_MSG = "You do not have permissions."
+PERMISSIONS_CHANGED_MSG = "Permissions changed."
 GET_TRACK_FROM_LISTENERS = "Get track from listeners."
 HOST_CHANGED = "Host changed."
 # Format: "<username> has disconnected."
@@ -43,7 +44,7 @@ VOTE_FOR_SKIP_EVENT = "VOTE_FOR_SKIP"
 # Permissions and user interactions
 CHANGE_HOST_EVENT = "CHANGE_HOST"
 HOST_CHANGED_EVENT = "HOST_CHANGED"
-CHANGE_ROOM_SETTINGS_EVENT = "CHANGE_ROOM_SETTINGS"
+CHANGE_PERMISSIONS_EVENT = "CHANGE_PERMISSIONS"
 
 
 # Permissions

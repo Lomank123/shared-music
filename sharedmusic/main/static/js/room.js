@@ -183,8 +183,8 @@ function connect() {
             setPermissions(permissions);
         }
         if (data.event == "CHANGE_PERMISSIONS") {
-            //permissions = data.permissions;
-            //setPermissions(permissions)
+            permissions = data.permissions;
+            setPermissions(permissions);
             toastr["info"]("Room permissions have been changed");
         }
         if (data.event == "ROOM_NOT_ALLOWED") {

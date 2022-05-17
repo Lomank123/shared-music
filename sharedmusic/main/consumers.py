@@ -46,8 +46,8 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
             await self.service.handle_track_ended(response)
         elif event == consts.CHANGE_HOST_EVENT:
             await self.service.handle_change_host(response)
-        elif event == consts.CHANGE_ROOM_SETTINGS_EVENT:
-            await self.service.handle_change_room_settings(response)
+        elif event == consts.CHANGE_PERMISSIONS_EVENT:
+            await self.service.handle_change_permissions(response)
         else:
             await self.service.handle_default(response)
 

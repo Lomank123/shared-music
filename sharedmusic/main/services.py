@@ -234,8 +234,15 @@ class MusicRoomConsumerService():
         })
         await self.channel_layer.group_send(self.room_group_name, data)
 
-    async def handle_change_room_settings(self, response):
-        pass
+    async def handle_change_permissions(self, response):
+        room = await RoomRepository.get_room_by_id_or_none(self.room_id)
+        new_permissions = response.get("permissions", None)
+        room.permissions = new_permissions
+        await RoomRepository.save_room(room)
+        data = self._build_context_data(consts.CHANGE_PERMISSIONS_EVENT, consts.PERMISSIONS_CHANGED_MSG, {
+            "permissions": room.permissions,
+        })
+        await self.channel_layer.group_send(self.room_group_name, data)
 
     async def handle_default(self, response):
         event = response.get("event", None)
