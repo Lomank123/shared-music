@@ -55,6 +55,9 @@ services:
 
   redis:
     image: "redis:alpine"
+    restart: always
+    volumes:
+      - redis-data:/data
 
   db:
     image: postgres:13-alpine
@@ -69,3 +72,4 @@ services:
 volumes:
   django:
   postgres-data:
+  redis-data:
