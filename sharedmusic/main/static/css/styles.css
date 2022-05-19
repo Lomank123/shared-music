@@ -176,9 +176,9 @@ input[type="email"] {
 }
 
 .user-data {
-    margin-top: auto;
     margin-bottom: 50px;
     text-align: center;
+    margin-top: 30px;
 }
 
 /* Sign In / Register */
@@ -340,7 +340,7 @@ input[type="email"] {
     margin-top: -40px;
     opacity: 0;
     padding: 3px 7px;
-    position: absolute;
+    position: fixed;
     visibility: hidden;
     transition: all 0.4s ease-in-out;
 }
@@ -535,4 +535,28 @@ input[type="email"] {
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown:hover .dropbtn i {
     color: var(--primary-color);
+}
+
+.logo {
+    width: 560px;
+    height: 320px;
+    background-image: url("../images/sharedmusic.svg");
+    background-size: cover;
+}
+
+.logo-mini {
+    width: 250px;
+    height: 150px;
+    background-image: url("../images/sharedmusic_medium.svg");
+    background-size: cover;
+    margin-top: auto;
+}
+
+@media screen and (max-width: 570px) {
+    .logo {
+        width: 250px;
+        height: 150px;
+        background-image: url("../images/sharedmusic_medium.svg");
+        background-size: cover;
+    }
 }

@@ -14,7 +14,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/modal.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/player.css' %}">
 	<!-- Title -->
-    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.png' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/sharedmusic_icon.png' %}">
     <title>Shared Music | {% block title %}{% endblock title %}</title>
   </head>
 
@@ -34,6 +34,7 @@
             <i class="fa-solid fa-arrow-right-to-bracket"></i>
             <p>Log in</p>
         </a>
+        <div class="logo-mini"></div>
         {% if user.is_authenticated %}
         <div class="user-data">
             <h6>Welcome, {{ user.username }}</h6>
