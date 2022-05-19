@@ -58,6 +58,9 @@ services:
 
   db:
     image: postgres:13-alpine
+    restart: always
+    volumes: 
+      - postgres-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
@@ -65,3 +68,4 @@ services:
 
 volumes:
   django:
+  postgres-data:
