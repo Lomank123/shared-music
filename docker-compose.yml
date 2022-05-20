@@ -63,16 +63,46 @@ services:
 
   redis:
     image: "redis:alpine"
+    restart: always
+    volumes:
+      - redis-data:/data
 
   db:
     image: postgres:13-alpine
+    restart: always
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
 
+  pgbackups:
+    image: prodrigestivill/postgres-backup-local
+    restart: always
+    user: postgres:postgres
+    volumes:
+      - ./backups:/backups
+    links:
+      - db
+    depends_on:
+      - db
+    environment:
+      - POSTGRES_HOST=${DB_HOST}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_EXTRA_OPTS=-Z6 --schema=public --blobs
+      - SCHEDULE=@every 1m
+      - BACKUP_KEEP_DAYS=2
+      - BACKUP_KEEP_WEEKS=2
+      - BACKUP_KEEP_MONTHS=2
+      - HEALTHCHECK_PORT=8080
+
 volumes:
   django:
+  postgres-data:
+  redis-data:
 
   #lint:
   #  build: .

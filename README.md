@@ -29,6 +29,8 @@ Live version can be visited at: [sharedmusic.live](https://sharedmusic.live/)
     - [Run project](#run-project)
     - [Linters](#linters)
     - [Fixtures](#fixtures)
+    - [Backup](#backup)
+    - [Restore](#restore)
   - [Tests](#tests)
     - [Tests description](#tests-description)
   - [Deployment](#deployment)
@@ -56,6 +58,11 @@ For Linux:
 ```
 cd path/to/project/shared-music
 cp .env.sample .env
+```
+
+Create `/backups` folder (if you want to use backups):
+```
+mkdir backups
 ```
 
 ### Docker setup
@@ -181,6 +188,46 @@ docker-compose up
 - User 2:
     - email: `test2@gmail.com`
     - password: `123123123Qq`
+
+### Backup
+- Assuming you have created `/backups` dir you can just run `pgbackups` container
+```
+docker-compose up pgbackups
+```
+
+If you want to configure it follow [here](https://github.com/prodrigestivill/docker-postgres-backup-local#environment-variables)
+
+### Restore
+- Run db container
+```
+docker-compose up db
+```
+
+- Enter there via docker exec sh:
+```
+docker exec -t -i shared-music_db_1 sh
+```
+
+- In db container create backups folder:
+```
+mkdir backups
+```
+
+- Copy backup file to db container (here I used path from my pc):
+```
+docker cp D:\path\to\folder\backups\last\backupfile.sql.gz shared-music_db_1:/backups
+```
+
+Replace `backupfile.sql.gz` with your actual backup file name (located at `backups\last` for example)
+
+- Run restoration command (replace `$USERNAME` and `$DBNAME` with `.env` variables (`DB_USER` and `DB_NAME`), and also `$BACKUPFILE` with previously copied file name)
+```
+docker exec --tty --interactive shared-music_db_1 /bin/sh -c "zcat backups/$BACKUPFILE | psql --username=$USERNAME --dbname=$DBNAME -W"
+```
+
+- Enter password (`DB_PASS` variable in `.env`)
+
+- Check restored db
 
 
 ## Tests
