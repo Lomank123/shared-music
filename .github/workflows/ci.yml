@@ -17,6 +17,7 @@ jobs:
           docker-compose up --exit-code-from test test
   deploy:
     runs-on: ubuntu-latest
+    needs: test
     steps:
       - name: Deploy to remote server
         uses: appleboy/ssh-action@master
