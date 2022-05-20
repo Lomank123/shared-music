@@ -61,6 +61,37 @@ services:
     depends_on:
       - django
 
+  test:
+    build:
+      context: .
+    user: "${UID}"
+    command: >
+      sh -c "
+        python manage.py wait_for_db &&
+        python manage.py test main.tests
+      "
+    volumes:
+      - ./sharedmusic:/sharedmusic
+    env_file: .env
+    depends_on:
+      - db
+
+  filldb:
+    build: .
+    command: >
+      sh -c "
+        python manage.py wait_for_db &&
+        python manage.py makemigrations &&
+        python manage.py migrate && 
+        python manage.py loaddata fixtures/dev.json
+      "
+    volumes: 
+      - ./sharedmusic:/sharedmusic
+    env_file: .env
+    depends_on:
+      - db
+    profiles: ["fixtures"]
+
   redis:
     image: "redis:alpine"
     restart: always
@@ -93,57 +124,15 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
       - POSTGRES_EXTRA_OPTS=-Z6 --schema=public --blobs
-      - SCHEDULE=@every 1m
+      # You can also use @every 1h30m10s
+      - SCHEDULE=@hourly
       - BACKUP_KEEP_DAYS=2
       - BACKUP_KEEP_WEEKS=2
       - BACKUP_KEEP_MONTHS=2
       - HEALTHCHECK_PORT=8080
+    
 
 volumes:
   django:
   postgres-data:
   redis-data:
-
-  #lint:
-  #  build: .
-  #  command: >
-  #    sh -c "
-  #      flake8 --max-line-length 120 --exclude migrations,venv,manage.py,__init__.py
-  #    "
-  #  volumes: 
-  #    - ./sharedmusic:/sharedmusic
-  #  env_file: .env
-  #  depends_on:
-  #    - db
-
-  #filldb:
-  #  build: .
-  #  command: >
-  #    sh -c "
-  #      python manage.py wait_for_db &&
-  #      python manage.py makemigrations &&
-  #      python manage.py migrate && 
-  #      python manage.py loaddata fixtures/dev.json
-  #    "
-  #  volumes: 
-  #    - ./sharedmusic:/sharedmusic
-  #  env_file: .env
-  #  depends_on:
-  #    - db
-  #  profiles: ["init"]
-
-  #test:
-  #  build:
-  #    context: .
-  #  user: "${UID}"
-  #  command: >
-  #    sh -c "
-  #      python manage.py wait_for_db &&
-  #      coverage run --source='.' manage.py test mainapp.tests &&
-  #      coverage xml
-  #    "
-  #  volumes: 
-  #    - ./sharedmusic:/sharedmusic
-  #  env_file: .env
-  #  depends_on: 
-  #    - db

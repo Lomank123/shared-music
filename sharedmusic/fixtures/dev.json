@@ -1,0 +1,92 @@
+[
+{
+  "model": "main.customuser",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$260000$3FM5BILaxXtmHCzoa6pO9r$RDaDD9MKqxPj5PtEEg7pAmrNG1LZ8199OZKIM0NqXGw=",
+    "last_login": "2022-05-20T05:25:03.763Z",
+    "is_superuser": false,
+    "username": "test1",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2022-05-20T05:25:03.390Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "main.customuser",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$260000$hoAtFZC3PDO5pRY4NNN00D$HhK3DE0jZh0e9Jc0iRyMr3v4OZbFrtRz0sUkwabeZhI=",
+    "last_login": "2022-05-20T06:28:58.924Z",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2022-05-20T05:42:29.571Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "main.playlist",
+  "pk": 1,
+  "fields": {
+    "name": "Playlist",
+    "creation_date": "2022-05-20T05:25:04.875Z"
+  }
+},
+{
+  "model": "main.playlist",
+  "pk": 2,
+  "fields": {
+    "name": "Playlist",
+    "creation_date": "2022-05-20T05:39:40.825Z"
+  }
+},
+{
+  "model": "main.room",
+  "pk": "09aa31a6-7def-4cec-93a7-8f3c8d746fc5",
+  "fields": {
+    "host": 1,
+    "creation_date": "2022-05-20T05:25:04.971Z",
+    "last_visited": "2022-05-20T05:25:04.971Z",
+    "playlist": 1,
+    "permissions": {
+      "PAUSE": 1,
+      "ADD_TRACK": 1,
+      "CHANGE_TIME": 1,
+      "CHANGE_TRACK": 1,
+      "DELETE_TRACK": 1,
+      "VOTE_FOR_SKIP": 1
+    },
+    "listeners": []
+  }
+},
+{
+  "model": "main.room",
+  "pk": "185cd2bf-a96a-4659-a06c-1ddd7ac76212",
+  "fields": {
+    "host": 1,
+    "creation_date": "2022-05-20T05:39:40.850Z",
+    "last_visited": "2022-05-20T05:39:40.850Z",
+    "playlist": 2,
+    "permissions": {
+      "PAUSE": 1,
+      "ADD_TRACK": 1,
+      "CHANGE_TIME": 1,
+      "CHANGE_TRACK": 1,
+      "DELETE_TRACK": 1,
+      "VOTE_FOR_SKIP": 1
+    },
+    "listeners": []
+  }
+}
+]

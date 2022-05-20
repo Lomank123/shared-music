@@ -86,9 +86,9 @@ services:
       - POSTGRES_PASSWORD=${DB_PASS}
       - POSTGRES_EXTRA_OPTS=-Z6 --schema=public --blobs
       - SCHEDULE=@daily
-      - BACKUP_KEEP_DAYS=2
-      - BACKUP_KEEP_WEEKS=2
-      - BACKUP_KEEP_MONTHS=2
+      - BACKUP_KEEP_DAYS=4
+      - BACKUP_KEEP_WEEKS=4
+      - BACKUP_KEEP_MONTHS=4
       - HEALTHCHECK_PORT=8080
 
 volumes:
