@@ -30,4 +30,4 @@ jobs:
             git pull ${{ secrets.REPO_URL }}
             docker-compose down
             docker rmi -f $(docker images -aq)
-            docker-compose up --build -d
+            docker-compose -f docker-compose-deploy.yml up -d
