@@ -1,4 +1,7 @@
 # shared-music
+
+![Alt text](./sharedmusic/main/static/images/sharedmusic_black.svg)
+
 **Shared Music** service provides you rooms where you can listen to music with friends or anyone else who wants to come in. All you have to do is click create room button and share the link. It's that simple! See all the features below.
 
 **Main goals:**
