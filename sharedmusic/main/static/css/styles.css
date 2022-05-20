@@ -58,6 +58,12 @@ input[type="email"] {
     padding: 0 15px;
 }
 
+.responsive-image {
+    width: 100%;
+    max-width: 700px;
+    height: auto;
+}
+
 .btn {
     background-color: var(--primary-color);
     border: 1px solid var(--primary-color);
@@ -133,6 +139,10 @@ input[type="email"] {
     top: 0;
     left: -250px;
     overflow-x: hidden;
+}
+
+.sidebar__logo {
+    margin-top: auto;
 }
 
 .sidebar__link {
@@ -535,28 +545,4 @@ input[type="email"] {
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown:hover .dropbtn i {
     color: var(--primary-color);
-}
-
-.logo {
-    width: 560px;
-    height: 320px;
-    background-image: url("../images/sharedmusic.svg");
-    background-size: cover;
-}
-
-.logo-mini {
-    width: 250px;
-    height: 150px;
-    background-image: url("../images/sharedmusic_medium.svg");
-    background-size: cover;
-    margin-top: auto;
-}
-
-@media screen and (max-width: 570px) {
-    .logo {
-        width: 250px;
-        height: 150px;
-        background-image: url("../images/sharedmusic_medium.svg");
-        background-size: cover;
-    }
 }
