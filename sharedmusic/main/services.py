@@ -210,7 +210,11 @@ class MusicRoomConsumerService():
         rev_tracks = playlist_tracks.copy()
         rev_tracks.reverse()
         # Find next track from playlist
-        next_track_index = rev_tracks.index(current_track_data) + 1
+        next_track_index = 1
+        for index in range(len(rev_tracks)):
+            if rev_tracks[index]['url'] == current_track_data['url']:
+                next_track_index = index + 1
+                break
         next_track = rev_tracks[0]
         if next_track_index < len(rev_tracks):
             next_track = rev_tracks[next_track_index]
