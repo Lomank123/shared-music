@@ -43,7 +43,7 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         elif event == consts.DELETE_TRACK_EVENT:
             await self.service.handle_delete_track(response)
         elif event == consts.TRACK_ENDED_EVENT:
-            await self.service.handle_track_ended(response)
+            await self.service.handle_set_next_track(response)
         elif event == consts.CHANGE_HOST_EVENT:
             await self.service.handle_change_host(response)
         elif event == consts.CHANGE_PERMISSIONS_EVENT:

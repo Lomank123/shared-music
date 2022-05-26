@@ -111,6 +111,7 @@ function connect() {
                 $(".repeat-btn").children().toggleClass("repeat-active");
                 loop = data.loop;
             }
+            hasVoted = false;
         }
         if (data.event == "DELETE_TRACK") {
             updatePlaylist(data.playlist, data.chosenTrackUrl);
