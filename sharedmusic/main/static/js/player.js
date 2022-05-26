@@ -134,33 +134,30 @@ function onPlayerStateChange(event) {
     audioPlayer.querySelector(".time .length").textContent = getTimeCodeFromNum(player.getDuration());
     audioPlayer.querySelector(".name .title").textContent = player.getVideoData().title;
 
-    // If track in on loop, send CHANGE_TRACK event with the same track
+    // If track on loop, send CHANGE_TRACK event with the same track
     if (event.data == YT.PlayerState.ENDED && username == users[0].username && loop) {
-        const id = youtube_parser(player.getVideoUrl());
-        const trackData = {
-            url: youtubeRawLink + id,
-            name: player.getVideoData().title,
-        };
-        changeTrack(event, trackData);
+        changeTrack(event, getCurrentTrackData());
         return;
     }
 
-    // For now only host can send this event otherwise it will cause error
-    // The event will be sent from all listeners and in some cases title will not be loaded
     if (event.data == YT.PlayerState.ENDED && username == users[0].username) {
-        const id = youtube_parser(player.getVideoUrl());
-        const trackData = {
-            url: youtubeRawLink + id,
-            name: player.getVideoData().title,
-        };
         roomSocket.send(
             JSON.stringify({
                 event: "TRACK_ENDED",
                 message: "Track has ended. Need new one.",
-                track: trackData,
+                track: getCurrentTrackData(),
             })
         );
     }
+}
+
+function getCurrentTrackData() {
+    const id = youtube_parser(player.getVideoUrl());
+    const trackData = {
+        url: youtubeRawLink + id,
+        name: player.getVideoData().title,
+    };
+    return trackData;
 }
 
 function mutePlayer() {
