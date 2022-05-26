@@ -237,10 +237,12 @@ class MusicRoomConsumerService():
         data = self._build_context_data(consts.CHANGE_TIME_EVENT, message, {"time": time})
         await self.channel_layer.group_send(self.room_group_name, data)
 
-    async def _find_next_track(self, playlist_tracks, current_track):
+    async def _find_next_track(self, playlist_tracks, current_track, previous=False):
         """
         Finds next track in the playlist (after current_track) and returns it.
         If it is the last track then it falls back to the first.
+
+        if previous is set to True, then previous track will be returned.
         """
         # We need reverse playlist
         rev_tracks = playlist_tracks.copy()
@@ -264,7 +266,8 @@ class MusicRoomConsumerService():
         # Get current playlist and current track
         playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist)
         current_track_data = response.get("track", None)
-        next_track = await self._find_next_track(playlist_tracks, current_track_data)
+        previous = response.get("previous", False)
+        next_track = await self._find_next_track(playlist_tracks, current_track_data, previous=previous)
         # Send change track event with next track
         message = "New current track set."
         data = self._build_context_data(consts.CHANGE_TRACK_EVENT, message, {
