@@ -219,3 +219,9 @@ input[type="range"]::-ms-track {
         margin-right: 0;
     }
 }
+
+@media screen and (max-width: 400px) {
+    .name .thumb {
+        display: none;
+    }
+}
