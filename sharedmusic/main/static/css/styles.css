@@ -291,11 +291,16 @@ input[type="email"] {
 
 #users-list li .username {
     margin-right: 10px;
+    max-width: 15vw;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .users-container {
     margin-bottom: 30px;
-    max-width: 325px;
+    max-width: 250px;
+    margin-right: 60px;
 }
 
 .online {
@@ -319,6 +324,10 @@ input[type="email"] {
 }
 
 /* Permissions */
+.perms-container {
+    margin-left: 30px;
+}
+
 .perms-container .permissions {
     overflow: auto;
     max-height: 50vh;
@@ -327,7 +336,6 @@ input[type="email"] {
 .playlist {
     max-height: 50vh;
     overflow-y: auto;
-    text-align: center;
 }
 
 .playlist-error {
@@ -557,7 +565,7 @@ input[type="email"] {
 }
 
 /* Mobile version */
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 1050px) {
     .container {
         max-width: 550px;
         margin: 0 auto;
@@ -576,6 +584,7 @@ input[type="email"] {
     }
     .playlist {
         max-height: 20vh;
+        text-align: center;
     }
     .track__title {
         width: 90vw;
@@ -583,13 +592,29 @@ input[type="email"] {
     .perms-container .permissions {
         max-height: 20vh;
     }
+    .perms-container h6 {
+        display: none;
+    }
     /* Playlist */
     .playlist {
         max-height: 20vh;
     }
+    .playlist-input {
+        text-align: center;
+    }
+    .users-container {
+        margin-right: 0;
+    }
+    #users-list li .username {
+        max-width: 20vw;
+    }
+    .sign-form {
+        width: 100%;
+        margin: 100px auto;
+    }
 }
 
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 500px) {
     * {
         font-size: 1rem;
     }
@@ -610,17 +635,10 @@ input[type="email"] {
         top: 40px;
         left: 20px;
     }
-    .perms-container {
-        margin-left: 10px;
-    }
     .playlist {
-        max-height: 30vh;
+        max-height: 25vh;
     }
     .room-name h1 {
         font-size: 1.2rem;
-    }
-    .users-container {
-        margin-bottom: 30px;
-        max-width: 325px;
     }
 }
