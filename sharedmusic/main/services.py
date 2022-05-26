@@ -286,8 +286,10 @@ class MusicRoomConsumerService():
         # Skip means we need to set next track which is the same as track ended event handling
         if skip:
             await self.handle_set_next_track(response)
-        # Otherwise we need to send votes info to other listeners
-        message = f"Number of votes: ${votes} of ${listeners_count}"
+            votes = 0
+            message = "Track skipped. Resetting votes."
+        else:
+            message = f"Number of votes: ${votes} of ${listeners_count}"
         data = self._build_context_data(consts.VOTE_FOR_SKIP_EVENT, message, {
             "votes": votes,
         })
