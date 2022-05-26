@@ -282,7 +282,7 @@ class MusicRoomConsumerService():
         # If votes > listeners / 2 then skip otherwise do nothing
         listeners_info = await RoomRepository.get_listeners_info(self.room_id)
         listeners_count = listeners_info['count']
-        skip = votes >= (listeners_count / 2)
+        skip = int(votes) >= (listeners_count / 2)
         # Skip means we need to set next track which is the same as track ended event handling
         if skip:
             await self.handle_set_next_track(response)
