@@ -114,10 +114,14 @@
 
 .name .thumb {
     margin-right: 10px;
+    margin-left: 20px;
 }
 .name {
     margin-left: auto;
     margin-right: 30px;
+}
+.name .title {
+    white-space: nowrap;
 }
 
 input[type="range"] {
@@ -189,4 +193,13 @@ input[type="range"]::-ms-track {
 
 .repeat-active {
     color: var(--primary-color);
+}
+
+@media screen and (max-width: 900px) {
+    .name .title {
+        display: none;
+    }
+    .name .thumb {
+        margin-right: 0;
+    }
 }
