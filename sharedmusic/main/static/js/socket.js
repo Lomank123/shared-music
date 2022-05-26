@@ -1,7 +1,6 @@
 const roomCode = $("#room").attr("room_code");
 const protocol = window.location.protocol == "https:" ? "wss://" : "ws://";
 const connectionString = protocol + window.location.host + "/ws/room/" + roomCode + "/";
-let votes = 0;
 
 let roomSocket = null;
 
@@ -50,8 +49,6 @@ function connect() {
         if (data.event == "CONNECT") {
             users = data.listeners.users;
             permissions = data.permissions;
-            votes = data.votes || 0;
-            $("#votes-number").text(`Votes: ${votes} / ${users.length}`);
             console.log(permissions);
             setPermissions(permissions);
             updateUserList(users);
@@ -96,7 +93,6 @@ function connect() {
             player.loadVideoById(id);
             playTrack();
             updatePlaylist(data.playlist, data.track.url);
-            hasVoted = false;
         }
         if (data.event == "SET_CURRENT_TRACK") {
             const id = youtube_parser(data.track.url);
@@ -139,10 +135,6 @@ function connect() {
         if (data.event == "CHANGE_LOOP") {
             $(".repeat-btn").children().toggleClass("repeat-active");
             loop = !loop;
-        }
-        if (data.event == "VOTE_FOR_SKIP") {
-            votes = data.votes;
-            $("#votes-number").text(`Votes: ${votes} / ${users.length}`);
         }
         if (data.event == "HOST_CHANGED") {
             $("#host").attr("host_username", data.new_host);

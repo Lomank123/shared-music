@@ -1,6 +1,4 @@
 const urlField = document.getElementById("url-field");
-let currentTrack;
-let hasVoted = false;
 
 function deleteTrack(event, trackData, chosenTrackUrl) {
     roomSocket.send(
@@ -100,26 +98,4 @@ function addTrack() {
                 $(".playlist-error").text("");
             }, 5000);
         });
-}
-
-function handleVote() {
-    if (hasVoted) {
-        $("#vote-error").text("Already voted");
-        setTimeout(() => {
-            $("#vote-error").text("");
-        }, 5000);
-        return;
-    }
-    console.log("vote");
-    votes += 1;
-    let currentTrack = getCurrentTrackData();
-    roomSocket.send(
-        JSON.stringify({
-            event: "VOTE_FOR_SKIP",
-            message: "Vote",
-            votes: votes,
-            track: currentTrack,
-        })
-    );
-    hasVoted = true;
 }
