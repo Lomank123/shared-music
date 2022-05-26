@@ -1,6 +1,7 @@
 const roomCode = $("#room").attr("room_code");
 const protocol = window.location.protocol == "https:" ? "wss://" : "ws://";
 const connectionString = protocol + window.location.host + "/ws/room/" + roomCode + "/";
+let votes = 0;
 
 let roomSocket = null;
 
@@ -49,6 +50,8 @@ function connect() {
         if (data.event == "CONNECT") {
             users = data.listeners.users;
             permissions = data.permissions;
+            votes = data.votes || 0;
+            $("#votes-number").text(`Votes: ${votes} / ${users.length}`);
             console.log(permissions);
             setPermissions(permissions);
             updateUserList(users);
@@ -93,6 +96,7 @@ function connect() {
             player.loadVideoById(id);
             playTrack();
             updatePlaylist(data.playlist, data.track.url);
+            hasVoted = false;
         }
         if (data.event == "SET_CURRENT_TRACK") {
             const id = youtube_parser(data.track.url);
@@ -111,6 +115,7 @@ function connect() {
                 $(".repeat-btn").children().toggleClass("repeat-active");
                 loop = data.loop;
             }
+            hasVoted = false;
         }
         if (data.event == "DELETE_TRACK") {
             updatePlaylist(data.playlist, data.chosenTrackUrl);
@@ -136,8 +141,8 @@ function connect() {
             loop = !loop;
         }
         if (data.event == "VOTE_FOR_SKIP") {
-            // Get votes from data and set it to some var
-            // Also need to add some button which will 
+            votes = data.votes;
+            $("#votes-number").text(`Votes: ${votes} / ${users.length}`);
         }
         if (data.event == "HOST_CHANGED") {
             $("#host").attr("host_username", data.new_host);
