@@ -240,3 +240,24 @@ function playTrack() {
     playBtn.classList.add("pause");
     player.playVideo();
 }
+
+function backward() {
+    roomSocket.send(
+        JSON.stringify({
+            event: "TRACK_ENDED",
+            message: "Track has ended. Need new one.",
+            track: getCurrentTrackData(),
+            previous: true,
+        })
+    );
+}
+
+function forward() {
+    roomSocket.send(
+        JSON.stringify({
+            event: "TRACK_ENDED",
+            message: "Track has ended. Need new one.",
+            track: getCurrentTrackData(),
+        })
+    );
+}

@@ -39,6 +39,21 @@
     justify-content: center;
     align-items: center;
 }
+
+.audio-player .controls .toggle-play {
+    margin-left: 30px;
+    margin-right: 20px;
+}
+
+.control-button {
+    color: #e0e0e0;
+    cursor: pointer;
+}
+
+.control-button:hover {
+    transform: scale(1.1);
+}
+
 .audio-player .controls .toggle-play.play {
     cursor: pointer;
     position: relative;
@@ -46,7 +61,7 @@
     height: 0;
     width: 0;
     border: 7px solid #0000;
-    border-left: 13px solid white;
+    border-left: 13px solid #e0e0e0;
 }
 .audio-player .controls .toggle-play.play:hover {
     transform: scale(1.1);
@@ -61,7 +76,7 @@
     position: absolute;
     top: 0;
     left: 0px;
-    background: white;
+    background: #e0e0e0;
     content: "";
     height: 15px;
     width: 3px;
@@ -70,7 +85,7 @@
     position: absolute;
     top: 0;
     right: 8px;
-    background: white;
+    background: #e0e0e0;
     content: "";
     height: 15px;
     width: 3px;
@@ -185,6 +200,7 @@ input[type="range"]::-ms-track {
     background-color: inherit;
     margin-left: 30px;
     cursor: pointer;
+    color: #e0e0e0;
 }
 
 .repeat-active {

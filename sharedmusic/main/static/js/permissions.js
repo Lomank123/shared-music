@@ -32,11 +32,6 @@ let modal = $modal({
         <input type="radio" name="delete" value="1" class="perms-menu__option" />
         <input type="radio" name="delete" value="5" class="perms-menu__option" />
     </div>
-    <div class="grid-wrapper" data="VOTE_FOR_SKIP">
-        <div class="perms-menu__name">Vote for skip</div>
-        <input type="radio" name="vote" value="1" class="perms-menu__option" />
-        <input type="radio" name="vote" value="5" class="perms-menu__option" />
-    </div>
 </div>`,
     footerButtons: [
         { class: "btn btn__ok", text: "Save", handler: "savePerms()" },
@@ -93,7 +88,6 @@ function setPermissions(permsList) {
         CHANGE_TIME: "Change time",
         CHANGE_TRACK: "Change track",
         DELETE_TRACK: "Delete track",
-        VOTE_FOR_SKIP: "Vote for skip",
     };
     let allow = 1;
     if (username === hostUsername) {

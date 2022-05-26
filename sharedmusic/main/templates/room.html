@@ -52,7 +52,9 @@
         </div>
         <div class="controls">
             <div class="play-container">
+                <i onclick="backward()" class="fa-solid fa-backward-step control-button"></i>
                 <div class="toggle-play play"></div>
+                <i onclick="forward()" class="fa-solid fa-forward-step control-button"></i>
             </div>
             <div class="volume-container">
                 <div class="volume-button">
@@ -65,9 +67,7 @@
                 <div class="divider">/</div>
                 <div class="length"></div>
             </div>
-            <button onclick="changeLoop()" class="repeat-btn">
-                <i class="fa-solid fa-arrow-rotate-left"></i>
-            </button>
+            <i onclick="changeLoop()" class="fa-solid fa-arrow-rotate-left repeat-btn"></i>
             <div class="name">
                 <img class="thumb" src="" width="45" height="45" hidden>
                 <div class="title"></div>

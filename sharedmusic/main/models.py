@@ -55,7 +55,6 @@ def permissions_jsonfield_default():
             (consts.ADD_TRACK_EVENT, consts.ROOM_ALLOW_ANY),
             (consts.DELETE_TRACK_EVENT, consts.ROOM_ALLOW_ANY),
             (consts.PAUSE_TRACK_EVENT, consts.ROOM_ALLOW_ANY),
-            (consts.VOTE_FOR_SKIP_EVENT, consts.ROOM_ALLOW_ANY),
         ])
 
 

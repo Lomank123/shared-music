@@ -132,7 +132,7 @@ function connect() {
             player.seekTo(data.time);
         }
         if (data.event == "CHANGE_LOOP") {
-            $(".repeat-btn").children().toggleClass("repeat-active");
+            $(".repeat-btn").toggleClass("repeat-active");
             loop = !loop;
         }
         if (data.event == "HOST_CHANGED") {
