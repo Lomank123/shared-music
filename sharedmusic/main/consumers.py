@@ -48,8 +48,6 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
             await self.service.handle_change_host(response)
         elif event == consts.CHANGE_PERMISSIONS_EVENT:
             await self.service.handle_change_permissions(response)
-        elif event == consts.VOTE_FOR_SKIP_EVENT:
-            await self.service.handle_vote_for_skip(response)
         else:
             await self.service.handle_default(response)
 

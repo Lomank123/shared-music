@@ -277,28 +277,6 @@ class MusicRoomConsumerService():
         })
         await self.channel_layer.group_send(self.room_group_name, data)
 
-    async def handle_vote_for_skip(self, response):
-        """
-        Handles vote for skip event. Checks if more than 50% (or equal) of listeners voted to skip and sends
-        change track event with the next one if so.
-        """
-        votes = response.get("votes", None)
-        # If votes > listeners / 2 then skip otherwise do nothing
-        listeners_info = await RoomRepository.get_listeners_info(self.room_id)
-        listeners_count = listeners_info['count']
-        skip = int(votes) >= (listeners_count / 2)
-        # Skip means we need to set next track which is the same as track ended event handling
-        if skip:
-            await self.handle_set_next_track(response)
-            votes = 0
-            message = "Track skipped. Resetting votes."
-        else:
-            message = f"Number of votes: ${votes} of ${listeners_count}"
-        data = self._build_context_data(consts.VOTE_FOR_SKIP_EVENT, message, {
-            "votes": votes,
-        })
-        await self.channel_layer.group_send(self.room_group_name, data)
-
     async def handle_change_host(self, response):
         """
         Changes host to new one by it's username.
