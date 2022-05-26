@@ -325,7 +325,7 @@ input[type="email"] {
 
 /* Permissions */
 .perms-container {
-    margin-left: 30px;
+    margin-left: 20px;
 }
 
 .perms-container .permissions {
@@ -598,6 +598,8 @@ input[type="email"] {
     /* Playlist */
     .playlist {
         max-height: 20vh;
+        margin-left: 15px;
+        margin-right: 15px;
     }
     .playlist-input {
         text-align: center;
@@ -636,9 +638,12 @@ input[type="email"] {
         left: 20px;
     }
     .playlist {
-        max-height: 25vh;
+        max-height: 20vh;
     }
     .room-name h1 {
         font-size: 1.2rem;
+    }
+    #toast-container > div {
+        width: 280px;
     }
 }
