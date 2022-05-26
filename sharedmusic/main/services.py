@@ -6,6 +6,10 @@ from main.decorators import update_room_expiration_time
 
 class MusicRoomConsumerService():
 
+    """
+    Consumer service which provides event handlers for music rooms.
+    """
+
     __slots__ = (
         'scope',
         'channel_layer',
@@ -28,7 +32,7 @@ class MusicRoomConsumerService():
 
     def _build_context_data(self, event, message="Message", extra_data={}):
         """
-        Builds dict context data.
+        Builds dict context data with given event, message and extras.
         """
         context_data = {
             "type": "send_message",
@@ -39,6 +43,10 @@ class MusicRoomConsumerService():
         return context_data
 
     async def _check_permission(self, event):
+        """
+        Returns True if event is not in permissions list or if permission is lower or equal to allow any.
+        Otherwise returns whether user is host.
+        """
         room = await RoomRepository.get_room_by_id_or_none(self.room_id)
         if event in room.permissions.keys():
             if int(room.permissions[event]) > consts.ROOM_ALLOW_ANY:
@@ -46,6 +54,9 @@ class MusicRoomConsumerService():
         return True
 
     async def connect_user(self):
+        """
+        Removes old connections of the same user and adds them as listener.
+        """
         if self.user.is_authenticated:
             # Remove all previous connections of the same user if they exist
             await self._remove_old_connections()
@@ -56,8 +67,12 @@ class MusicRoomConsumerService():
             await RoomRepository.add_listener(self.room_id, self.user)
 
     async def disconnect_user(self):
-        u = self.channel_layer._get_group_channel_name(self.room_group_name)
-        if self.channel_name in self.channel_layer.groups[u]:
+        """
+        Handles disconnect event. Removes user from listeners list and sends related message
+        with updated list to others.
+        """
+        channel_name = self.channel_layer._get_group_channel_name(self.room_group_name)
+        if self.channel_name in self.channel_layer.groups[channel_name]:
             # Removing listener
             await RoomRepository.remove_listener(self.room_id, self.user)
             # Send disconnect message to other listeners
@@ -71,12 +86,12 @@ class MusicRoomConsumerService():
 
     async def _remove_old_connections(self):
         """
-        Removes all previous (old) channels from room and user groups.
+        Removes all previous (old) connections from room and user groups.
         """
         try:
             # Create copy to iterate through
-            u = self.channel_layer._get_group_channel_name(self.user_group_name)
-            user_group = self.channel_layer.groups[u].copy()
+            channel_name = self.channel_layer._get_group_channel_name(self.user_group_name)
+            user_group = self.channel_layer.groups[channel_name].copy()
         except KeyError:
             user_group = {}
         # Remove old channel (if same user or multiple tabs)
@@ -96,7 +111,7 @@ class MusicRoomConsumerService():
 
     async def handle_connect(self, response):
         """
-        Handles connect event. Sends track to new listener and related message to all other users.
+        Handles connect event. Sends track to new listener and related message to all other listeners.
         """
         message = response.get("message", None)
         listeners_data = await RoomRepository.get_listeners_info(self.room_id)
@@ -114,6 +129,10 @@ class MusicRoomConsumerService():
         await self._get_track_from_listeners(listeners_data)
 
     async def _get_track_from_listeners(self, listeners):
+        """
+        Finds first online listener in the room and sends them event
+        to get track data for new one. If no listeners found nothing happens.
+        """
         another_user = None
         if len(listeners['users']) > 1:
             for listener in listeners['users']:
@@ -133,6 +152,9 @@ class MusicRoomConsumerService():
 
     @update_room_expiration_time
     async def handle_change_track(self, response):
+        """
+        Handles change track event. Sends chosen track data and playlist to other listeners.
+        """
         # Get new track data and send to clients
         track_data = response.get("track", None)
         room_playlist = await RoomRepository.get_room_playlist(self.room_id)
@@ -146,6 +168,10 @@ class MusicRoomConsumerService():
 
     @update_room_expiration_time
     async def handle_add_track(self, response):
+        """
+        Handles add track event. Sends updated playlist and flag whether new Soundtrack instance
+        has been created.
+        """
         url = response.get("url", None)
         name = response.get("name", None)
         new_track, _ = await SoundtrackRepository.get_or_create(url, name)
@@ -163,6 +189,9 @@ class MusicRoomConsumerService():
 
     @update_room_expiration_time
     async def handle_delete_track(self, response):
+        """
+        Handles delete track event. Sends deleted track info along with updated playlist.
+        """
         room_playlist = await RoomRepository.get_room_playlist(self.room_id)
         track_data = response.get("track", None)
         chosen_track_url = response.get("chosenTrackUrl", None)
@@ -181,6 +210,10 @@ class MusicRoomConsumerService():
         await self.channel_layer.group_send(self.room_group_name, data)
 
     async def handle_send_track_to_new_user(self, response):
+        """
+        Used when new listener enters the room.
+        Retrieves track data from existing listener and sends it only to new one by specifying user group.
+        """
         new_user = response.get("user", None)
         track_data = response.get("track", None)
         loop = response.get("loop", None)
@@ -196,33 +229,67 @@ class MusicRoomConsumerService():
 
     @update_room_expiration_time
     async def handle_change_time(self, response):
+        """
+        Handles player time change. Sends new time to all listeners.
+        """
         time = response.get("time", None)
         message = "Set current time."
         data = self._build_context_data(consts.CHANGE_TIME_EVENT, message, {"time": time})
         await self.channel_layer.group_send(self.room_group_name, data)
 
-    async def handle_track_ended(self, response):
-        room_playlist = await RoomRepository.get_room_playlist(self.room_id)
-        # Get current playlist and current track
-        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist)
-        current_track_data = response.get("track", None)
+    async def _find_next_track(self, playlist_tracks, current_track):
+        """
+        Finds next track in the playlist (after current_track) and returns it.
+        If it is the last track then it falls back to the first.
+        """
         # We need reverse playlist
         rev_tracks = playlist_tracks.copy()
         rev_tracks.reverse()
         # Find next track from playlist
         next_track_index = 1
         for index in range(len(rev_tracks)):
-            if rev_tracks[index]['url'] == current_track_data['url']:
+            if rev_tracks[index]['url'] == current_track['url']:
                 next_track_index = index + 1
                 break
         next_track = rev_tracks[0]
         if next_track_index < len(rev_tracks):
             next_track = rev_tracks[next_track_index]
+        return next_track
+
+    async def handle_set_next_track(self, response):
+        """
+        Finds next track in the list and sends change track event.
+        """
+        room_playlist = await RoomRepository.get_room_playlist(self.room_id)
+        # Get current playlist and current track
+        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist)
+        current_track_data = response.get("track", None)
+        next_track = await self._find_next_track(playlist_tracks, current_track_data)
         # Send change track event with next track
         message = "New current track set."
         data = self._build_context_data(consts.CHANGE_TRACK_EVENT, message, {
             "playlist": playlist_tracks,
             "track": {'url': next_track['url']},
+        })
+        await self.channel_layer.group_send(self.room_group_name, data)
+
+    async def handle_vote_for_skip(self, response):
+        """
+        Handles vote for skip event. Checks if more than 50% (or equal) of listeners voted to skip and sends
+        change track event with the next one if so.
+        """
+        votes = response.get("votes", None)
+        # If votes > listeners / 2 then skip otherwise do nothing
+        listeners_info = await RoomRepository.get_listeners_info(self.room_id)
+        listeners_count = listeners_info['count']
+        skip = votes >= (listeners_count / 2)
+        # Skip means we need to set next track which is the same as track ended event handling
+        if skip:
+            await self.handle_set_next_track(response)
+        # Otherwise we need to send votes info to other listeners
+        message = f"Number of votes: ${votes} of ${listeners_count}"
+        data = self._build_context_data(consts.VOTE_FOR_SKIP_EVENT, message, {
+            "votes": votes,
         })
         await self.channel_layer.group_send(self.room_group_name, data)
 
@@ -239,6 +306,9 @@ class MusicRoomConsumerService():
         await self.channel_layer.group_send(self.room_group_name, data)
 
     async def handle_change_permissions(self, response):
+        """
+        Updates permissions and sends them to all listeners.
+        """
         room = await RoomRepository.get_room_by_id_or_none(self.room_id)
         new_permissions = response.get("permissions", None)
         room.permissions = new_permissions
@@ -249,11 +319,18 @@ class MusicRoomConsumerService():
         await self.channel_layer.group_send(self.room_group_name, data)
 
     async def handle_default(self, response):
+        """
+        Default handler which sends given event and message to all listeners.
+        """
         event = response.get("event", None)
         message = response.get("message", None)
         data = self._build_context_data(event, message)
         await self.channel_layer.group_send(self.room_group_name, data)
 
     async def handle_not_allowed(self, response):
+        """
+        If user has no permissions to perform some action this handler is used.
+        Sends related message.
+        """
         data = self._build_context_data(consts.ROOM_NOT_ALLOWED_EVENT, consts.ROOM_NOT_ALLOWED_MSG)
         await self.channel_layer.group_send(self.user_group_name, data)

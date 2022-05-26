@@ -135,6 +135,10 @@ function connect() {
             $(".repeat-btn").children().toggleClass("repeat-active");
             loop = !loop;
         }
+        if (data.event == "VOTE_FOR_SKIP") {
+            // Get votes from data and set it to some var
+            // Also need to add some button which will 
+        }
         if (data.event == "HOST_CHANGED") {
             $("#host").attr("host_username", data.new_host);
             hostUsername = $("#host").attr("host_username");
