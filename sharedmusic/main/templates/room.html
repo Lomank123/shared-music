@@ -34,6 +34,12 @@
                 <input id="url-field" type="text" placeholder="Enter youtube url"/>
                 <button class="btn" onclick="addTrack()">Add track</button>
                 <div class="playlist-error"></div>
+                <div class="vote-for-skip">
+                    <div>Wanna skip this track?</div>
+                    <div id="votes-number"></div>
+                    <button class="btn" onclick="handleVote()">Skip</button>
+                    <span style="color:red" id="vote-error"></span>
+                </div>
             </div>
         </div>
         <div class="users-container">
