@@ -2,9 +2,9 @@ name: CI
 
 on:
     push:
-        branches: [main]
+        branches: [ main ]
     pull_request:
-        branches: [main]
+        branches: [ main ]
 
 jobs:
     test:
@@ -12,6 +12,6 @@ jobs:
         steps:
             - uses: actions/checkout@v2
             - name: Run tests
-              run: |
-                  cat .env.sample >> .env
-                  docker-compose up --exit-code-from test test
+                run: |
+                    cat .env.sample >> .env
+                    docker-compose up --exit-code-from test test
