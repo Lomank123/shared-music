@@ -180,8 +180,8 @@ input[type="email"] {
     max-width: 30px;
     background-color: var(--main-bg-color);
     position: fixed;
-    top: 50px;
-    left: 50px;
+    top: 40px;
+    left: 30px;
     cursor: pointer;
 }
 
@@ -266,9 +266,13 @@ input[type="email"] {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.6rem;
     margin-bottom: 50px;
     margin-top: 30px;
+    margin-left: 90px;
+}
+
+.room-name h1 {
+    font-size: 1.6rem;
 }
 
 .room-name .btn {
@@ -277,8 +281,7 @@ input[type="email"] {
 
 #users-list {
     max-height: 50vh;
-    overflow-y: auto;
-    overflow-x: auto;
+    overflow: auto;
 }
 
 #users-list li {
@@ -288,11 +291,16 @@ input[type="email"] {
 
 #users-list li .username {
     margin-right: 10px;
+    max-width: 15vw;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .users-container {
     margin-bottom: 30px;
-    max-width: 325px;
+    max-width: 250px;
+    margin-right: 60px;
 }
 
 .online {
@@ -315,6 +323,15 @@ input[type="email"] {
     margin-left: 8px;
 }
 
+/* Permissions */
+.perms-container {
+    margin-left: 30px;
+}
+
+.perms-container .permissions {
+    overflow: auto;
+    max-height: 50vh;
+}
 /* Playlist */
 .playlist {
     max-height: 50vh;
@@ -486,7 +503,7 @@ input[type="email"] {
 }
 
 .perms-menu {
-    width: 600px;
+    max-width: 600px;
 }
 
 .grid-wrapper {
@@ -518,7 +535,7 @@ input[type="email"] {
     display: none;
     position: fixed;
     background-color: #f1f1f1;
-    min-width: 160px;
+    max-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
     z-index: 1;
 }
@@ -545,4 +562,83 @@ input[type="email"] {
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown:hover .dropbtn i {
     color: var(--primary-color);
+}
+
+/* Mobile version */
+@media screen and (max-width: 1050px) {
+    .container {
+        max-width: 550px;
+        margin: 0 auto;
+    }
+    .lobby {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 20px;
+    }
+    .playlist-container {
+        order: 2;
+        grid-column: 1 / -1;
+    }
+    .playlist-container h6 {
+        text-align: center;
+    }
+    .playlist {
+        max-height: 20vh;
+        text-align: center;
+    }
+    .track__title {
+        width: 90vw;
+    }
+    .perms-container .permissions {
+        max-height: 20vh;
+    }
+    .perms-container h6 {
+        display: none;
+    }
+    /* Playlist */
+    .playlist {
+        max-height: 20vh;
+    }
+    .playlist-input {
+        text-align: center;
+    }
+    .users-container {
+        margin-right: 0;
+    }
+    #users-list li .username {
+        max-width: 20vw;
+    }
+    .sign-form {
+        width: 100%;
+        margin: 100px auto;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    * {
+        font-size: 1rem;
+    }
+    .sidebar {
+        width: 200px;
+        left: -250px;
+    }
+    .container {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+    .dropdown-content a {
+        padding: 4px;
+        font-size: 12px;
+    }
+    .openbtn {
+        max-width: 20px;
+        top: 40px;
+        left: 20px;
+    }
+    .playlist {
+        max-height: 25vh;
+    }
+    .room-name h1 {
+        font-size: 1.2rem;
+    }
 }
