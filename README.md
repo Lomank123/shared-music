@@ -142,23 +142,21 @@ Insert some screenshots
 - Save/Load room playlist (WIP)
 - Download urls from room or user playlist (WIP)
 - Communicate by sending messages to in-room chat (WIP)
-    - Private messages included
 
 ### Tech features
 - Both asgi and wsgi apps (daphne and gunicorn) to serve `http` and `WebSocket` connections.
 - WebSocket protocol to keep changes in rooms
 - Celery tasks
     -  To remove abandoned rooms (periodically)
-- CI/CD with the help of GitHub Actions (tests and linter) (WIP)
+- CI/CD with the help of GitHub Actions
 - Nginx reverse proxy to serve static files and WebSockets
 
 ### Room owner features:
-- Set permissions to limit some actions (WIP)
-    - Who can change track
-    - Who can vote for change
+- Set permissions to limit some actions
+    - Who can change/add/delete track
     - Enable/Disable vote for change
+- Transfer ownership to any listener
 - Ban, kick or mute listeners if it is needed (WIP)
-- Transfer ownership to any listener (WIP)
 
 
 ## Usage
@@ -245,9 +243,9 @@ docker exec --tty --interactive shared-music_db_1 /bin/sh -c "zcat backups/$BACK
 
 Assuming remote host OS is Linux, and Docker, docker-compose and Git have been installed recently:
 
-- Enter remote host's console via ssh:
+- Enter remote host's console via ssh (where `IP` is your host ip address):
 ```
-ssh -l username ip-address 
+ssh -l username IP
 ```
 Fill in password after this command.
 
