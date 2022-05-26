@@ -246,7 +246,8 @@ class MusicRoomConsumerService():
         """
         # We need reverse playlist
         rev_tracks = playlist_tracks.copy()
-        rev_tracks.reverse()
+        if not previous:
+            rev_tracks.reverse()
         # Find next track from playlist
         next_track_index = 1
         for index in range(len(rev_tracks)):
