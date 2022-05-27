@@ -133,6 +133,7 @@ class MusicRoomConsumerService():
             "playlist": playlist_tracks,
             "permissions": room.permissions,
             "recent_messages": recent_messages,
+            "max_connections": room.max_connections,
         })
         await self.channel_layer.group_send(self.room_group_name, data)
         # Here we need to send event from another user to new one
@@ -328,10 +329,13 @@ class MusicRoomConsumerService():
         """
         room = await RoomRepository.get_room_by_id_or_none(self.room_id)
         new_permissions = response.get("permissions", None)
+        new_max_connections = response.get("max_connections", None)
         room.permissions = new_permissions
+        room.max_connections = new_max_connections
         await RoomRepository.save_room(room)
         data = self._build_context_data(consts.CHANGE_PERMISSIONS_EVENT, consts.PERMISSIONS_CHANGED_MSG, {
             "permissions": room.permissions,
+            "max_connections": room.max_connections,
         })
         await self.channel_layer.group_send(self.room_group_name, data)
 
@@ -418,3 +422,12 @@ class MusicRoomConsumerService():
         Returns True if user is banned, otherwise False.
         """
         return await RoomRepository.is_user_banned(self.room_id, self.user)
+
+    async def _is_room_full(self):
+        """
+        Return True if the number or online listeners >= room's max_connections number.
+        Otherwise return False.
+        """
+        max_connections = RoomRepository.get_room_by_id_or_none(self.room_id).max_connections
+        listeners_count = RoomRepository.get_listeners_info(self.room_id)["count"]
+        return listeners_count >= max_connections

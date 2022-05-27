@@ -10,12 +10,11 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.service = MusicRoomConsumerService(self.scope, self.channel_layer, self.channel_name)
 
-        # If user is banned then close connection immediately
+        # If user is banned or room is full then close connection immediately
         is_banned = await self.service._is_user_banned()
-        if is_banned:
+        is_room_full = self.service._is_room_full()
+        if is_banned or is_room_full:
             return
-
-        # TODO: Check connection limit here as well
 
         # Handle authenticated user connection
         await self.service.connect_user()
