@@ -281,7 +281,7 @@ input[type="email"] {
 
 #users-list {
     max-height: 50vh;
-    overflow: auto;
+    overflow-y: auto;
 }
 
 #users-list li {
@@ -298,9 +298,7 @@ input[type="email"] {
 }
 
 .users-container {
-    margin-bottom: 30px;
     max-width: 250px;
-    margin-right: 60px;
 }
 
 .online {
@@ -325,10 +323,9 @@ input[type="email"] {
 
 /* Permissions */
 .perms-container {
-    margin-left: 20px;
 }
 
-.perms-container .permissions {
+.permissions {
     overflow: auto;
     max-height: 50vh;
 }
@@ -355,7 +352,7 @@ input[type="email"] {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    width: 30vw;
+    width: 20vw;
 }
 
 .track__title::before {
@@ -526,8 +523,8 @@ input[type="email"] {
 
 /* The container <div> - needed to position the dropdown content */
 .dropdown {
-    position: relative;
     display: inline-block;
+    position: relative;
 }
 
 /* Dropdown Content (Hidden by Default) */
@@ -650,17 +647,31 @@ input[type="email"] {
 
 /* Chat */
 .chat {
+    max-height: 50vh;
+    overflow-y: auto;
 }
+
 .chat-input {
-    margin-top: 10px;
-    margin-bottom: 100px;
-}
-.message {
     display: flex;
+    align-items: center;
     gap: 10px;
 }
 
+.chat-input {
+    margin-top: 10px;
+}
+
+.message {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--primary-color);
+    margin-bottom: 10px;
+    padding: 5px 10px;
+    margin-right: 10px;
+}
+
 .message__sender {
+    font-size: 0.9rem;
     font-weight: bold;
 }
 
@@ -669,9 +680,13 @@ input[type="email"] {
 }
 
 .message__content {
+    max-width: 200px;
+    word-wrap: break-word;
+    font-size: 0.9rem;
 }
 
 .message__time {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: gray;
+    align-self: flex-end;
 }

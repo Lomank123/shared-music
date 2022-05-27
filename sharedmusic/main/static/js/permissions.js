@@ -40,7 +40,7 @@ let permsModalHost = $modal({
 });
 
 let permsModalUser = $modal({
-    title: "Change room permissions",
+    title: "Room permissions",
     content: `
         <h5>Your permissions:</h5>
         <div class="permissions"></div>`,
