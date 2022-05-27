@@ -136,7 +136,7 @@ CHANNEL_LAYERS = {
         # },
 
         # Method 2: Via local Redis
-        'BACKEND': 'channels_redis.pubsub.RedisPubSubChannelLayer',
+        'BACKEND': 'main.channel_layers.CustomChannelLayer',
         'CONFIG': {
             "hosts": [(REDIS_HOST, 6379)],
         },

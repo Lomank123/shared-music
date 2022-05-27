@@ -1,4 +1,4 @@
-from main.models import Room, Playlist, Soundtrack, PlaylistTrack, CustomUser
+from main.models import Room, Playlist, Soundtrack, PlaylistTrack, CustomUser, ChatMessage
 from channels.db import database_sync_to_async
 from django.db.models import F
 
@@ -31,6 +31,15 @@ class RoomRepository():
         room = Room.objects.select_related("playlist").get(id=room_id)
         playlist = room.playlist
         return playlist
+
+    @staticmethod
+    @database_sync_to_async
+    def is_user_muted(room_id, user):
+        """
+        Returns True if room's mute_list contains user.
+        """
+        room = Room.objects.get(id=room_id)
+        return user in room.mute_list.all()
 
     @staticmethod
     @database_sync_to_async
@@ -72,6 +81,24 @@ class RoomRepository():
         room = Room.objects.get(id=room_id)
         room.host = new_host
         room.save()
+
+    @staticmethod
+    @database_sync_to_async
+    def mute_user(room_id, user_id):
+        """
+        Adds user to mute list.
+        """
+        room = Room.objects.get(id=room_id)
+        room.mute_list.add(user_id)
+
+    @staticmethod
+    @database_sync_to_async
+    def unmute_user(room_id, user_id):
+        """
+        Removes user from mute list.
+        """
+        room = Room.objects.get(id=room_id)
+        room.mute_list.remove(user_id)
 
 
 class PlaylistRepository():
@@ -134,3 +161,26 @@ class CustomUserRepository():
         """
         user = CustomUser.objects.filter(username=username).first()
         return user
+
+
+class ChatMessageRepository():
+
+    @staticmethod
+    @database_sync_to_async
+    def create(room_id, user_id, message):
+        """
+        Create method for chat messages.
+        """
+        chat_message, _ = ChatMessage.objects.get_or_create(room_id=room_id, sender_id=user_id, message=message)
+        return chat_message
+
+    @staticmethod
+    @database_sync_to_async
+    def get_recent_messages(room_id, amount=20):
+        """
+        Returns the list of recent messages. The number depends on amount arg.
+        """
+        chat_messages = ChatMessage.objects \
+            .filter(room_id=room_id).order_by("timestamp")[:amount] \
+            .annotate(username=F('sender__username')).values("username", "message", "timestamp")
+        return list(chat_messages)

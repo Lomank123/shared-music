@@ -66,7 +66,6 @@ class Room(models.Model):
     last_visited = models.DateTimeField(auto_now=True, verbose_name="Last visited")
     playlist = models.OneToOneField(Playlist, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Playlist")
     permissions = models.JSONField(default=permissions_jsonfield_default, verbose_name="Permissions")
-    ban_list = models.ManyToManyField(get_user_model(), blank=True, related_name="ban_list", verbose_name="Ban list")
     mute_list = models.ManyToManyField(get_user_model(), blank=True, related_name="mute_list", verbose_name="Mute list")
 
     class Meta:

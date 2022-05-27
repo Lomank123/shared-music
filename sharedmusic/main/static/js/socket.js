@@ -150,6 +150,9 @@ function connect() {
         if (data.event == "ROOM_NOT_ALLOWED") {
             toastr["error"]("Insufficient permissions");
         }
+        if (data.event == "SEND_CHAT_MESSAGE") {
+            console.log(data.chat_message);
+        }
     };
 
     if (roomSocket.readyState == WebSocket.OPEN) {

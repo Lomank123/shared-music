@@ -18,8 +18,8 @@ function updateUserList(users) {
                 <button class="dropbtn"><i class="fa-regular fa-square-caret-down"></i></button>
                 <div class="dropdown-content">
                 <a href="javascript:void(0)" onclick="changeHost('${user.username}')">Change host</a>
-                <a href="javascript:void(0)">Kick user</a>
-                <a href="javascript:void(0)">Ban user</a>
+                <a href="javascript:void(0)" onclick="muteUser('${user.username}')">Mute user</a>
+                <a href="javascript:void(0)" onclick="unmuteUser('${user.username}')">Unmute user</a>
                 </div>
             </div>`);
             node.append(changeHostButton);
@@ -44,6 +44,38 @@ function changeHost(newHost) {
             event: "CHANGE_HOST",
             message: "Change host.",
             new_host: newHost,
+        })
+    );
+}
+
+function muteUser(username) {
+    roomSocket.send(
+        JSON.stringify({
+            event: "MUTE_LISTENER",
+            message: "Mute user.",
+            username: username,
+        })
+    );
+}
+
+function unmuteUser(username) {
+    roomSocket.send(
+        JSON.stringify({
+            event: "UNMUTE_LISTENER",
+            message: "Unmute user.",
+            username: username,
+        })
+    );
+}
+
+function sendMessage() {
+    const chatField = document.getElementById("chat-field");
+    const text = chatField.value;
+    roomSocket.send(
+        JSON.stringify({
+            event: "SEND_CHAT_MESSAGE",
+            message: "New message incomming.",
+            chat_message: text,
         })
     );
 }
