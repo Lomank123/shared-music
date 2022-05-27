@@ -1,7 +1,8 @@
 from main.repositories import RoomRepository, PlaylistRepository, SoundtrackRepository, \
-    PlaylistTrackRepository, CustomUserRepository
+    PlaylistTrackRepository, CustomUserRepository, ChatMessageRepository
 from main import consts
 from main.decorators import update_room_expiration_time
+from django.forms.models import model_to_dict
 
 
 class MusicRoomConsumerService():
@@ -109,6 +110,13 @@ class MusicRoomConsumerService():
                 for group_name in [self.room_group_name, self.user_group_name]:
                     await self.channel_layer.group_discard(group_name, channel)
 
+    async def _get_recent_chat_messages(self):
+        """
+        Returns recent chat messages.
+        """
+        recent_messages = await ChatMessageRepository.get_recent_messages(self.room_id)
+        return recent_messages
+
     async def handle_connect(self, response):
         """
         Handles connect event. Sends track to new listener and related message to all other listeners.
@@ -118,11 +126,13 @@ class MusicRoomConsumerService():
         room_playlist = await RoomRepository.get_room_playlist(self.room_id)
         playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist)
         room = await RoomRepository.get_room_by_id_or_none(self.room_id)
+        recent_messages = await self._get_recent_chat_messages()
         data = self._build_context_data(consts.CONNECT_EVENT, message, {
             "user": self.user.username,
             "listeners": listeners_data,
             "playlist": playlist_tracks,
             "permissions": room.permissions,
+            "recent_messages": recent_messages,
         })
         await self.channel_layer.group_send(self.room_group_name, data)
         # Here we need to send event from another user to new one
@@ -277,6 +287,25 @@ class MusicRoomConsumerService():
         })
         await self.channel_layer.group_send(self.room_group_name, data)
 
+    async def handle_chat_message(self, response):
+        """
+        Handles chat messages. Retrieves user message, creates new ChatMessage instance
+        and sends it to others.
+        """
+        text = response.get("chat_message", None)
+        new_chat_message = await ChatMessageRepository.create(self.room_id, self.user.id, text)
+        # Formatting model dict
+        dict_chat_msg = model_to_dict(new_chat_message)
+        dict_chat_msg["username"] = self.user.username
+        dict_chat_msg["timestamp"] = str(new_chat_message.timestamp)
+        del dict_chat_msg["sender"]
+
+        message = "New message incoming"
+        data = self._build_context_data(consts.SEND_CHAT_MESSAGE_EVENT, message, {
+            "chat_message": dict_chat_msg,
+        })
+        await self.channel_layer.group_send(self.room_group_name, data)
+
     async def handle_change_host(self, response):
         """
         Changes host to new one by it's username.
@@ -284,6 +313,8 @@ class MusicRoomConsumerService():
         new_host_username = response.get("new_host", None)
         new_host = await CustomUserRepository.get_by_username_or_none(new_host_username)
         await RoomRepository.change_host(self.room_id, new_host)
+        # Unmute new host automatically
+        await RoomRepository.unmute_user(self.room_id, new_host.id)
         data = self._build_context_data(consts.HOST_CHANGED_EVENT, consts.HOST_CHANGED, {
             "new_host": new_host_username,
         })
@@ -311,10 +342,50 @@ class MusicRoomConsumerService():
         data = self._build_context_data(event, message)
         await self.channel_layer.group_send(self.room_group_name, data)
 
-    async def handle_not_allowed(self, response):
+    async def handle_not_allowed(self):
         """
         If user has no permissions to perform some action this handler is used.
         Sends related message.
         """
         data = self._build_context_data(consts.ROOM_NOT_ALLOWED_EVENT, consts.ROOM_NOT_ALLOWED_MSG)
         await self.channel_layer.group_send(self.user_group_name, data)
+
+    async def handle_mute(self, response):
+        """
+        Mutes user by updating room's mute list.
+        """
+        username = response.get("username")
+        chosen_user = await CustomUserRepository.get_by_username_or_none(username)
+        await RoomRepository.mute_user(self.room_id, chosen_user.id)
+        # Send message to affected user
+        message = "You are currently muted."
+        data = self._build_context_data(consts.MUTE_LISTENER_EVENT, message)
+        chosen_user_group = f"{consts.USER_GROUP_PREFIX}_{chosen_user}"
+        await self.channel_layer.group_send(chosen_user_group, data)
+
+    async def handle_unmute(self, response):
+        """
+        Unmutes user by updating room's mute list.
+        """
+        username = response.get("username")
+        chosen_user = await CustomUserRepository.get_by_username_or_none(username)
+        await RoomRepository.unmute_user(self.room_id, chosen_user.id)
+        # Send message to affected user
+        message = "You are no longer muted!"
+        data = self._build_context_data(consts.UNMUTE_LISTENER_EVENT, message)
+        chosen_user_group = f"{consts.USER_GROUP_PREFIX}_{chosen_user}"
+        await self.channel_layer.group_send(chosen_user_group, data)
+
+    async def handle_listener_muted(self):
+        """
+        Sends message to muted listener.
+        """
+        message = "You are currently muted."
+        data = self._build_context_data(consts.LISTENER_MUTED_EVENT, message)
+        await self.channel_layer.group_send(self.user_group_name, data)
+
+    async def _is_listener_muted(self):
+        """
+        Returns True if user is muted, otherwise False.
+        """
+        return await RoomRepository.is_user_muted(self.room_id, self.user)

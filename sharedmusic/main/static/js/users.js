@@ -18,8 +18,8 @@ function updateUserList(users) {
                 <button class="dropbtn"><i class="fa-regular fa-square-caret-down"></i></button>
                 <div class="dropdown-content">
                 <a href="javascript:void(0)" onclick="changeHost('${user.username}')">Change host</a>
-                <a href="javascript:void(0)">Kick user</a>
-                <a href="javascript:void(0)">Ban user</a>
+                <a href="javascript:void(0)" onclick="muteUser('${user.username}')">Mute user</a>
+                <a href="javascript:void(0)" onclick="unmuteUser('${user.username}')">Unmute user</a>
                 </div>
             </div>`);
             node.append(changeHostButton);

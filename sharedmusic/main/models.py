@@ -66,8 +66,16 @@ class Room(models.Model):
     last_visited = models.DateTimeField(auto_now=True, verbose_name="Last visited")
     playlist = models.OneToOneField(Playlist, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Playlist")
     permissions = models.JSONField(default=permissions_jsonfield_default, verbose_name="Permissions")
+    mute_list = models.ManyToManyField(get_user_model(), blank=True, related_name="mute_list", verbose_name="Mute list")
 
     class Meta:
         verbose_name_plural = "Rooms"
         verbose_name = "Room"
         ordering = ["-id"]
+
+
+class ChatMessage(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="messages", verbose_name="Chat message")
+    sender = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, verbose_name="Sender")
+    message = models.CharField(max_length=600, verbose_name="Message")
+    timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Timestamp")

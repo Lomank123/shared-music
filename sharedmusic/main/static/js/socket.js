@@ -52,6 +52,8 @@ function connect() {
             console.log(permissions);
             setPermissions(permissions);
             updateUserList(users);
+            chat.text("");
+            handleChatMessages(data.recent_messages);
             if (username === data.user) {
                 updatePlaylist(data.playlist);
             }
@@ -149,6 +151,10 @@ function connect() {
         }
         if (data.event == "ROOM_NOT_ALLOWED") {
             toastr["error"]("Insufficient permissions");
+        }
+        if (data.event == "SEND_CHAT_MESSAGE") {
+            console.log(data.chat_message);
+            handleChatMessages([data.chat_message]);
         }
     };
 

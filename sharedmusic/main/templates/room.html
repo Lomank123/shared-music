@@ -23,9 +23,11 @@
             <div id="host" host_username="{{ room.host.username }}"></div>
             <div id="user" username="{{ user.username }}"></div>
             <h6 style="font-weight: bold;">Greetings, {{ user.username }}</h6>
-            <h5>Your permissions:</h5>
-            <div class="permissions"></div>
-            <a href="javascript:void(0)" onclick="showModal()" host-only>Change settings</a>
+            <div class="chat"></div>
+            <div class="chat-input">
+                <input id="chat-field" type="text" placeholder="Enter message"/>
+                <button class="btn" onclick="sendMessage()">Send</button>
+            </div>
         </div>
         <div class="playlist-container">
             <h6>Playlist:</h6>
@@ -40,6 +42,7 @@
             <h4>Online users:</h4>
             <ul id="users-list">
             </ul>
+            <a href="javascript:void(0)" onclick="showModal()">View permissions</a>
         </div>
     </div>
     <!--Youtube-->
@@ -81,6 +84,7 @@
     <script src="{% static 'js/socket.js' %}"></script>
     <script src="{% static 'js/utility.js' %}"></script>
     <script src="{% static 'js/users.js' %}"></script>
+    <script src="{% static 'js/chat.js' %}"></script>
     <script src="{% static 'js/player.js' %}"></script>
     <script src="{% static 'js/playlist.js' %}"></script>
     <script src="{% static 'js/permissions.js' %}"></script>

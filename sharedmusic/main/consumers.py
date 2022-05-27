@@ -26,7 +26,7 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         # Check permission before handling event
         allowed = await self.service._check_permission(event)
         if not allowed:
-            await self.service.handle_not_allowed(response)
+            await self.service.handle_not_allowed()
             return
 
         # Event handlers
@@ -48,6 +48,16 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
             await self.service.handle_change_host(response)
         elif event == consts.CHANGE_PERMISSIONS_EVENT:
             await self.service.handle_change_permissions(response)
+        elif event == consts.SEND_CHAT_MESSAGE_EVENT:
+            is_muted = await self.service._is_listener_muted()
+            if not is_muted:
+                await self.service.handle_chat_message(response)
+            else:
+                await self.service.handle_listener_muted()
+        elif event == consts.MUTE_LISTENER_EVENT:
+            await self.service.handle_mute(response)
+        elif event == consts.UNMUTE_LISTENER_EVENT:
+            await self.service.handle_unmute(response)
         else:
             await self.service.handle_default(response)
 

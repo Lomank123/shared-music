@@ -1,6 +1,6 @@
 let permissions = {};
 
-let modal = $modal({
+let permsModalHost = $modal({
     title: "Change room permissions",
     content: `<div class="perms-menu"><div class="grid-wrapper" data="title">
         <div class="perms-menu__name">Permissions</div>
@@ -35,23 +35,35 @@ let modal = $modal({
 </div>`,
     footerButtons: [
         { class: "btn btn__ok", text: "Save", handler: "savePerms()" },
-        { class: "btn btn__cancel", text: "Cancel", handler: "closeModal()" },
+        { class: "btn btn__cancel", text: "Cancel", handler: "closeModal(permsModalHost)" },
     ],
 });
 
+let permsModalUser = $modal({
+    title: "Room permissions",
+    content: `
+        <h5>Your permissions:</h5>
+        <div class="permissions"></div>`,
+    footerButtons: [{ class: "btn btn__cancel", text: "Close", handler: "closeModal(permsModalUser)" }],
+});
+
 function showModal() {
-    modal.show();
-    let settings = $(".perms-menu").children();
-    settings.each((idx, setting) => {
-        setting = $(setting);
-        if (setting.attr("data") == "title") {
-            return;
-        }
-        let currentValue = permissions[setting.attr("data")];
-        setting.find(`input[type="radio"][value="${currentValue}"]`).prop("checked", true);
-    });
+    if (username == hostUsername) {
+        permsModalHost.show();
+        let settings = $(".perms-menu").children();
+        settings.each((idx, setting) => {
+            setting = $(setting);
+            if (setting.attr("data") == "title") {
+                return;
+            }
+            let currentValue = permissions[setting.attr("data")];
+            setting.find(`input[type="radio"][value="${currentValue}"]`).prop("checked", true);
+        });
+    } else {
+        permsModalUser.show();
+    }
 }
-function closeModal() {
+function closeModal(modal) {
     modal.hide();
 }
 function savePerms() {
@@ -77,7 +89,7 @@ function savePerms() {
             permissions: permissions,
         })
     );
-    modal.hide();
+    permsModalHost.hide();
 }
 
 // Visual permission display
