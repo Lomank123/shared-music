@@ -67,6 +67,8 @@ class Room(models.Model):
     playlist = models.OneToOneField(Playlist, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Playlist")
     permissions = models.JSONField(default=permissions_jsonfield_default, verbose_name="Permissions")
     mute_list = models.ManyToManyField(get_user_model(), blank=True, related_name="mute_list", verbose_name="Mute list")
+    max_connections = models.IntegerField(default=20, verbose_name="Max connections")
+    ban_list = models.ManyToManyField(get_user_model(), blank=True, related_name="ban_list", verbose_name="Ban list")
 
     class Meta:
         verbose_name_plural = "Rooms"

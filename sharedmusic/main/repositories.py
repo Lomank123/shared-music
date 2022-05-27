@@ -43,6 +43,15 @@ class RoomRepository():
 
     @staticmethod
     @database_sync_to_async
+    def is_user_banned(room_id, user):
+        """
+        Returns True if room's ban_list contains user.
+        """
+        room = Room.objects.get(id=room_id)
+        return user in room.ban_list.all()
+
+    @staticmethod
+    @database_sync_to_async
     def add_listener(room_id, user):
         """
         Attaches user to room.
@@ -99,6 +108,24 @@ class RoomRepository():
         """
         room = Room.objects.get(id=room_id)
         room.mute_list.remove(user_id)
+
+    @staticmethod
+    @database_sync_to_async
+    def ban_user(room_id, user_id):
+        """
+        Adds user to ban list.
+        """
+        room = Room.objects.get(id=room_id)
+        room.ban_list.add(user_id)
+
+    @staticmethod
+    @database_sync_to_async
+    def unban_user(room_id, user_id):
+        """
+        Removes user from ban list.
+        """
+        room = Room.objects.get(id=room_id)
+        room.ban_list.remove(user_id)
 
 
 class PlaylistRepository():

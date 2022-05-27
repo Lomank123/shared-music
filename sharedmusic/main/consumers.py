@@ -9,6 +9,14 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
 
     async def connect(self):
         self.service = MusicRoomConsumerService(self.scope, self.channel_layer, self.channel_name)
+
+        # If user is banned then close connection immediately
+        is_banned = await self.service._is_user_banned()
+        if is_banned:
+            return
+
+        # TODO: Check connection limit here as well
+
         # Handle authenticated user connection
         await self.service.connect_user()
         await self.accept()
@@ -49,7 +57,7 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
         elif event == consts.CHANGE_PERMISSIONS_EVENT:
             await self.service.handle_change_permissions(response)
         elif event == consts.SEND_CHAT_MESSAGE_EVENT:
-            is_muted = await self.service._is_listener_muted()
+            is_muted = await self.service._is_user_muted()
             if not is_muted:
                 await self.service.handle_chat_message(response)
             else:
@@ -58,6 +66,10 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
             await self.service.handle_mute(response)
         elif event == consts.UNMUTE_LISTENER_EVENT:
             await self.service.handle_unmute(response)
+        elif event == consts.BAN_USER_EVENT:
+            await self.service.handle_ban(response, self.close)
+        elif event == consts.UNBAN_USER_EVENT:
+            await self.service.handle_unban(response)
         else:
             await self.service.handle_default(response)
 

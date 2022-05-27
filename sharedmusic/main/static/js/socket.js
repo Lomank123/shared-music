@@ -156,6 +156,10 @@ function connect() {
             console.log(data.chat_message);
             handleChatMessages([data.chat_message]);
         }
+        if (data.event == "BAN_USER") {
+            console.log("You have been banned.");
+            roomSocket.close();
+        }
     };
 
     if (roomSocket.readyState == WebSocket.OPEN) {

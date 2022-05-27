@@ -315,6 +315,8 @@ class MusicRoomConsumerService():
         await RoomRepository.change_host(self.room_id, new_host)
         # Unmute new host automatically
         await RoomRepository.unmute_user(self.room_id, new_host.id)
+        # Technically new host cannot be banned user
+        # await RoomRepository.unban_user(self.room_id, new_host.id)
         data = self._build_context_data(consts.HOST_CHANGED_EVENT, consts.HOST_CHANGED, {
             "new_host": new_host_username,
         })
@@ -384,8 +386,35 @@ class MusicRoomConsumerService():
         data = self._build_context_data(consts.LISTENER_MUTED_EVENT, message)
         await self.channel_layer.group_send(self.user_group_name, data)
 
-    async def _is_listener_muted(self):
+    async def handle_ban(self, response, close_func):
+        """
+        Bans user by updating room's ban list and sending related event to close connection.
+        """
+        username = response.get("username")
+        chosen_user = await CustomUserRepository.get_by_username_or_none(username)
+        await RoomRepository.ban_user(self.room_id, chosen_user.id)
+        # Send message to affected user
+        message = "You have been banned."
+        data = self._build_context_data(consts.BAN_USER_EVENT, message)
+        chosen_user_group = f"{consts.USER_GROUP_PREFIX}_{chosen_user}"
+        await self.channel_layer.group_send(chosen_user_group, data)
+
+    async def handle_unban(self, response):
+        """
+        Unbans user by updating room's ban list.
+        """
+        username = response.get("username")
+        chosen_user = await CustomUserRepository.get_by_username_or_none(username)
+        await RoomRepository.unban_user(self.room_id, chosen_user.id)
+
+    async def _is_user_muted(self):
         """
         Returns True if user is muted, otherwise False.
         """
         return await RoomRepository.is_user_muted(self.room_id, self.user)
+
+    async def _is_user_banned(self):
+        """
+        Returns True if user is banned, otherwise False.
+        """
+        return await RoomRepository.is_user_banned(self.room_id, self.user)

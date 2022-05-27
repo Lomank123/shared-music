@@ -20,6 +20,7 @@ function updateUserList(users) {
                 <a href="javascript:void(0)" onclick="changeHost('${user.username}')">Change host</a>
                 <a href="javascript:void(0)" onclick="muteUser('${user.username}')">Mute user</a>
                 <a href="javascript:void(0)" onclick="unmuteUser('${user.username}')">Unmute user</a>
+                <a href="javascript:void(0)" onclick="banUser('${user.username}')">Ban user</a>
                 </div>
             </div>`);
             node.append(changeHostButton);
@@ -44,6 +45,26 @@ function changeHost(newHost) {
             event: "CHANGE_HOST",
             message: "Change host.",
             new_host: newHost,
+        })
+    );
+}
+
+function banUser(username) {
+    roomSocket.send(
+        JSON.stringify({
+            event: "BAN_USER",
+            message: "Ban user.",
+            username: username,
+        })
+    );
+}
+
+function unbanUser(username) {
+    roomSocket.send(
+        JSON.stringify({
+            event: "UNBAN_USER",
+            message: "Unban user.",
+            username: username,
         })
     );
 }
