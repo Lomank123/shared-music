@@ -13,6 +13,7 @@ class HomeView(LoginRequiredMixin, CreateView):
     form_class = RoomCreationForm
     model = Room
     template_name = 'home.html'
+    login_url = '/signup/'
 
     def get_success_url(self):
         return reverse('room', kwargs={"id": self.object.id})
@@ -27,6 +28,7 @@ class HomeView(LoginRequiredMixin, CreateView):
 
 class RoomView(LoginRequiredMixin, TemplateView):
     template_name = 'room.html'
+    login_url = '/signup/'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
