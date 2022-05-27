@@ -294,11 +294,12 @@ class MusicRoomConsumerService():
         """
         text = response.get("chat_message", None)
         new_chat_message = await ChatMessageRepository.create(self.room_id, self.user.id, text)
-        # serialized_obj = serializers.serialize('json',  [new_chat_message])
+        # Formatting model dict
         dict_chat_msg = model_to_dict(new_chat_message)
         dict_chat_msg["username"] = self.user.username
         dict_chat_msg["timestamp"] = str(new_chat_message.timestamp)
         del dict_chat_msg["sender"]
+
         message = "New message incoming"
         data = self._build_context_data(consts.SEND_CHAT_MESSAGE_EVENT, message, {
             "chat_message": dict_chat_msg,
@@ -312,6 +313,8 @@ class MusicRoomConsumerService():
         new_host_username = response.get("new_host", None)
         new_host = await CustomUserRepository.get_by_username_or_none(new_host_username)
         await RoomRepository.change_host(self.room_id, new_host)
+        # Unmute new host automatically
+        await RoomRepository.unmute_user(self.room_id, new_host.id)
         data = self._build_context_data(consts.HOST_CHANGED_EVENT, consts.HOST_CHANGED, {
             "new_host": new_host_username,
         })
