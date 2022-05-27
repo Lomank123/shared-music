@@ -296,6 +296,9 @@ class MusicRoomConsumerService():
         new_chat_message = await ChatMessageRepository.create(self.room_id, self.user.id, text)
         # serialized_obj = serializers.serialize('json',  [new_chat_message])
         dict_chat_msg = model_to_dict(new_chat_message)
+        dict_chat_msg["username"] = self.user.username
+        dict_chat_msg["timestamp"] = str(new_chat_message.timestamp)
+        del dict_chat_msg["sender"]
         message = "New message incoming"
         data = self._build_context_data(consts.SEND_CHAT_MESSAGE_EVENT, message, {
             "chat_message": dict_chat_msg,

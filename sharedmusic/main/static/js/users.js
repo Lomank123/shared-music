@@ -47,35 +47,3 @@ function changeHost(newHost) {
         })
     );
 }
-
-function muteUser(username) {
-    roomSocket.send(
-        JSON.stringify({
-            event: "MUTE_LISTENER",
-            message: "Mute user.",
-            username: username,
-        })
-    );
-}
-
-function unmuteUser(username) {
-    roomSocket.send(
-        JSON.stringify({
-            event: "UNMUTE_LISTENER",
-            message: "Unmute user.",
-            username: username,
-        })
-    );
-}
-
-function sendMessage() {
-    const chatField = document.getElementById("chat-field");
-    const text = chatField.value;
-    roomSocket.send(
-        JSON.stringify({
-            event: "SEND_CHAT_MESSAGE",
-            message: "New message incomming.",
-            chat_message: text,
-        })
-    );
-}

@@ -647,3 +647,31 @@ input[type="email"] {
         width: 280px;
     }
 }
+
+/* Chat */
+.chat {
+}
+.chat-input {
+    margin-top: 10px;
+    margin-bottom: 100px;
+}
+.message {
+    display: flex;
+    gap: 10px;
+}
+
+.message__sender {
+    font-weight: bold;
+}
+
+.message__sender::after {
+    content: ":";
+}
+
+.message__content {
+}
+
+.message__time {
+    font-size: 0.8rem;
+    color: gray;
+}
