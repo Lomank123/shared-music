@@ -5,7 +5,7 @@ from main.decorators import update_room_expiration_time
 from django.forms.models import model_to_dict
 
 
-class MusicRoomConsumerService():
+class MusicRoomConsumerService:
 
     """
     Consumer service which provides event handlers for music rooms.
@@ -54,36 +54,26 @@ class MusicRoomConsumerService():
                 return self.user.id == room.host_id
         return True
 
-    async def connect_user(self):
+    async def _is_user_muted(self):
         """
-        Removes old connections of the same user and adds them as listener.
+        Returns True if user is muted, otherwise False.
         """
-        if self.user.is_authenticated:
-            # Remove all previous connections of the same user if they exist
-            await self._remove_old_connections()
-            # Join groups
-            for group_name in [self.room_group_name, self.user_group_name]:
-                await self.channel_layer.group_add(group_name, self.channel_name)
-            # Add new listener
-            await RoomRepository.add_listener(self.room_id, self.user.id)
+        return await RoomRepository.is_user_muted(self.room_id, self.user)
 
-    async def disconnect_user(self):
+    async def _is_user_banned(self):
         """
-        Handles disconnect event. Removes user from listeners list and sends related message
-        with updated list to others.
+        Returns True if user is banned, otherwise False.
         """
-        channel_name = self.channel_layer._get_group_channel_name(self.room_group_name)
-        if self.channel_name in self.channel_layer.groups[channel_name]:
-            # Removing listener
-            await RoomRepository.remove_listener(self.room_id, self.user.id)
-            # Send disconnect message to other listeners
-            listeners_data = await RoomRepository.get_listeners_info(self.room_id)
-            message = f"{self.user} {consts.USER_DISCONNECTED}"
-            data = self._build_context_data(consts.DISCONNECT_EVENT, message, {"listeners": listeners_data})
-            await self.channel_layer.group_send(self.room_group_name, data)
-            # Leave groups
-            for group_name in [self.room_group_name, self.user_group_name]:
-                await self.channel_layer.group_discard(group_name, self.channel_name)
+        return await RoomRepository.is_user_banned(self.room_id, self.user)
+
+    async def _is_room_full(self):
+        """
+        Return True if the number or online listeners >= room's max_connections number.
+        Otherwise return False.
+        """
+        room = await RoomRepository.get_room_by_id_or_none(self.room_id)
+        listeners_info = await RoomRepository.get_listeners_info(self.room_id)
+        return listeners_info["count"] >= room.max_connections
 
     async def _remove_old_connections(self):
         """
@@ -117,27 +107,6 @@ class MusicRoomConsumerService():
         recent_messages = await ChatMessageRepository.get_recent_messages(self.room_id)
         return recent_messages
 
-    async def handle_connect(self, response):
-        """
-        Handles connect event. Sends track to new listener and related message to all other listeners.
-        """
-        message = response.get("message", None)
-        listeners_data = await RoomRepository.get_listeners_info(self.room_id)
-        playlist_tracks = await RoomPlaylistRepository.get_playlist_tracks(self.room_id)
-        room = await RoomRepository.get_room_by_id_or_none(self.room_id)
-        recent_messages = await self._get_recent_chat_messages()
-        data = self._build_context_data(consts.CONNECT_EVENT, message, {
-            "user": self.user.username,
-            "listeners": listeners_data,
-            "playlist": playlist_tracks,
-            "permissions": room.permissions,
-            "recent_messages": recent_messages,
-            "max_connections": room.max_connections,
-        })
-        await self.channel_layer.group_send(self.room_group_name, data)
-        # Here we need to send event from another user to new one
-        await self._get_track_from_listeners(listeners_data)
-
     async def _get_track_from_listeners(self, listeners):
         """
         Finds first online listener in the room and sends them event
@@ -159,6 +128,80 @@ class MusicRoomConsumerService():
                 f"{consts.USER_GROUP_PREFIX}_{another_user}",
                 track_sender_data
             )
+
+    async def _find_next_track(self, playlist_tracks, current_track, previous=False):
+        """
+        Finds next track in the playlist (after current_track) and returns it.
+        If it is the last track then it falls back to the first.
+
+        if previous is set to True, then previous track will be returned.
+        """
+        # We need reverse playlist
+        rev_tracks = playlist_tracks.copy()
+        if not previous:
+            rev_tracks.reverse()
+        # Find next track from playlist
+        next_track_index = 1
+        for index in range(len(rev_tracks)):
+            if rev_tracks[index]['url'] == current_track['url']:
+                next_track_index = index + 1
+                break
+        next_track = rev_tracks[0]
+        if next_track_index < len(rev_tracks):
+            next_track = rev_tracks[next_track_index]
+        return next_track
+
+    async def connect_user(self):
+        """
+        Removes old connections of the same user and adds them as listener.
+        """
+        if self.user.is_authenticated:
+            # Remove all previous connections of the same user if they exist
+            await self._remove_old_connections()
+            # Join groups
+            for group_name in [self.room_group_name, self.user_group_name]:
+                await self.channel_layer.group_add(group_name, self.channel_name)
+            # Add new listener
+            await RoomRepository.add_listener(self.room_id, self.user.id)
+
+    async def disconnect_user(self):
+        """
+        Handles disconnect event. Removes user from listeners list and sends related message
+        with updated list to others.
+        """
+        channel_name = self.channel_layer._get_group_channel_name(self.room_group_name)
+        if self.channel_name in self.channel_layer.groups[channel_name]:
+            # Removing listener
+            await RoomRepository.remove_listener(self.room_id, self.user.id)
+            # Send disconnect message to other listeners
+            listeners_data = await RoomRepository.get_listeners_info(self.room_id)
+            message = f"{self.user} {consts.USER_DISCONNECTED}"
+            data = self._build_context_data(consts.DISCONNECT_EVENT, message, {"listeners": listeners_data})
+            await self.channel_layer.group_send(self.room_group_name, data)
+            # Leave groups
+            for group_name in [self.room_group_name, self.user_group_name]:
+                await self.channel_layer.group_discard(group_name, self.channel_name)
+
+    async def handle_connect(self, response):
+        """
+        Handles connect event. Sends track to new listener and related message to all other listeners.
+        """
+        message = response.get("message", None)
+        listeners_data = await RoomRepository.get_listeners_info(self.room_id)
+        playlist_tracks = await RoomPlaylistRepository.get_playlist_tracks(self.room_id)
+        room = await RoomRepository.get_room_by_id_or_none(self.room_id)
+        recent_messages = await self._get_recent_chat_messages()
+        data = self._build_context_data(consts.CONNECT_EVENT, message, {
+            "user": self.user.username,
+            "listeners": listeners_data,
+            "playlist": playlist_tracks,
+            "permissions": room.permissions,
+            "recent_messages": recent_messages,
+            "max_connections": room.max_connections,
+        })
+        await self.channel_layer.group_send(self.room_group_name, data)
+        # Here we need to send event from another user to new one
+        await self._get_track_from_listeners(listeners_data)
 
     @update_room_expiration_time
     async def handle_change_track(self, response):
@@ -242,28 +285,6 @@ class MusicRoomConsumerService():
         message = "Set current time."
         data = self._build_context_data(consts.CHANGE_TIME_EVENT, message, {"time": time})
         await self.channel_layer.group_send(self.room_group_name, data)
-
-    async def _find_next_track(self, playlist_tracks, current_track, previous=False):
-        """
-        Finds next track in the playlist (after current_track) and returns it.
-        If it is the last track then it falls back to the first.
-
-        if previous is set to True, then previous track will be returned.
-        """
-        # We need reverse playlist
-        rev_tracks = playlist_tracks.copy()
-        if not previous:
-            rev_tracks.reverse()
-        # Find next track from playlist
-        next_track_index = 1
-        for index in range(len(rev_tracks)):
-            if rev_tracks[index]['url'] == current_track['url']:
-                next_track_index = index + 1
-                break
-        next_track = rev_tracks[0]
-        if next_track_index < len(rev_tracks):
-            next_track = rev_tracks[next_track_index]
-        return next_track
 
     async def handle_set_next_track(self, response):
         """
@@ -404,24 +425,3 @@ class MusicRoomConsumerService():
         username = response.get("username")
         chosen_user = await CustomUserRepository.get_by_username_or_none(username)
         await RoomRepository.unban_user(self.room_id, chosen_user.id)
-
-    async def _is_user_muted(self):
-        """
-        Returns True if user is muted, otherwise False.
-        """
-        return await RoomRepository.is_user_muted(self.room_id, self.user)
-
-    async def _is_user_banned(self):
-        """
-        Returns True if user is banned, otherwise False.
-        """
-        return await RoomRepository.is_user_banned(self.room_id, self.user)
-
-    async def _is_room_full(self):
-        """
-        Return True if the number or online listeners >= room's max_connections number.
-        Otherwise return False.
-        """
-        room = await RoomRepository.get_room_by_id_or_none(self.room_id)
-        listeners_info = await RoomRepository.get_listeners_info(self.room_id)
-        return listeners_info["count"] >= room.max_connections
