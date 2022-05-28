@@ -5,7 +5,7 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.views import LoginView, LogoutView
-from main.models import Room, Playlist
+from main.models import Room, RoomPlaylist
 from main.forms import CustomUserCreationForm, RoomCreationForm
 
 
@@ -19,11 +19,11 @@ class HomeView(LoginRequiredMixin, CreateView):
         return reverse('room', kwargs={"id": self.object.id})
 
     def form_valid(self, form):
+        # Attach user as a host
         form.instance.host = self.request.user
-        # Create new playlist
-        playlist = Playlist.objects.create()
-        form.instance.playlist = playlist
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        RoomPlaylist.objects.create(room_id=self.object.id)
+        return response
 
 
 class RoomView(LoginRequiredMixin, TemplateView):

@@ -1,5 +1,5 @@
-from main.repositories import RoomRepository, PlaylistRepository, SoundtrackRepository, \
-    PlaylistTrackRepository, CustomUserRepository, ChatMessageRepository
+from main.repositories import RoomRepository, RoomPlaylistRepository, SoundtrackRepository, \
+    RoomPlaylistTrackRepository, CustomUserRepository, ChatMessageRepository
 from main import consts
 from main.decorators import update_room_expiration_time
 from django.forms.models import model_to_dict
@@ -123,8 +123,7 @@ class MusicRoomConsumerService():
         """
         message = response.get("message", None)
         listeners_data = await RoomRepository.get_listeners_info(self.room_id)
-        room_playlist = await RoomRepository.get_room_playlist(self.room_id)
-        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist.id)
+        playlist_tracks = await RoomPlaylistRepository.get_playlist_tracks(self.room_id)
         room = await RoomRepository.get_room_by_id_or_none(self.room_id)
         recent_messages = await self._get_recent_chat_messages()
         data = self._build_context_data(consts.CONNECT_EVENT, message, {
@@ -168,8 +167,7 @@ class MusicRoomConsumerService():
         """
         # Get new track data and send to clients
         track_data = response.get("track", None)
-        room_playlist = await RoomRepository.get_room_playlist(self.room_id)
-        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist.id)
+        playlist_tracks = await RoomPlaylistRepository.get_playlist_tracks(self.room_id)
         message = f"Track changed by {self.user.username}."
         data = self._build_context_data(consts.CHANGE_TRACK_EVENT, message, {
             "playlist": playlist_tracks,
@@ -186,11 +184,10 @@ class MusicRoomConsumerService():
         url = response.get("url", None)
         name = response.get("name", None)
         new_track, _ = await SoundtrackRepository.get_or_create(url, name)
-        # We need to know whether new PlaylistTrack instance has been created
-        room_playlist = await RoomRepository.get_room_playlist(self.room_id)
-        _, created = await PlaylistTrackRepository.get_or_create(new_track.id, room_playlist.id)
+        # We need to know whether new RoomPlaylistTrack instance has been created
+        _, created = await RoomPlaylistTrackRepository.get_or_create(new_track.id, self.room_id)
         # Send message
-        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist.id)
+        playlist_tracks = await RoomPlaylistRepository.get_playlist_tracks(self.room_id)
         message = f"New track added by {self.user.username}."
         data = self._build_context_data(consts.ADD_TRACK_EVENT, message, {
             "playlist": playlist_tracks,
@@ -203,15 +200,14 @@ class MusicRoomConsumerService():
         """
         Handles delete track event. Sends deleted track info along with updated playlist.
         """
-        room_playlist = await RoomRepository.get_room_playlist(self.room_id)
         track_data = response.get("track", None)
         chosen_track_url = response.get("chosenTrackUrl", None)
         # Delete playlist track
         soundtrack = await SoundtrackRepository.get_by_url_and_name(track_data["url"], track_data["name"])
-        playlist_track = await PlaylistTrackRepository.get_by_track_and_playlist(soundtrack, room_playlist)
-        await PlaylistTrackRepository.delete(playlist_track)
+        playlist_track = await RoomPlaylistTrackRepository.get_by_track_and_playlist(soundtrack.id, self.room_id)
+        await RoomPlaylistTrackRepository.delete(playlist_track)
         # Get updated playlist
-        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist.id)
+        playlist_tracks = await RoomPlaylistRepository.get_playlist_tracks(self.room_id)
         message = f"Track removed by {self.user.username}."
         data = self._build_context_data(consts.DELETE_TRACK_EVENT, message, {
             "playlist": playlist_tracks,
@@ -228,8 +224,7 @@ class MusicRoomConsumerService():
         new_user = response.get("user", None)
         track_data = response.get("track", None)
         loop = response.get("loop", None)
-        room_playlist = await RoomRepository.get_room_playlist(self.room_id)
-        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist.id)
+        playlist_tracks = await RoomPlaylistRepository.get_playlist_tracks(self.room_id)
         message = f"Set current track data. {self.user.username}"
         data = self._build_context_data(consts.SET_CURRENT_TRACK_EVENT, message, {
             "playlist": playlist_tracks,
@@ -274,9 +269,8 @@ class MusicRoomConsumerService():
         """
         Finds next track in the list and sends change track event.
         """
-        room_playlist = await RoomRepository.get_room_playlist(self.room_id)
         # Get current playlist and current track
-        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist.id)
+        playlist_tracks = await RoomPlaylistRepository.get_playlist_tracks(self.room_id)
         current_track_data = response.get("track", None)
         previous = response.get("previous", False)
         next_track = await self._find_next_track(playlist_tracks, current_track_data, previous=previous)
