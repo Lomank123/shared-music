@@ -65,7 +65,7 @@ class MusicRoomConsumerService():
             for group_name in [self.room_group_name, self.user_group_name]:
                 await self.channel_layer.group_add(group_name, self.channel_name)
             # Add new listener
-            await RoomRepository.add_listener(self.room_id, self.user)
+            await RoomRepository.add_listener(self.room_id, self.user.id)
 
     async def disconnect_user(self):
         """
@@ -75,7 +75,7 @@ class MusicRoomConsumerService():
         channel_name = self.channel_layer._get_group_channel_name(self.room_group_name)
         if self.channel_name in self.channel_layer.groups[channel_name]:
             # Removing listener
-            await RoomRepository.remove_listener(self.room_id, self.user)
+            await RoomRepository.remove_listener(self.room_id, self.user.id)
             # Send disconnect message to other listeners
             listeners_data = await RoomRepository.get_listeners_info(self.room_id)
             message = f"{self.user} {consts.USER_DISCONNECTED}"
@@ -124,7 +124,7 @@ class MusicRoomConsumerService():
         message = response.get("message", None)
         listeners_data = await RoomRepository.get_listeners_info(self.room_id)
         room_playlist = await RoomRepository.get_room_playlist(self.room_id)
-        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist)
+        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist.id)
         room = await RoomRepository.get_room_by_id_or_none(self.room_id)
         recent_messages = await self._get_recent_chat_messages()
         data = self._build_context_data(consts.CONNECT_EVENT, message, {
@@ -169,7 +169,7 @@ class MusicRoomConsumerService():
         # Get new track data and send to clients
         track_data = response.get("track", None)
         room_playlist = await RoomRepository.get_room_playlist(self.room_id)
-        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist)
+        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist.id)
         message = f"Track changed by {self.user.username}."
         data = self._build_context_data(consts.CHANGE_TRACK_EVENT, message, {
             "playlist": playlist_tracks,
@@ -188,9 +188,9 @@ class MusicRoomConsumerService():
         new_track, _ = await SoundtrackRepository.get_or_create(url, name)
         # We need to know whether new PlaylistTrack instance has been created
         room_playlist = await RoomRepository.get_room_playlist(self.room_id)
-        _, created = await PlaylistTrackRepository.get_or_create(new_track, room_playlist)
+        _, created = await PlaylistTrackRepository.get_or_create(new_track.id, room_playlist.id)
         # Send message
-        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist)
+        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist.id)
         message = f"New track added by {self.user.username}."
         data = self._build_context_data(consts.ADD_TRACK_EVENT, message, {
             "playlist": playlist_tracks,
@@ -211,7 +211,7 @@ class MusicRoomConsumerService():
         playlist_track = await PlaylistTrackRepository.get_by_track_and_playlist(soundtrack, room_playlist)
         await PlaylistTrackRepository.delete(playlist_track)
         # Get updated playlist
-        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist)
+        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist.id)
         message = f"Track removed by {self.user.username}."
         data = self._build_context_data(consts.DELETE_TRACK_EVENT, message, {
             "playlist": playlist_tracks,
@@ -229,7 +229,7 @@ class MusicRoomConsumerService():
         track_data = response.get("track", None)
         loop = response.get("loop", None)
         room_playlist = await RoomRepository.get_room_playlist(self.room_id)
-        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist)
+        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist.id)
         message = f"Set current track data. {self.user.username}"
         data = self._build_context_data(consts.SET_CURRENT_TRACK_EVENT, message, {
             "playlist": playlist_tracks,
@@ -276,7 +276,7 @@ class MusicRoomConsumerService():
         """
         room_playlist = await RoomRepository.get_room_playlist(self.room_id)
         # Get current playlist and current track
-        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist)
+        playlist_tracks = await PlaylistRepository.get_playlist_tracks(room_playlist.id)
         current_track_data = response.get("track", None)
         previous = response.get("previous", False)
         next_track = await self._find_next_track(playlist_tracks, current_track_data, previous=previous)
@@ -313,7 +313,7 @@ class MusicRoomConsumerService():
         """
         new_host_username = response.get("new_host", None)
         new_host = await CustomUserRepository.get_by_username_or_none(new_host_username)
-        await RoomRepository.change_host(self.room_id, new_host)
+        await RoomRepository.change_host(self.room_id, new_host.id)
         # Unmute new host automatically
         await RoomRepository.unmute_user(self.room_id, new_host.id)
         # Technically new host cannot be banned user
@@ -428,6 +428,6 @@ class MusicRoomConsumerService():
         Return True if the number or online listeners >= room's max_connections number.
         Otherwise return False.
         """
-        max_connections = RoomRepository.get_room_by_id_or_none(self.room_id).max_connections
-        listeners_count = RoomRepository.get_listeners_info(self.room_id)["count"]
-        return listeners_count >= max_connections
+        room = await RoomRepository.get_room_by_id_or_none(self.room_id)
+        listeners_info = await RoomRepository.get_listeners_info(self.room_id)
+        return listeners_info["count"] >= room.max_connections

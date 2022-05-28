@@ -12,7 +12,7 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
 
         # If user is banned or room is full then close connection immediately
         is_banned = await self.service._is_user_banned()
-        is_room_full = self.service._is_room_full()
+        is_room_full = await self.service._is_room_full()
         if is_banned or is_room_full:
             return
 

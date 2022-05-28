@@ -52,21 +52,21 @@ class RoomRepository():
 
     @staticmethod
     @database_sync_to_async
-    def add_listener(room_id, user):
+    def add_listener(room_id, user_id):
         """
         Attaches user to room.
         """
         room = Room.objects.get(id=room_id)
-        room.listeners.add(user)
+        room.listeners.add(user_id)
 
     @staticmethod
     @database_sync_to_async
-    def remove_listener(room_id, user):
+    def remove_listener(room_id, user_id):
         """
         Removes user from room.
         """
         room = Room.objects.get(id=room_id)
-        room.listeners.remove(user)
+        room.listeners.remove(user_id)
 
     @staticmethod
     @database_sync_to_async
@@ -83,12 +83,12 @@ class RoomRepository():
 
     @staticmethod
     @database_sync_to_async
-    def change_host(room_id, new_host):
+    def change_host(room_id, new_host_id):
         """
         Changes host of room.
         """
         room = Room.objects.get(id=room_id)
-        room.host = new_host
+        room.host_id = new_host_id
         room.save()
 
     @staticmethod
@@ -132,11 +132,11 @@ class PlaylistRepository():
 
     @staticmethod
     @database_sync_to_async
-    def get_playlist_tracks(playlist):
+    def get_playlist_tracks(playlist_id):
         """
         Returns list of urls and names of tracks which are in given playlist.
         """
-        soundtracks = Playlist.objects.get(id=playlist.id).tracks.annotate(
+        soundtracks = Playlist.objects.get(id=playlist_id).tracks.annotate(
             name=F('track__name'),
             url=F('track__url')
         ).values("url", "name")
@@ -162,14 +162,14 @@ class PlaylistTrackRepository():
 
     @staticmethod
     @database_sync_to_async
-    def get_or_create(track, playlist):
-        new_playlist_track, created = PlaylistTrack.objects.get_or_create(track=track, playlist=playlist)
+    def get_or_create(track_id, playlist_id):
+        new_playlist_track, created = PlaylistTrack.objects.get_or_create(track_id=track_id, playlist_id=playlist_id)
         return new_playlist_track, created
 
     @staticmethod
     @database_sync_to_async
-    def get_by_track_and_playlist(soundtrack, playlist):
-        playlist_track = PlaylistTrack.objects.get(track=soundtrack, playlist=playlist)
+    def get_by_track_and_playlist(track_id, playlist_id):
+        playlist_track = PlaylistTrack.objects.get(track_id=track_id, playlist_id=playlist_id)
         return playlist_track
 
     @staticmethod
