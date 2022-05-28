@@ -53,6 +53,7 @@ class Room(models.Model):
     mute_list = models.ManyToManyField(get_user_model(), blank=True, related_name="mute_list", verbose_name="Mute list")
     max_connections = models.IntegerField(default=20, verbose_name="Max connections")
     ban_list = models.ManyToManyField(get_user_model(), blank=True, related_name="ban_list", verbose_name="Ban list")
+    is_deleted = models.BooleanField(default=False, verbose_name="Is deleted")
 
     class Meta:
         verbose_name_plural = "Rooms"

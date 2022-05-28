@@ -14,6 +14,9 @@ def delete_rooms_without_listeners():
     expiration_date = timezone.now() - timedelta(days=1)
     rooms = Room.objects.filter(last_visited__lte=expiration_date)
     rooms_count = rooms.count()
-    rooms.delete()
+    for room in rooms:
+        room.is_deleted = True
+        room.save()
+    # rooms.delete()
 
     return {"detail": f"{rooms_count} rooms has been deleted."}
