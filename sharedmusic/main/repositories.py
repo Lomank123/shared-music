@@ -1,4 +1,4 @@
-from main.models import Room, Playlist, Soundtrack, PlaylistTrack, CustomUser, ChatMessage
+from main.models import Room, RoomPlaylist, Soundtrack, RoomPlaylistTrack, CustomUser, ChatMessage
 from channels.db import database_sync_to_async
 from django.db.models import F
 
@@ -21,16 +21,6 @@ class RoomRepository():
         Saves room.
         """
         room.save()
-
-    @staticmethod
-    @database_sync_to_async
-    def get_room_playlist(room_id):
-        """
-        Returns playlist of current room.
-        """
-        room = Room.objects.select_related("playlist").get(id=room_id)
-        playlist = room.playlist
-        return playlist
 
     @staticmethod
     @database_sync_to_async
@@ -128,15 +118,15 @@ class RoomRepository():
         room.ban_list.remove(user_id)
 
 
-class PlaylistRepository():
+class RoomPlaylistRepository():
 
     @staticmethod
     @database_sync_to_async
-    def get_playlist_tracks(playlist_id):
+    def get_playlist_tracks(room_id):
         """
         Returns list of urls and names of tracks which are in given playlist.
         """
-        soundtracks = Playlist.objects.get(id=playlist_id).tracks.annotate(
+        soundtracks = RoomPlaylist.objects.get(room_id=room_id).tracks.annotate(
             name=F('track__name'),
             url=F('track__url')
         ).values("url", "name")
@@ -158,18 +148,21 @@ class SoundtrackRepository():
         return track
 
 
-class PlaylistTrackRepository():
+class RoomPlaylistTrackRepository():
 
     @staticmethod
     @database_sync_to_async
     def get_or_create(track_id, playlist_id):
-        new_playlist_track, created = PlaylistTrack.objects.get_or_create(track_id=track_id, playlist_id=playlist_id)
+        new_playlist_track, created = RoomPlaylistTrack.objects.get_or_create(
+            track_id=track_id,
+            playlist_id=playlist_id
+        )
         return new_playlist_track, created
 
     @staticmethod
     @database_sync_to_async
     def get_by_track_and_playlist(track_id, playlist_id):
-        playlist_track = PlaylistTrack.objects.get(track_id=track_id, playlist_id=playlist_id)
+        playlist_track = RoomPlaylistTrack.objects.get(track_id=track_id, playlist_id=playlist_id)
         return playlist_track
 
     @staticmethod

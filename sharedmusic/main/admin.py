@@ -1,5 +1,6 @@
 from django.contrib import admin
-from main.models import Room, CustomUser, Soundtrack, Playlist, PlaylistTrack, ChatMessage
+from main.models import Room, CustomUser, Soundtrack, RoomPlaylist, RoomPlaylistTrack, ChatMessage, \
+    UserPlaylist
 from django.contrib.auth.admin import UserAdmin
 
 
@@ -46,6 +47,7 @@ class CustomUserAdmin(UserAdmin):
 
 admin.site.register(Room)
 admin.site.register(Soundtrack)
-admin.site.register(Playlist)
-admin.site.register(PlaylistTrack)
+admin.site.register(RoomPlaylist)
+admin.site.register(RoomPlaylistTrack)
 admin.site.register(ChatMessage)
+admin.site.register(UserPlaylist)
