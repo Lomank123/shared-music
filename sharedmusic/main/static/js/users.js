@@ -4,6 +4,7 @@ let hostUsername = $("#host").attr("host_username");
 let users = [];
 
 function updateUserList(users) {
+    $(".room-title").text(`${hostUsername}'s room`);
     while (usersList.hasChildNodes()) {
         usersList.removeChild(usersList.firstChild);
     }
