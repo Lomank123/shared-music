@@ -1,5 +1,13 @@
 const chat = $(".chat");
 const chatField = $("#chat-field");
+let flag = false;
+
+const options = {
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+};
 
 function muteUser(username) {
     roomSocket.send(
@@ -33,13 +41,17 @@ function sendMessage() {
     chatField.val("");
 }
 
-function handleChatMessages(messages) {
-    const options = {
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    };
+function handleChatMessages(messages, reset = false) {
+    if (reset) {
+        chat.text("");
+    }
+    if (messages.length === 0) {
+        chat.text("No messages :(");
+        flag = true;
+    } else if (flag) {
+        chat.text("");
+        flag = false;
+    }
     messages.forEach((newMessage) => {
         let date = new Date(newMessage.timestamp).toLocaleDateString("en-US", options);
 

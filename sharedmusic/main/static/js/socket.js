@@ -52,8 +52,7 @@ function connect() {
             console.log(permissions);
             setPermissions(permissions);
             updateUserList(users);
-            chat.text("");
-            handleChatMessages(data.recent_messages);
+            handleChatMessages(data.recent_messages, true);
             if (username === data.user) {
                 updatePlaylist(data.playlist);
             }

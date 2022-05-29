@@ -18,11 +18,11 @@
         <button onclick="copyLinkToClipboard(this)" class="btn">Copy link</button>
     </div>
     <div class="lobby">
-        <div class="perms-container">
+        <div class="chat-container">
             <div id="room" room_code="{{ room.id }}"></div>
             <div id="host" host_username="{{ room.host.username }}"></div>
             <div id="user" username="{{ user.username }}"></div>
-            <h6 style="font-weight: bold;">Greetings, {{ user.username }}</h6>
+            <h6>Greetings, {{ user.username }}</h6>
             <div class="chat"></div>
             <div class="chat-input">
                 <input id="chat-field" type="text" placeholder="Enter message"/>
@@ -42,7 +42,9 @@
             <h4>Online users:</h4>
             <ul id="users-list">
             </ul>
-            <a href="javascript:void(0)" onclick="showModal()">View permissions</a>
+            <div class="perms-btn">
+                <a href="javascript:void(0)" onclick="showModal()">View permissions</a>
+            </div>
         </div>
     </div>
     <!--Youtube-->
