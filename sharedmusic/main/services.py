@@ -3,6 +3,7 @@ from main.repositories import RoomRepository, RoomPlaylistRepository, Soundtrack
 from main import consts
 from main.decorators import update_room_expiration_time
 from django.forms.models import model_to_dict
+from sharedmusic.settings.settings import CHANNEL_LAYERS
 
 
 class MusicRoomConsumerService:
@@ -80,11 +81,18 @@ class MusicRoomConsumerService:
         Removes all previous (old) connections from room and user groups.
         """
         try:
+            group_channel_name = self.user_group_name
+            if CHANNEL_LAYERS["default"]["BACKEND"] == 'main.channel_layers.CustomChannelLayer':
+                group_channel_name = self.channel_layer._get_group_channel_name(self.user_group_name)
+        except AttributeError:
+            pass
+
+        user_group = {}
+        try:
             # Create copy to iterate through
-            channel_name = self.channel_layer._get_group_channel_name(self.user_group_name)
-            user_group = self.channel_layer.groups[channel_name].copy()
+            user_group = self.channel_layer.groups[group_channel_name].copy()
         except KeyError:
-            user_group = {}
+            pass
         # Remove old channel (if same user or multiple tabs)
         for channel in user_group:
             if channel != self.channel_name:
@@ -169,8 +177,14 @@ class MusicRoomConsumerService:
         Handles disconnect event. Removes user from listeners list and sends related message
         with updated list to others.
         """
-        channel_name = self.channel_layer._get_group_channel_name(self.room_group_name)
-        if self.channel_name in self.channel_layer.groups[channel_name]:
+        try:
+            group_channel_name = self.room_group_name
+            if CHANNEL_LAYERS["default"]["BACKEND"] == 'main.channel_layers.CustomChannelLayer':
+                group_channel_name = self.channel_layer._get_group_channel_name(self.room_group_name)
+        except AttributeError:
+            # In case of different channel layer
+            group_channel_name = self.room_group_name
+        if self.channel_name in self.channel_layer.groups[group_channel_name]:
             # Removing listener
             await RoomRepository.remove_listener(self.room_id, self.user.id)
             # Send disconnect message to other listeners

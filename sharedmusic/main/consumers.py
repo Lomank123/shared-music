@@ -2,6 +2,8 @@ import json
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from main import consts
 from main.services import MusicRoomConsumerService
+from django.core.serializers.json import DjangoJSONEncoder
+from sharedmusic.settings.settings import CHANNEL_LAYERS
 # from asgiref.sync import sync_to_async
 
 
@@ -74,4 +76,11 @@ class MusicRoomConsumer(AsyncJsonWebsocketConsumer):
 
     async def send_message(self, res):
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({"payload": res}))
+        # If django json encoder will be used with redis pubsub channel layer it may cause error
+        # autobahn.exception.Disconnected: Attempt to send on a closed protocol
+        # Actually nothing bad happens, but I add chack to suppress this exception (in most cases).
+        # 1 case of error is when user opens 2 tabs and 1 gets disconnected
+        if CHANNEL_LAYERS["default"]["BACKEND"] == 'channels.layers.InMemoryChannelLayer':
+            await self.send(text_data=json.dumps({"payload": res}, default=DjangoJSONEncoder().default))
+        else:
+            await self.send(text_data=json.dumps({"payload": res}))
