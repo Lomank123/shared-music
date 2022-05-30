@@ -327,7 +327,7 @@ input[type="email"] {
 
 .permissions {
     overflow: auto;
-    height: 50vh;
+    max-height: 50vh;
 }
 /* Playlist */
 .playlist {
@@ -354,7 +354,7 @@ input[type="email"] {
     text-overflow: ellipsis;
     width: 20vw;
 }
-
+/*
 .track__title::before {
     background: black;
     border-radius: 8px 8px 8px 0px;
@@ -373,7 +373,7 @@ input[type="email"] {
     opacity: 1;
     visibility: visible;
 }
-
+*/
 .track__playButton {
     order: -1;
     transition: ease-in-out 0.2s;
@@ -419,7 +419,6 @@ input[type="email"] {
     display: flex;
     gap: 10px;
     margin-top: 20px;
-    margin-bottom: 50px;
 }
 
 .playlist-input input {
@@ -654,6 +653,8 @@ input[type="email"] {
 .chat {
     height: 50vh;
     overflow-y: auto;
+    margin-top: 10px;
+    max-width: 400px;
 }
 
 .chat-input {
@@ -664,6 +665,11 @@ input[type="email"] {
 
 .chat-input {
     margin-top: 20px;
+}
+
+.muted-message {
+    color: red;
+    margin-top: 5px;
 }
 
 .message {
@@ -685,7 +691,7 @@ input[type="email"] {
 }
 
 .message__content {
-    max-width: 200px;
+    max-width: 100%;
     word-wrap: break-word;
     font-size: 0.9rem;
 }
@@ -708,6 +714,15 @@ input[type="email"] {
 .users-container {
     background-color: var(--block-bg-color);
     padding: 20px;
-    padding-bottom: 0;
     border-radius: 10px;
+}
+
+.playlist-tooltip {
+    position: fixed;
+    opacity: 0;
+    background: black;
+    border-radius: 8px 8px 8px 0px;
+    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 3px 7px;
 }

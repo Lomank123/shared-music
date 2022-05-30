@@ -6,6 +6,7 @@ const volumeEl = document.querySelector(".volume-container .volume");
 const volumeSlider = document.querySelector(".controls .volume-slider");
 const playBtn = document.querySelector(".controls .toggle-play");
 const thumb = document.querySelector(".name .thumb");
+const tooltip = $(".progress-tooltip");
 
 let player;
 let loop = false;
@@ -64,7 +65,6 @@ function onPlayerReady(event) {
     timeline.addEventListener("mousemove", (e) => {
         const timelineWidth = window.getComputedStyle(timeline).width;
         const timeToSeek = (e.offsetX / parseInt(timelineWidth)) * player.getDuration();
-        let tooltip = $(".progress-tooltip");
         tooltip.text(getTimeCodeFromNum(timeToSeek));
         tooltip.get(0).style.left =
             e.pageX + tooltip.get(0).clientWidth + 15 < document.body.clientWidth

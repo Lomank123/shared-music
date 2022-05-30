@@ -49,7 +49,6 @@ function connect() {
         if (data.event == "CONNECT") {
             users = data.listeners.users;
             permissions = data.permissions;
-            console.log(permissions);
             setPermissions(permissions);
             updateUserList(users);
             handleChatMessages(data.recent_messages, true);
@@ -158,6 +157,15 @@ function connect() {
         if (data.event == "BAN_USER") {
             console.log("You have been banned.");
             roomSocket.close();
+        }
+        if (data.event == "MUTE_LISTENER") {
+            $(".muted-message").removeClass("hidden");
+        }
+        if (data.event == "UNMUTE_LISTENER") {
+            $(".muted-message").addClass("hidden");
+        }
+        if (data.event == "LISTENER_MUTED") {
+            $(".muted-message").removeClass("hidden");
         }
     };
 

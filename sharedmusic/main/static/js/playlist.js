@@ -55,6 +55,10 @@ function updatePlaylist(newPlaylist, url = "") {
         playButton.on("click", (e) => {
             changeTrack(e, track);
         });
+        trackTitle.hover(
+            (e) => playlistTooltipHover(e, track.name),
+            (e) => playlistTooltipUnhover(e)
+        );
         trackElement.append(playButton, trackTitle, deleteButton);
         playlist.prepend(trackElement);
     });
@@ -98,4 +102,18 @@ function addTrack() {
                 $(".playlist-error").text("");
             }, 5000);
         });
+}
+
+const playlistTooltip = $(".playlist-tooltip");
+
+function playlistTooltipHover(e, text) {
+    playlistTooltip.text(text);
+    playlistTooltip.css("opacity", 1);
+    playlistTooltip.css("top", e.clientY - 50);
+    playlistTooltip.css("left", document.body.clientWidth / 2 - 150);
+}
+
+function playlistTooltipUnhover(e) {
+    playlistTooltip.text("");
+    playlistTooltip.css("opacity", 0);
 }

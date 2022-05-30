@@ -80,8 +80,6 @@ function savePerms() {
         let newValue = setting.find('input[type="radio"]:checked').val();
         permissions[perm] = newValue;
     });
-    console.log("Permissions saved, boss");
-    console.log(permissions);
     roomSocket.send(
         JSON.stringify({
             event: "CHANGE_PERMISSIONS",
