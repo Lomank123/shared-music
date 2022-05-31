@@ -25,5 +25,7 @@ async def build_communicator(user, room_id) -> WebsocketCommunicator:
     # Communicator instance represent 1 connected user
     # If you want more than 1 user then create multiple communicators
     communicator = WebsocketCommunicator(application, f"/ws/room/{room_id}/", headers)
+    communicator.scope["url_route"] = {"kwargs": {"room_id": room_id}}
+    communicator.scope["user"] = user
     # Return communicator with authenticated user
     return communicator
