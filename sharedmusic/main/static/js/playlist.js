@@ -97,10 +97,7 @@ function addTrack() {
         })
         .catch((err) => {
             console.log(`Track with id=${id} not found`);
-            $(".playlist-error").text("Track not found");
-            setTimeout(() => {
-                $(".playlist-error").text("");
-            }, 5000);
+            setPlaylistError("Track not found");
         });
 }
 
@@ -116,4 +113,11 @@ function playlistTooltipHover(e, text) {
 function playlistTooltipUnhover(e) {
     playlistTooltip.text("");
     playlistTooltip.css("opacity", 0);
+}
+
+function setPlaylistError(error) {
+    $(".playlist-error").text(error);
+    setTimeout(() => {
+        $(".playlist-error").text("");
+    }, 5000);
 }

@@ -84,7 +84,10 @@ function connect() {
             console.log("Closing connection. Refresh the page.");
         }
         if (data.event == "ADD_TRACK") {
-            // display new track in playlist with buttons
+            if (!data.created) {
+                setPlaylistError("Track is already in playlist");
+                return;
+            }
             updatePlaylist(data.playlist, player.getVideoUrl());
         }
         if (data.event == "CHANGE_TRACK") {
@@ -100,10 +103,8 @@ function connect() {
             player.loadVideoById(id, data.track.currentTime);
             playTrack();
             if (data.track.isPaused) {
-                //player.mute();
                 setTimeout(() => {
                     pauseTrack();
-                    //player.unMute();
                 }, 500);
             }
             updatePlaylist(data.playlist, data.track.url);
