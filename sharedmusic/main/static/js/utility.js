@@ -44,3 +44,10 @@ function copyLinkToClipboard(btn) {
         btn.textContent = "Copy link";
     }, 4000);
 }
+
+function dropdownHover(element) {
+    element = $(element);
+    let offset = element.offset();
+    element.children(".dropdown-content").css("top", offset.top + element.height());
+    element.children(".dropdown-content").css("left", offset.left);
+}
