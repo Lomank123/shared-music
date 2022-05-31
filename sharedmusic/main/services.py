@@ -313,7 +313,10 @@ class MusicRoomConsumerService:
         message = "New current track set."
         data = self._build_context_data(consts.CHANGE_TRACK_EVENT, message, {
             "playlist": playlist_tracks,
-            "track": {'url': next_track['url']},
+            "track": {
+                'url': next_track['url'],
+                'name': next_track['name'],
+            },
         })
         await self.channel_layer.group_send(self.room_group_name, data)
 
