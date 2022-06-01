@@ -6,6 +6,7 @@ const volumeEl = document.querySelector(".volume-container .volume");
 const volumeSlider = document.querySelector(".controls .volume-slider");
 const playBtn = document.querySelector(".controls .toggle-play");
 const thumb = document.querySelector(".name .thumb");
+const tooltip = $(".progress-tooltip");
 
 let player;
 let loop = false;
@@ -64,7 +65,6 @@ function onPlayerReady(event) {
     timeline.addEventListener("mousemove", (e) => {
         const timelineWidth = window.getComputedStyle(timeline).width;
         const timeToSeek = (e.offsetX / parseInt(timelineWidth)) * player.getDuration();
-        let tooltip = $(".progress-tooltip");
         tooltip.text(getTimeCodeFromNum(timeToSeek));
         tooltip.get(0).style.left =
             e.pageX + tooltip.get(0).clientWidth + 15 < document.body.clientWidth
@@ -97,7 +97,6 @@ function onPlayerReady(event) {
     //toggle between playing and pausing on button click
     playBtn.addEventListener("click", () => {
         if (player.getPlayerState() === 1) {
-            //pauseTrack();
             roomSocket.send(
                 JSON.stringify({
                     event: "PAUSE",
@@ -105,7 +104,6 @@ function onPlayerReady(event) {
                 })
             );
         } else {
-            //playTrack();
             roomSocket.send(
                 JSON.stringify({
                     event: "PLAY",
@@ -230,12 +228,14 @@ function setThumbnail(id) {
 function pauseTrack() {
     playBtn.classList.remove("pause");
     playBtn.classList.add("play");
+    stopEqualizerAnimation();
     player.pauseVideo();
 }
 
 function playTrack() {
     playBtn.classList.remove("play");
     playBtn.classList.add("pause");
+    startEqualizerAnimation();
     player.playVideo();
 }
 

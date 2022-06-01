@@ -3,6 +3,7 @@
     --sidebar-bg-color: rgba(17, 24, 39);
     --primary-color: rgb(173, 33, 33);
     --primary-color-hover: rgb(109, 20, 20);
+    --block-bg-color: rgb(43, 47, 58);
     /* Scrollbar variables */
     --scrollbarBG: rgba(255, 255, 255, 0.8);
     --scrollbarThumb: rgb(173, 33, 33);
@@ -280,8 +281,9 @@ input[type="email"] {
 }
 
 #users-list {
-    max-height: 50vh;
+    height: 50vh;
     overflow-y: auto;
+    margin-top: 5px;
 }
 
 #users-list li {
@@ -295,10 +297,6 @@ input[type="email"] {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-}
-
-.users-container {
-    max-width: 250px;
 }
 
 .online {
@@ -322,7 +320,10 @@ input[type="email"] {
 }
 
 /* Permissions */
-.perms-container {
+
+.perms-btn {
+    margin-top: 20px;
+    text-align: center;
 }
 
 .permissions {
@@ -331,8 +332,9 @@ input[type="email"] {
 }
 /* Playlist */
 .playlist {
-    max-height: 50vh;
+    height: 50vh;
     overflow-y: auto;
+    margin-top: 5px;
 }
 
 .playlist-error {
@@ -354,7 +356,7 @@ input[type="email"] {
     text-overflow: ellipsis;
     width: 20vw;
 }
-
+/*
 .track__title::before {
     background: black;
     border-radius: 8px 8px 8px 0px;
@@ -373,7 +375,7 @@ input[type="email"] {
     opacity: 1;
     visibility: visible;
 }
-
+*/
 .track__playButton {
     order: -1;
     transition: ease-in-out 0.2s;
@@ -416,10 +418,14 @@ input[type="email"] {
 }
 
 .playlist-input {
+    display: flex;
+    gap: 10px;
     margin-top: 20px;
-    margin-bottom: 50px;
 }
 
+.playlist-input input {
+    flex-grow: 2;
+}
 /* Home */
 .home {
     display: flex;
@@ -524,13 +530,12 @@ input[type="email"] {
 /* The container <div> - needed to position the dropdown content */
 .dropdown {
     display: inline-block;
-    position: relative;
 }
 
 /* Dropdown Content (Hidden by Default) */
 .dropdown-content {
     display: none;
-    position: fixed;
+    position: absolute;
     background-color: #f1f1f1;
     max-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
@@ -586,10 +591,10 @@ input[type="email"] {
     .track__title {
         width: 90vw;
     }
-    .perms-container .permissions {
+    .permissions {
         max-height: 20vh;
     }
-    .perms-container h6 {
+    .chat-container h6 {
         display: none;
     }
     /* Playlist */
@@ -647,8 +652,10 @@ input[type="email"] {
 
 /* Chat */
 .chat {
-    max-height: 50vh;
+    height: 50vh;
     overflow-y: auto;
+    max-width: 400px;
+    margin-top: 5px;
 }
 
 .chat-input {
@@ -658,7 +665,12 @@ input[type="email"] {
 }
 
 .chat-input {
-    margin-top: 10px;
+    margin-top: 20px;
+}
+
+.muted-message {
+    color: red;
+    margin-top: 5px;
 }
 
 .message {
@@ -680,7 +692,7 @@ input[type="email"] {
 }
 
 .message__content {
-    max-width: 200px;
+    max-width: 100%;
     word-wrap: break-word;
     font-size: 0.9rem;
 }
@@ -689,4 +701,78 @@ input[type="email"] {
     font-size: 0.7rem;
     color: gray;
     align-self: flex-end;
+}
+
+.chat-input,
+.playlist-input,
+.perms-btn {
+    border-top: 4px solid var(--primary-color);
+    padding-top: 20px;
+}
+
+.chat-container,
+.playlist-container,
+.users-container {
+    background-color: var(--block-bg-color);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.playlist-tooltip {
+    position: fixed;
+    opacity: 0;
+    background: black;
+    border-radius: 8px 8px 8px 0px;
+    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 3px 7px;
+}
+
+.box {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 41px;
+    height: 45px;
+    cursor: pointer;
+}
+
+@keyframes go-up-down {
+    0% {
+        height: 0;
+    }
+    100% {
+        height: 35px;
+    }
+}
+
+.line-1,
+.line-2,
+.line-3,
+.line-4,
+.line-5 {
+    position: relative;
+    width: 4px;
+    height: 35px;
+    background-color: var(--primary-color);
+}
+
+.line-1 {
+    animation: go-up-down 0.7s infinite alternate;
+}
+
+.line-2 {
+    animation: go-up-down 0.6s infinite alternate;
+}
+
+.line-3 {
+    animation: go-up-down 0.9s infinite alternate;
+}
+
+.line-4 {
+    animation: go-up-down 0.3s infinite alternate;
+}
+
+.line-5 {
+    animation: go-up-down 0.4s infinite alternate;
 }

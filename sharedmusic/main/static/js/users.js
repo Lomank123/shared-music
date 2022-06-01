@@ -4,6 +4,7 @@ let hostUsername = $("#host").attr("host_username");
 let users = [];
 
 function updateUserList(users) {
+    $(".room-title").text(`${hostUsername}'s room`);
     while (usersList.hasChildNodes()) {
         usersList.removeChild(usersList.firstChild);
     }
@@ -14,13 +15,13 @@ function updateUserList(users) {
         if (user.username != hostUsername && username == hostUsername) {
             //let changeHostButton = $(`<button onClick="changeHost('${user.username}')">Change</button>`);
             let changeHostButton = $(`
-            <div class="dropdown">
+            <div onmouseover="dropdownHover(this)" class="dropdown">
                 <button class="dropbtn"><i class="fa-regular fa-square-caret-down"></i></button>
                 <div class="dropdown-content">
-                <a href="javascript:void(0)" onclick="changeHost('${user.username}')">Change host</a>
-                <a href="javascript:void(0)" onclick="muteUser('${user.username}')">Mute user</a>
-                <a href="javascript:void(0)" onclick="unmuteUser('${user.username}')">Unmute user</a>
-                <a href="javascript:void(0)" onclick="banUser('${user.username}')">Ban user</a>
+                    <a href="javascript:void(0)" onclick="changeHost('${user.username}')">Change host</a>
+                    <a href="javascript:void(0)" onclick="muteUser('${user.username}')">Mute user</a>
+                    <a href="javascript:void(0)" onclick="unmuteUser('${user.username}')">Unmute user</a>
+                    <a href="javascript:void(0)" onclick="banUser('${user.username}')">Ban user</a>
                 </div>
             </div>`);
             node.append(changeHostButton);
@@ -67,4 +68,21 @@ function unbanUser(username) {
             username: username,
         })
     );
+}
+
+function handleUserBan() {
+    $(".content").addClass("hidden");
+    $(".loading").removeClass("hidden");
+    $(".lds-ripple").text("");
+    $(".loading__error").text("You have been banned from the room");
+    let time = 10;
+    $(".loading__message").text(`You will be redirected to home page in ${time} seconds`);
+    let timerId = setInterval(() => {
+        time -= 1;
+        $(".loading__message").text(`You will be redirected to home page in ${time} seconds`);
+    }, 1000);
+    setTimeout(() => {
+        clearInterval(timerId);
+        window.location.href = "/";
+    }, 10000);
 }

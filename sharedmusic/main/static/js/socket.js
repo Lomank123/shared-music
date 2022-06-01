@@ -22,7 +22,6 @@ function connect() {
         console.log("WebSocket error.");
         const loading = $(".loading");
         const content = $(".content");
-        // If connection error occured while in the room
         if (loading.hasClass("hidden")) {
             content.addClass("hidden");
             loading.removeClass("hidden");
@@ -49,11 +48,9 @@ function connect() {
         if (data.event == "CONNECT") {
             users = data.listeners.users;
             permissions = data.permissions;
-            console.log(permissions);
             setPermissions(permissions);
             updateUserList(users);
-            chat.text("");
-            handleChatMessages(data.recent_messages);
+            handleChatMessages(data.recent_messages, true);
             if (username === data.user) {
                 updatePlaylist(data.playlist);
             }
@@ -86,7 +83,10 @@ function connect() {
             console.log("Closing connection. Refresh the page.");
         }
         if (data.event == "ADD_TRACK") {
-            // display new track in playlist with buttons
+            if (!data.created) {
+                setPlaylistError("Track is already in playlist");
+                return;
+            }
             updatePlaylist(data.playlist, player.getVideoUrl());
         }
         if (data.event == "CHANGE_TRACK") {
@@ -102,10 +102,8 @@ function connect() {
             player.loadVideoById(id, data.track.currentTime);
             playTrack();
             if (data.track.isPaused) {
-                //player.mute();
                 setTimeout(() => {
                     pauseTrack();
-                    //player.unMute();
                 }, 500);
             }
             updatePlaylist(data.playlist, data.track.url);
@@ -158,7 +156,17 @@ function connect() {
         }
         if (data.event == "BAN_USER") {
             console.log("You have been banned.");
+            handleUserBan();
             roomSocket.close();
+        }
+        if (data.event == "MUTE_LISTENER") {
+            $(".muted-message").removeClass("hidden");
+        }
+        if (data.event == "UNMUTE_LISTENER") {
+            $(".muted-message").addClass("hidden");
+        }
+        if (data.event == "LISTENER_MUTED") {
+            $(".muted-message").removeClass("hidden");
         }
     };
 
