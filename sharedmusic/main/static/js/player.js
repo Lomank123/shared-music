@@ -97,7 +97,6 @@ function onPlayerReady(event) {
     //toggle between playing and pausing on button click
     playBtn.addEventListener("click", () => {
         if (player.getPlayerState() === 1) {
-            //pauseTrack();
             roomSocket.send(
                 JSON.stringify({
                     event: "PAUSE",
@@ -105,7 +104,6 @@ function onPlayerReady(event) {
                 })
             );
         } else {
-            //playTrack();
             roomSocket.send(
                 JSON.stringify({
                     event: "PLAY",
@@ -230,12 +228,14 @@ function setThumbnail(id) {
 function pauseTrack() {
     playBtn.classList.remove("pause");
     playBtn.classList.add("play");
+    stopEqualizerAnimation();
     player.pauseVideo();
 }
 
 function playTrack() {
     playBtn.classList.remove("play");
     playBtn.classList.add("pause");
+    startEqualizerAnimation();
     player.playVideo();
 }
 

@@ -22,7 +22,6 @@ function connect() {
         console.log("WebSocket error.");
         const loading = $(".loading");
         const content = $(".content");
-        // If connection error occured while in the room
         if (loading.hasClass("hidden")) {
             content.addClass("hidden");
             loading.removeClass("hidden");
@@ -157,6 +156,7 @@ function connect() {
         }
         if (data.event == "BAN_USER") {
             console.log("You have been banned.");
+            handleUserBan();
             roomSocket.close();
         }
         if (data.event == "MUTE_LISTENER") {

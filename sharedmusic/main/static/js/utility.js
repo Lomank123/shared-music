@@ -51,3 +51,17 @@ function dropdownHover(element) {
     element.children(".dropdown-content").css("top", offset.top + element.height());
     element.children(".dropdown-content").css("left", offset.left);
 }
+
+function startEqualizerAnimation() {
+    $(".box").children().css("animationPlayState", "running");
+}
+
+function stopEqualizerAnimation() {
+    // When track in paused and you add (delete) track from playlist, animation starts to play
+    // If I stop animation right away, it doesnt have time to start playing (height of lines is set to 0)
+    // So we need some time for animation to play
+    // As alternative, I can change animation styles (but I am too lazy, maybe next time)
+    setTimeout(() => {
+        $(".box").children().css("animationPlayState", "paused");
+    }, 200);
+}

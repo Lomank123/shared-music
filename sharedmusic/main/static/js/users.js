@@ -69,3 +69,20 @@ function unbanUser(username) {
         })
     );
 }
+
+function handleUserBan() {
+    $(".content").addClass("hidden");
+    $(".loading").removeClass("hidden");
+    $(".lds-ripple").text("");
+    $(".loading__error").text("You have been banned from the room");
+    let time = 10;
+    $(".loading__message").text(`You will be redirected to home page in ${time} seconds`);
+    let timerId = setInterval(() => {
+        time -= 1;
+        $(".loading__message").text(`You will be redirected to home page in ${time} seconds`);
+    }, 1000);
+    setTimeout(() => {
+        clearInterval(timerId);
+        window.location.href = "/";
+    }, 10000);
+}
