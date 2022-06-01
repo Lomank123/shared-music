@@ -15,5 +15,5 @@ jobs:
         run: |
           cat .env.sample >> .env
           docker-compose up --exit-code-from test test
-      - uses: codecov/codecov-action@v2.1.0
       - name: Codecov
+        uses: codecov/codecov-action@v2.1.0
