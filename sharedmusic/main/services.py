@@ -440,5 +440,8 @@ class MusicRoomConsumerService:
         Unbans user by updating room's ban list.
         """
         username = response.get("username")
+        message = f"User {username} has been unbanned."
         chosen_user = await CustomUserRepository.get_by_username_or_none(username)
         await RoomRepository.unban_user(self.room_id, chosen_user.id)
+        data = self._build_context_data(consts.UNBAN_USER_EVENT, message)
+        await self.channel_layer.group_send(self.room_group_name, data)
