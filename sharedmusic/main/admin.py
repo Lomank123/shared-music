@@ -45,9 +45,51 @@ class CustomUserAdmin(UserAdmin):
     ordering = ('email',)
 
 
-admin.site.register(Room)
-admin.site.register(Soundtrack)
-admin.site.register(RoomPlaylist)
-admin.site.register(RoomPlaylistTrack)
-admin.site.register(ChatMessage)
-admin.site.register(UserPlaylist)
+@admin.register(Room)
+class RoomAdmin(admin.ModelAdmin):
+    model = Room
+    list_display = ('id', 'host', 'max_connections', 'last_visited', 'is_deleted', 'creation_date',)
+    list_filter = ('is_deleted',)
+    search_fields = ('id',)
+    ordering = ('creation_date',)
+
+
+@admin.register(Soundtrack)
+class SoundtrackAdmin(admin.ModelAdmin):
+    model = Soundtrack
+    list_display = ('name', 'id', 'url', 'creation_date',)
+    search_fields = ('name', 'id', 'url',)
+    ordering = ('creation_date',)
+
+
+@admin.register(RoomPlaylist)
+class RoomPlaylistAdmin(admin.ModelAdmin):
+    model = RoomPlaylist
+    list_display = ('name', 'room_id', 'room', 'creation_date',)
+    search_fields = ('room_id', 'name',)
+    ordering = ('creation_date',)
+
+
+@admin.register(RoomPlaylistTrack)
+class RoomPlaylistTrackAdmin(admin.ModelAdmin):
+    model = RoomPlaylistTrack
+    list_display = ('track', 'playlist', 'id',)
+    search_fields = ('id',)
+    ordering = ('id',)
+
+
+@admin.register(ChatMessage)
+class ChatMessageAdmin(admin.ModelAdmin):
+    model = ChatMessage
+    list_display = ('sender', 'room', 'message', 'id', 'timestamp',)
+    list_filter = ('sender',)
+    search_fields = ('message', 'sender', 'room')
+    ordering = ('timestamp',)
+
+
+@admin.register(UserPlaylist)
+class UserPlaylistAdmin(admin.ModelAdmin):
+    model = UserPlaylist
+    list_display = ('name', 'id', 'user', 'creation_date',)
+    search_fields = ('id', 'name')
+    ordering = ('creation_date',)

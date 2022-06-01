@@ -17,6 +17,9 @@ class Soundtrack(models.Model):
     url = models.URLField(max_length=2000, verbose_name="URL")
     creation_date = models.DateTimeField(auto_now_add=True, verbose_name="Creation date")
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         verbose_name_plural = 'Soundtracks'
         verbose_name = 'Soundtrack'
@@ -56,6 +59,9 @@ class Room(models.Model):
     ban_list = models.ManyToManyField(get_user_model(), blank=True, related_name="ban_list", verbose_name="Ban list")
     is_deleted = models.BooleanField(default=False, verbose_name="Is deleted")
 
+    def __str__(self):
+        return f"{self.host}'s room ({self.id})"
+
     def save(self, *args, **kwargs):
         date = timezone.now()
         if self.creation_date is None:
@@ -70,7 +76,7 @@ class Room(models.Model):
 
 
 class ChatMessage(models.Model):
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="messages", verbose_name="Chat message")
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="messages", verbose_name="Room")
     sender = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, verbose_name="Sender")
     message = models.CharField(max_length=600, verbose_name="Message")
     timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Timestamp")
