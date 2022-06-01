@@ -13,6 +13,7 @@ Live version can be visited at: [sharedmusic.live](https://sharedmusic.live/)
 
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![codecov](https://codecov.io/gh/Lomank123/shared-music/branch/main/graph/badge.svg?token=371L2PBI81)](https://codecov.io/gh/Lomank123/shared-music)
 
 
 ## Table of contents
