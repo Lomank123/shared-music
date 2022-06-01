@@ -2,10 +2,10 @@
 
 ![Alt text](./sharedmusic/main/static/images/sharedmusic_black.svg)
 
-**Shared Music** service provides you rooms where you can listen to music with friends or anyone else who wants to come in. All you have to do is click create room button and share the link. It's that simple! See all the features below.
+**Shared Music** service provides you rooms where you can listen to music with friends or anyone else who wants to come in. All you have to do is click create room button and share the link. It's that simple! See all the features [here](#features).
 
 **Main goals:**
-- Provide a useful service which will allow anyone listen to music, share it and play at the same time
+- Provide useful service which will let anyone create music rooms for shared listening and communicating
 - Construct WebSocket-based application
 - Gain team work experience
 
@@ -28,7 +28,7 @@ Live version can be visited at: [sharedmusic.live](https://sharedmusic.live/)
   - [Features](#features)
     - [Main features](#main-features)
     - [Tech features](#tech-features)
-    - [Room owner features:](#room-owner-features)
+    - [Room host features:](#room-host-features)
   - [Usage](#usage)
     - [Run project](#run-project)
     - [Fixtures](#fixtures)
@@ -137,26 +137,28 @@ Insert some screenshots
 ### Main features
 - Create room in one click
 - Invite anyone by sharing the link
-- Communicate by sending messages to in-room chat
-- Load tracks from YouTube (other services WIP)
-- User playlist (WIP)
-- Save/Load room playlist (WIP)
-- Download urls from room or user playlist (WIP)
+- Communicate by sending messages to room chat
+- *Load tracks from YouTube (other services WIP)*
+- *User playlist (WIP)*
+- *Save/Load room playlist (WIP)*
+- *Download urls from room or user playlist (WIP)*
 
 ### Tech features
+- CI/CD
 - Both asgi and wsgi apps (daphne and gunicorn) to serve `http` and `WebSocket` connections.
 - WebSocket protocol to keep changes in rooms
-- Celery tasks
-    -  To remove abandoned rooms (periodically)
-- CI/CD with the help of GitHub Actions
 - Nginx reverse proxy to serve static files and WebSockets
+- Celery tasks
+  -  To remove abandoned rooms (periodically)
 
-### Room owner features:
-- Set permissions to limit some actions
-    - Who can change/add/delete track
-    - Enable/Disable vote for change
+### Room host features:
+- Change permissions
+  - change/add/delete track
+  - pause/play track
+  - change time of current track
 - Transfer ownership to any listener
-- Ban, kick or mute listeners if it is needed
+- Ban/unban any listener
+- Mute/unmute any listener
 
 
 ## Usage
@@ -176,6 +178,9 @@ docker-compose up
 
 ### Fixtures
 - To fill the database:
+```
+docker-compose up filldb
+```
 
 **`dev.json` fixtures contain:**
   - Superuser
@@ -248,7 +253,7 @@ These tests cover:
 - channels Consumers
 - Services
 - Celery tasks
-- Views (WIP)
+- Views
 
 Services and consumers tests run using `InMemoryChannelLayer`.
 
@@ -273,23 +278,23 @@ docker-compose -f docker-compose-deploy.yml up
 ## Tech stack
 
 - **Backend**:
-    - Django 3
-    - channels
-    - Redis
-    - Gunicorn
-    - Daphne
-    - PostgreSQL
-    - Coverage
-    - Celery
-    - Nginx
+  - Django 3
+  - channels
+  - Redis
+  - Gunicorn
+  - Daphne
+  - PostgreSQL
+  - Coverage
+  - Celery
+  - Nginx
 - **Frontend**:
-    - YouTube API
-    - jQuery
+  - YouTube API
+  - jQuery
 - **Other**:
-    - GitHub
-    - Codecov
-    - Docker
-    - docker-compose
+  - GitHub
+  - Codecov
+  - Docker
+  - docker-compose
 
 
 ## Authors
