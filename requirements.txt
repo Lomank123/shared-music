@@ -2,7 +2,6 @@ Django==3.2.13
 django-extensions
 channels
 channels_redis
-flake8
 django-cors-headers
 django-cleanup
 python-dotenv
@@ -11,6 +10,6 @@ gunicorn
 django-crispy-forms
 celery
 django-celery-beat
-flower
 daphne
 Redis
+coverage

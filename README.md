@@ -30,7 +30,6 @@ Live version can be visited at: [sharedmusic.live](https://sharedmusic.live/)
     - [Room owner features:](#room-owner-features)
   - [Usage](#usage)
     - [Run project](#run-project)
-    - [Linters](#linters)
     - [Fixtures](#fixtures)
     - [Backup](#backup)
     - [Restore](#restore)
@@ -137,11 +136,11 @@ Insert some screenshots
 ### Main features
 - Create room in one click
 - Invite anyone by sharing the link
+- Communicate by sending messages to in-room chat
 - Load tracks from YouTube (other services WIP)
 - User playlist (WIP)
 - Save/Load room playlist (WIP)
 - Download urls from room or user playlist (WIP)
-- Communicate by sending messages to in-room chat (WIP)
 
 ### Tech features
 - Both asgi and wsgi apps (daphne and gunicorn) to serve `http` and `WebSocket` connections.
@@ -156,7 +155,7 @@ Insert some screenshots
     - Who can change/add/delete track
     - Enable/Disable vote for change
 - Transfer ownership to any listener
-- Ban, kick or mute listeners if it is needed (WIP)
+- Ban, kick or mute listeners if it is needed
 
 
 ## Usage
@@ -174,21 +173,25 @@ py manage.py runserver
 docker-compose up
 ```
 
-### Linters
-- To run linters:
-
 ### Fixtures
 - To fill the database:
 
-- Superuser:
-    - email: `admin@gmail.com`
+**`dev.json` fixtures contain:**
+  - Superuser
+  - Regular user
+  - Room
+  - Room playlist
+  - Soundtrack
+  - Room playlist track
+  - Chat messages
+
+**Users credentials**
+  - Superuser:
+    - username: `admin`
     - password: `12345`
-- User 1:
-    - email: `test1@gmail.com`
+  - User 1:
+    - username: `test1`
     - password: `123123123Aa`
-- User 2:
-    - email: `test2@gmail.com`
-    - password: `123123123Qq`
 
 ### Backup
 - Assuming you have created `/backups` dir you can just run `pgbackups` container
@@ -234,10 +237,19 @@ docker exec --tty --interactive shared-music_db_1 /bin/sh -c "zcat backups/$BACK
 ## Tests
 
 - To run tests:
-
+```
+docker-compose up test
+```
 
 ### Tests description
 
+These tests cover:
+- channels Consumers
+- Services
+- Celery tasks
+- Views (WIP)
+
+Services and consumers tests run using `InMemoryChannelLayer`.
 
 ## Deployment
 
@@ -281,5 +293,5 @@ docker-compose -f docker-compose-deploy.yml up
 
 ## Authors
 
-- [Lomank123](https://github.com/Lomank123)
-- [erikgab01](https://github.com/erikgab01)
+- [Lomank123](https://github.com/Lomank123) - Backend
+- [erikgab01](https://github.com/erikgab01) - Frontend

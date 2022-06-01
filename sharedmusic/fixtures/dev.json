@@ -3,16 +3,16 @@
   "model": "main.customuser",
   "pk": 1,
   "fields": {
-    "password": "pbkdf2_sha256$260000$3FM5BILaxXtmHCzoa6pO9r$RDaDD9MKqxPj5PtEEg7pAmrNG1LZ8199OZKIM0NqXGw=",
-    "last_login": "2022-05-20T05:25:03.763Z",
-    "is_superuser": false,
-    "username": "test1",
+    "password": "pbkdf2_sha256$260000$P9dTOTvj8XsS1uDuRa5Kiw$9ECwyQNN+DrgBOqV9zIjSRKjUOPEtG9vvE63L24ULfg=",
+    "last_login": "2022-06-01T10:47:05.327Z",
+    "is_superuser": true,
+    "username": "admin",
     "first_name": "",
     "last_name": "",
     "email": "",
-    "is_staff": false,
+    "is_staff": true,
     "is_active": true,
-    "date_joined": "2022-05-20T05:25:03.390Z",
+    "date_joined": "2022-06-01T10:46:30.858Z",
     "groups": [],
     "user_permissions": []
   }
@@ -21,72 +21,87 @@
   "model": "main.customuser",
   "pk": 2,
   "fields": {
-    "password": "pbkdf2_sha256$260000$hoAtFZC3PDO5pRY4NNN00D$HhK3DE0jZh0e9Jc0iRyMr3v4OZbFrtRz0sUkwabeZhI=",
-    "last_login": "2022-05-20T06:28:58.924Z",
-    "is_superuser": true,
-    "username": "admin",
+    "password": "pbkdf2_sha256$260000$vsCkmg3prh6dZ81BwKYpNV$rjc0TZD0k78XVWruD3LclnMPaICw8QHfTYXFcFw/Z2c=",
+    "last_login": "2022-06-01T10:48:28.304Z",
+    "is_superuser": false,
+    "username": "test1",
     "first_name": "",
     "last_name": "",
     "email": "",
-    "is_staff": true,
+    "is_staff": false,
     "is_active": true,
-    "date_joined": "2022-05-20T05:42:29.571Z",
+    "date_joined": "2022-06-01T10:47:33.797Z",
     "groups": [],
     "user_permissions": []
   }
 },
 {
-  "model": "main.playlist",
-  "pk": 1,
-  "fields": {
-    "name": "Playlist",
-    "creation_date": "2022-05-20T05:25:04.875Z"
-  }
-},
-{
-  "model": "main.playlist",
+  "model": "main.soundtrack",
   "pk": 2,
   "fields": {
+    "name": "Nastya Kazantseva - Midnight",
+    "url": "https://www.youtube.com/watch?v=wPZldPeL1ss",
+    "creation_date": "2022-06-01T10:49:37.704Z"
+  }
+},
+{
+  "model": "main.room",
+  "pk": "2ce4978e-0ac0-441e-b258-9891528b965b",
+  "fields": {
+    "host": 1,
+    "creation_date": "2022-06-01T10:47:53.901Z",
+    "last_visited": "2022-06-01T10:49:56.327Z",
+    "permissions": {
+      "PAUSE": 1,
+      "ADD_TRACK": 1,
+      "CHANGE_TIME": 1,
+      "CHANGE_TRACK": 1,
+      "DELETE_TRACK": 1
+    },
+    "max_connections": 20,
+    "is_deleted": false,
+    "listeners": [
+      2,
+      1
+    ],
+    "mute_list": [],
+    "ban_list": []
+  }
+},
+{
+  "model": "main.chatmessage",
+  "pk": 1,
+  "fields": {
+    "room": "2ce4978e-0ac0-441e-b258-9891528b965b",
+    "sender": 1,
+    "message": "Hello, test1!",
+    "timestamp": "2022-06-01T10:50:27.213Z"
+  }
+},
+{
+  "model": "main.chatmessage",
+  "pk": 2,
+  "fields": {
+    "room": "2ce4978e-0ac0-441e-b258-9891528b965b",
+    "sender": 2,
+    "message": "Welcome, admin!",
+    "timestamp": "2022-06-01T10:50:34.117Z"
+  }
+},
+{
+  "model": "main.roomplaylist",
+  "pk": "2ce4978e-0ac0-441e-b258-9891528b965b",
+  "fields": {
     "name": "Playlist",
-    "creation_date": "2022-05-20T05:39:40.825Z"
+    "creation_date": "2022-06-01T10:47:53.932Z"
   }
 },
 {
-  "model": "main.room",
-  "pk": "09aa31a6-7def-4cec-93a7-8f3c8d746fc5",
+  "model": "main.roomplaylisttrack",
+  "pk": 2,
   "fields": {
-    "host": 1,
-    "creation_date": "2022-05-20T05:25:04.971Z",
-    "last_visited": "2022-05-20T05:25:04.971Z",
-    "playlist": 1,
-    "permissions": {
-      "PAUSE": 1,
-      "ADD_TRACK": 1,
-      "CHANGE_TIME": 1,
-      "CHANGE_TRACK": 1,
-      "DELETE_TRACK": 1,
-      "VOTE_FOR_SKIP": 1
-    },
-    "listeners": []
-  }
-},
-{
-  "model": "main.room",
-  "pk": "185cd2bf-a96a-4659-a06c-1ddd7ac76212",
-  "fields": {
-    "host": 1,
-    "creation_date": "2022-05-20T05:39:40.850Z",
-    "last_visited": "2022-05-20T05:39:40.850Z",
-    "playlist": 2,
-    "permissions": {
-      "PAUSE": 1,
-      "ADD_TRACK": 1,
-      "CHANGE_TIME": 1,
-      "CHANGE_TRACK": 1,
-      "DELETE_TRACK": 1,
-      "VOTE_FOR_SKIP": 1
-    },
-    "listeners": []
+    "track": 2,
+    "playlist": "2ce4978e-0ac0-441e-b258-9891528b965b"
   }
 }
 ]
