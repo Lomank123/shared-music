@@ -1,19 +1,26 @@
-from django.shortcuts import reverse
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView, LogoutView
+from django.http import HttpResponseRedirect
+from django.shortcuts import reverse
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.views import LoginView, LogoutView
-from main.models import Room, RoomPlaylist
+
 from main.forms import CustomUserCreationForm, RoomCreationForm
+from main.models import Room, RoomPlaylist
 
 
-class HomeView(LoginRequiredMixin, CreateView):
+class HomeView(CreateView):
     form_class = RoomCreationForm
     model = Room
     template_name = 'home.html'
     login_url = '/signup/'
+
+    def post(self, request):
+        if request.user.is_authenticated:
+            return super().post(request)
+        else:
+            return HttpResponseRedirect(reverse('signup'))
 
     def get_success_url(self):
         return reverse('room', kwargs={"id": self.object.id})
