@@ -55,6 +55,15 @@ function connect() {
                 updatePlaylist(data.playlist);
             }
         }
+        if (data.event == "SEND_EXTRA_INFO") {
+            if (data.mute_list) {
+                muteList = data.mute_list.map(user => user.username);
+                updateUserList(users);
+            }
+            if (data.ban_list) {
+                banList = data.ban_list;
+            }
+        }
         if (data.event == "GET_TRACK_FROM_LISTENERS") {
             let state = player.getPlayerState();
             const trackData = {
@@ -139,6 +148,7 @@ function connect() {
         if (data.event == "HOST_CHANGED") {
             $("#host").attr("host_username", data.new_host);
             hostUsername = $("#host").attr("host_username");
+            $(".muted-message").addClass("hidden");
             updateUserList(users);
             setPermissions(permissions);
         }
