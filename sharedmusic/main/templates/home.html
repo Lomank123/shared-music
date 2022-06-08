@@ -5,7 +5,10 @@
 {% block content %}
 <div class="home">
     <img class="responsive-image" src="/static/images/sharedmusic.svg">
-    <p class="home-message">Let's start by creating a room. <br> Or you may ask your friends for link to join their room.</p>
+    <p class="home-message">
+      Shared music is a place where you can easily create rooms and listen your favorite tracks with others by sharing the link. <br>
+      Create room by clicking the button or ask someone to share the link.
+    </p>
     <form id="create-room-form" class="create-room" method="POST">
       {% csrf_token %}
       {{ form }}

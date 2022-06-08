@@ -30,7 +30,11 @@ class MusicRoomConsumerService:
         self.room_id = self.scope['url_route']['kwargs']['room_id']
         self.room_group_name = f'{consts.ROOM_GROUP_PREFIX}_{self.room_id}'
         # User group must contain only one user
-        self.user_group_name = f'{consts.USER_GROUP_PREFIX}_{self.user.username}'
+        self.user_group_name = self._get_user_group(self.user.username)
+
+    @staticmethod
+    def _get_user_group(username):
+        return f'{consts.USER_GROUP_PREFIX}_{username}'
 
     def _build_context_data(self, event, message="Message", extra_data={}):
         """
@@ -115,7 +119,7 @@ class MusicRoomConsumerService:
         recent_messages = await ChatMessageRepository.get_recent_messages(self.room_id)
         return recent_messages
 
-    async def _get_track_from_listeners(self, listeners):
+    async def _send_track_from_listeners(self, listeners):
         """
         Finds first online listener in the room and sends them event
         to get track data for new one. If no listeners found nothing happens.
@@ -133,9 +137,18 @@ class MusicRoomConsumerService:
                 {"receiver": self.user.username, }
             )
             await self.channel_layer.group_send(
-                f"{consts.USER_GROUP_PREFIX}_{another_user}",
+                self._get_user_group(another_user),
                 track_sender_data
             )
+
+    async def _send_extra_info(self, username, extra_data):
+        """
+        Sends additional info (ban list, mute list).
+        """
+        message = "Send additional info to user."
+        data = self._build_context_data(consts.SEND_EXTRA_INFO_EVENT, message, extra_data)
+        group_name = self._get_user_group(username)
+        await self.channel_layer.group_send(group_name, data)
 
     async def _find_next_track(self, playlist_tracks, current_track, previous=False):
         """
@@ -184,7 +197,11 @@ class MusicRoomConsumerService:
         except AttributeError:
             # In case of different channel layer
             group_channel_name = self.room_group_name
-        if self.channel_name in self.channel_layer.groups[group_channel_name]:
+        try:
+            groups = self.channel_layer.groups[group_channel_name]
+        except KeyError:
+            return
+        if self.channel_name in groups:
             # Removing listener
             await RoomRepository.remove_listener(self.room_id, self.user.id)
             # Send disconnect message to other listeners
@@ -215,7 +232,16 @@ class MusicRoomConsumerService:
         })
         await self.channel_layer.group_send(self.room_group_name, data)
         # Here we need to send event from another user to new one
-        await self._get_track_from_listeners(listeners_data)
+        await self._send_track_from_listeners(listeners_data)
+        # Send extra info if user is host
+        if self.user.id == room.host_id:
+            ban_list = await RoomRepository.get_room_ban_list(self.room_id)
+            mute_list = await RoomRepository.get_room_mute_list(self.room_id)
+            extra_data = {
+                "ban_list": ban_list,
+                "mute_list": mute_list,
+            }
+            await self._send_extra_info(self.user.username, extra_data)
 
     @update_room_expiration_time
     async def handle_change_track(self, response):
@@ -278,7 +304,7 @@ class MusicRoomConsumerService:
         Used when new listener enters the room.
         Retrieves track data from existing listener and sends it only to new one by specifying user group.
         """
-        new_user = response.get("user", None)
+        new_user_username = response.get("user", None)
         track_data = response.get("track", None)
         loop = response.get("loop", None)
         playlist_tracks = await RoomPlaylistRepository.get_playlist_tracks(self.room_id)
@@ -288,7 +314,8 @@ class MusicRoomConsumerService:
             "track": track_data,
             "loop": loop,
         })
-        await self.channel_layer.group_send(f"{consts.USER_GROUP_PREFIX}_{new_user}", data)
+        new_user_group = self._get_user_group(new_user_username)
+        await self.channel_layer.group_send(new_user_group, data)
 
     @update_room_expiration_time
     async def handle_change_time(self, response):
@@ -332,6 +359,7 @@ class MusicRoomConsumerService:
         dict_chat_msg["username"] = self.user.username
         dict_chat_msg["timestamp"] = str(new_chat_message.timestamp)
         del dict_chat_msg["sender"]
+        del dict_chat_msg["room"]
 
         message = "New message incoming"
         data = self._build_context_data(consts.SEND_CHAT_MESSAGE_EVENT, message, {
@@ -354,6 +382,14 @@ class MusicRoomConsumerService:
             "new_host": new_host_username,
         })
         await self.channel_layer.group_send(self.room_group_name, data)
+        # Send lists to new host
+        ban_list = await RoomRepository.get_room_ban_list(self.room_id)
+        mute_list = await RoomRepository.get_room_mute_list(self.room_id)
+        extra_data = {
+            "ban_list": ban_list,
+            "mute_list": mute_list,
+        }
+        await self._send_extra_info(new_host_username, extra_data)
 
     async def handle_change_permissions(self, response):
         """
@@ -398,8 +434,14 @@ class MusicRoomConsumerService:
         # Send message to affected user
         message = "You are currently muted."
         data = self._build_context_data(consts.MUTE_LISTENER_EVENT, message)
-        chosen_user_group = f"{consts.USER_GROUP_PREFIX}_{chosen_user}"
+        chosen_user_group = self._get_user_group(chosen_user.username)
+        # Notify muted user
         await self.channel_layer.group_send(chosen_user_group, data)
+        # Send updated mute list to host
+        # self.user is host because only host can send mute events
+        mute_list = await RoomRepository.get_room_mute_list(self.room_id)
+        extra_data = {'mute_list': mute_list}
+        await self._send_extra_info(self.user.username, extra_data=extra_data)
 
     async def handle_unmute(self, response):
         """
@@ -411,8 +453,11 @@ class MusicRoomConsumerService:
         # Send message to affected user
         message = "You are no longer muted!"
         data = self._build_context_data(consts.UNMUTE_LISTENER_EVENT, message)
-        chosen_user_group = f"{consts.USER_GROUP_PREFIX}_{chosen_user}"
+        chosen_user_group = self._get_user_group(chosen_user.username)
         await self.channel_layer.group_send(chosen_user_group, data)
+        mute_list = await RoomRepository.get_room_mute_list(self.room_id)
+        extra_data = {'mute_list': mute_list}
+        await self._send_extra_info(self.user.username, extra_data=extra_data)
 
     async def handle_listener_muted(self):
         """
@@ -432,8 +477,11 @@ class MusicRoomConsumerService:
         # Send message to affected user
         message = "You have been banned."
         data = self._build_context_data(consts.BAN_USER_EVENT, message)
-        chosen_user_group = f"{consts.USER_GROUP_PREFIX}_{chosen_user}"
+        chosen_user_group = self._get_user_group(chosen_user.username)
         await self.channel_layer.group_send(chosen_user_group, data)
+        ban_list = await RoomRepository.get_room_ban_list(self.room_id)
+        extra_data = {'ban_list': ban_list}
+        await self._send_extra_info(self.user.username, extra_data=extra_data)
 
     async def handle_unban(self, response):
         """
@@ -445,3 +493,6 @@ class MusicRoomConsumerService:
         await RoomRepository.unban_user(self.room_id, chosen_user.id)
         data = self._build_context_data(consts.UNBAN_USER_EVENT, message)
         await self.channel_layer.group_send(self.room_group_name, data)
+        ban_list = await RoomRepository.get_room_ban_list(self.room_id)
+        extra_data = {'ban_list': ban_list}
+        await self._send_extra_info(self.user.username, extra_data=extra_data)

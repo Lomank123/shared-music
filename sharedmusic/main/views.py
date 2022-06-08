@@ -39,7 +39,9 @@ class RoomView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["room"] = Room.objects.filter(id=kwargs["id"]).first()
+        room = Room.objects.filter(id=kwargs["id"]).first()
+        context["is_banned"] = room.ban_list.filter(id=self.request.user.id).exists()
+        context["room"] = room
         return context
 
 

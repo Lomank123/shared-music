@@ -117,6 +117,24 @@ class RoomRepository():
         room = Room.objects.get(id=room_id)
         room.ban_list.remove(user_id)
 
+    @staticmethod
+    @database_sync_to_async
+    def get_room_mute_list(room_id):
+        """
+        Returns room's mute list.
+        """
+        room = Room.objects.get(id=room_id)
+        return list(room.mute_list.values("username"))
+
+    @staticmethod
+    @database_sync_to_async
+    def get_room_ban_list(room_id):
+        """
+        Returns room's ban list.
+        """
+        room = Room.objects.get(id=room_id)
+        return list(room.ban_list.values("username"))
+
 
 class RoomPlaylistRepository():
 

@@ -31,6 +31,7 @@
         method="post"
         enctype="multipart/form-data"
     >
+        <p>Please, sign up first by entering username and password.</p>
         {% csrf_token %}
         {{ form|crispy }}
         <button class="btn signup__btn" type="submit">
