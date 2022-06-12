@@ -805,3 +805,12 @@ input[type="email"] {
 .banned-user:not(:first-child) {
     margin-top: 20px;
 }
+
+.issues {
+    margin-bottom: 20px;
+}
+
+.issues p {
+    font-size: 0.8rem;
+    text-align: center;
+}

@@ -36,6 +36,10 @@
             <p>Log in</p>
         </a>
         <img class="sidebar__logo responsive-image" src="/static/images/sharedmusic.svg">
+        <div class="issues">
+            <p>If you found any bugs please contact us at lomank200222@gmail.com</p>
+            <p>Or create an issue on <a target="_blank" href="https://github.com/Lomank123/shared-music/issues"><i class="fa-brands fa-github"></i></a></p>
+        </div>
         {% if user.is_authenticated %}
         <div class="user-data">
             <h6>Welcome, {{ user.username }}</h6>
@@ -44,7 +48,7 @@
                 <p>Logout</p>
             </a>
         </div>
-      {% endif %}
+        {% endif %}
     </nav>
     <button class="openbtn" onclick="openNav()">
         <svg
