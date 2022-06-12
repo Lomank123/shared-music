@@ -39,9 +39,9 @@ function showContent() {
 
 function copyLinkToClipboard(btn) {
     navigator.clipboard.writeText(window.location.href);
-    btn.textContent = "Copied to clipboard";
+    btn.innerHTML = '<i class="fa-solid fa-check"></i>';
     setTimeout(() => {
-        btn.textContent = "Copy link";
+        btn.innerHTML = '<i class="fa-solid fa-copy"></i>';
     }, 4000);
 }
 

@@ -29,10 +29,10 @@ function updatePlaylist(newPlaylist, url = "") {
     }
     newPlaylist.forEach((track) => {
         let trackElement = $(`<div class="playlist__track"></div>`);
-        let playButton = $(`<button class="track__playButton"><i class="fas fa-play"></i></button>`);
+        let playButton = $(`<button title="Play track" class="track__playButton"><i class="fas fa-play"></i></button>`);
         let trackTitle = $(`<div class="track__title" data-title="${track.name}">${track.name}</div>`);
         let deleteButton = $(
-            `<button class="track__deleteButton"><i class="fa-solid fa-trash-can"></i></button>`
+            `<button title="Delete track from playlist" class="track__deleteButton"><i class="fa-solid fa-trash-can"></i></button>`
         );
         let trackData = {
             name: track.name,
@@ -48,7 +48,7 @@ function updatePlaylist(newPlaylist, url = "") {
             if (chosenUrl === trackUrl) {
                 //playButton.addClass("track__playButton_active");
                 playButton = $(`
-                <div class="box">
+                <div title="Play/Pause track" class="box">
                     <div class="line-1"></div>
                     <div class="line-2"></div>
                     <div class="line-3"></div>

@@ -20,7 +20,7 @@
     </div>
     <div class="room-name">
         <h1 class="room-title"></h1>
-        <button onclick="copyLinkToClipboard(this)" class="btn">Copy link</button>
+        <button title="Copy link to clipboard" onclick="copyLinkToClipboard(this)" class="btn btn-image"><i class="fa-solid fa-copy"></i></button>
     </div>
     <div class="lobby">
         <div class="chat-container">
@@ -31,7 +31,7 @@
             <div class="chat"></div>
             <div class="chat-input">
                 <input id="chat-field" type="text" placeholder="Enter message"/>
-                <button class="btn" onclick="sendMessage()">Send</button>
+                <button title="Send message to chat" class="btn btn-image" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
             <div class="muted-message hidden">You are muted</div>
         </div>
@@ -40,7 +40,7 @@
             <div class="playlist"></div>
             <div class="playlist-input">
                 <input id="url-field" type="text" placeholder="Enter youtube url"/>
-                <button class="btn" onclick="addTrack()">Add track</button>
+                <button title="Add track to playlist" class="btn btn-image" onclick="addTrack()"><i class="fa-solid fa-plus"></i></button>
             </div>
             <div class="playlist-error"></div>
             <div class="playlist-tooltip">test</div>
@@ -49,9 +49,9 @@
             <h4>Online users:</h4>
             <ul id="users-list">
             </ul>
-            <div class="perms-btn">
-                <a href="javascript:void(0)" onclick="showModal()">View permissions</a>
-                <a class="hidden" href="javascript:void(0)" onclick="showBanlistModal()" host-only>View banlist</a>
+            <div class="user-buttons">
+                <button title="View permissions" class="btn btn-image" onclick="showModal()"><i class="fa-solid fa-list-check"></i></button>
+                <button title="View banlist" class="btn btn-image hidden" onclick="showBanlistModal()" host-only><i class="fa-solid fa-user-slash"></i></button>
             </div>
         </div>
     </div>

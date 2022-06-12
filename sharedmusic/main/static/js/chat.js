@@ -31,6 +31,9 @@ function unmuteUser(username) {
 
 function sendMessage() {
     const text = chatField.val();
+    if (text === "") {
+        return;
+    }
     roomSocket.send(
         JSON.stringify({
             event: "SEND_CHAT_MESSAGE",

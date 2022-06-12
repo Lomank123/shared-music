@@ -39,7 +39,10 @@
         {% if user.is_authenticated %}
         <div class="user-data">
             <h6>Welcome, {{ user.username }}</h6>
-            <a href="{% url 'logout' %}" class="sidebar__link sidebar__link_logout">Logout</a>
+            <a href="{% url 'logout' %}" class="sidebar__link sidebar__link_logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <p>Logout</p>
+            </a>
         </div>
       {% endif %}
     </nav>

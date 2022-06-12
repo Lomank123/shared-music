@@ -112,7 +112,7 @@ function updateBanlist() {
         let element = $(`
             <div class="banned-user">
                 <div class="banned-user__username">${user.username}</div>
-                <button onclick="unbanUser('${user.username}')" class="btn">Unban</button>
+                <button title="Unban user" onclick="unbanUser('${user.username}')" class="btn btn-image"><i class="fa-solid fa-ban"></i></button>
             </div>
         `);
         banlistElement.append(element);

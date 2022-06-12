@@ -73,6 +73,11 @@ input[type="email"] {
     border-radius: 10px;
 }
 
+.btn-image {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
 .btn:hover {
     background-color: var(--primary-color-hover);
     border: 1px solid var(--primary-color-hover);
@@ -321,9 +326,15 @@ input[type="email"] {
 
 /* Permissions */
 
-.perms-btn {
+.user-buttons {
     margin-top: 20px;
     text-align: center;
+    display: flex;
+    gap: 10px;
+}
+
+.user-buttons .btn {
+    flex-grow: 1;
 }
 
 .permissions {
@@ -706,7 +717,7 @@ input[type="email"] {
 
 .chat-input,
 .playlist-input,
-.perms-btn {
+.user-buttons {
     border-top: 4px solid var(--primary-color);
     padding-top: 20px;
 }
@@ -778,11 +789,6 @@ input[type="email"] {
     animation: go-up-down 0.4s infinite alternate;
 }
 
-.perms-btn {
-    display: flex;
-    flex-direction: column;
-}
-
 .banlist {
     overflow-y: auto;
     max-height: 50vh;
@@ -798,8 +804,4 @@ input[type="email"] {
 
 .banned-user:not(:first-child) {
     margin-top: 20px;
-}
-
-.banned-user .btn {
-    font-size: 1rem;
 }
