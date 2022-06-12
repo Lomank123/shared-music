@@ -132,6 +132,8 @@ class RoomRepository():
             .annotate(username=F("mute_list__username"))
             .values("username")
         )
+        if mute_list[0]["username"] is None:
+            return list()
         return mute_list
 
     @staticmethod
@@ -145,6 +147,8 @@ class RoomRepository():
             .annotate(username=F("ban_list__username"))
             .values("username")
         )
+        if ban_list[0]["username"] is None:
+            return list()
         return ban_list
 
 
