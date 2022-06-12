@@ -62,6 +62,7 @@ function connect() {
             }
             if (data.ban_list) {
                 banList = data.ban_list;
+                updateBanlist();
             }
         }
         if (data.event == "GET_TRACK_FROM_LISTENERS") {

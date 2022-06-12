@@ -4,7 +4,11 @@
 {% block title %}Room{% endblock title %}
 
 {% block content %}
-<div id="is_banned" banned="{{ is_banned }}"></div>
+{% if is_banned %}
+<div class="loading">
+    <div class="loading__error">You are banned from this room</div>
+</div>
+{% else %}
 <div class="loading">
     <div class="lds-ripple"><div></div><div></div></div>
     <div class="loading__error"></div>
@@ -47,6 +51,7 @@
             </ul>
             <div class="perms-btn">
                 <a href="javascript:void(0)" onclick="showModal()">View permissions</a>
+                <a class="hidden" href="javascript:void(0)" onclick="showBanlistModal()" host-only>View banlist</a>
             </div>
         </div>
     </div>
@@ -83,6 +88,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 {% endblock content %}
 
 {% block scripts %}

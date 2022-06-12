@@ -65,3 +65,7 @@ function stopEqualizerAnimation() {
         $(".box").children().css("animationPlayState", "paused");
     }, 200);
 }
+
+function closeModal(modal) {
+    modal.hide();
+}

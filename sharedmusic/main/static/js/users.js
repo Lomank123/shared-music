@@ -38,9 +38,9 @@ function updateUserList(users) {
     });
     // Hide all elements with attribute "host-only", if user is not host
     if (username == hostUsername) {
-        $("[host-only]").css("visibility", "visible");
+        $("[host-only]").removeClass("hidden");
     } else {
-        $("[host-only]").css("visibility", "hidden");
+        $("[host-only]").addClass("hidden");
     }
 }
 
@@ -89,4 +89,32 @@ function handleUserBan() {
         clearInterval(timerId);
         window.location.href = "/";
     }, 10000);
+}
+
+let banlistModal = $modal({
+    title: "Banlist",
+    content: `
+        <div class="banlist"></div>`,
+    footerButtons: [{ class: "btn btn__cancel", text: "Close", handler: "closeModal(banlistModal)" }],
+});
+
+function showBanlistModal() {
+    banlistModal.show();
+}
+
+function updateBanlist() {
+    let banlistElement = $(".banlist");
+    banlistElement.text("");
+    if (banList.length === 0) {
+        banlistElement.append($("<div>No banned users :)</div>"));
+    }
+    banList.forEach(user => {
+        let element = $(`
+            <div class="banned-user">
+                <div class="banned-user__username">${user.username}</div>
+                <button onclick="unbanUser('${user.username}')" class="btn">Unban</button>
+            </div>
+        `);
+        banlistElement.append(element);
+    });
 }

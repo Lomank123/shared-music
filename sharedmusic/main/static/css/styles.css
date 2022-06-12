@@ -421,6 +421,7 @@ input[type="email"] {
     display: flex;
     gap: 10px;
     margin-top: 20px;
+    align-items: center;
 }
 
 .playlist-input input {
@@ -775,4 +776,30 @@ input[type="email"] {
 
 .line-5 {
     animation: go-up-down 0.4s infinite alternate;
+}
+
+.perms-btn {
+    display: flex;
+    flex-direction: column;
+}
+
+.banlist {
+    overflow-y: auto;
+    max-height: 50vh;
+    padding-right: 20px;
+}
+
+.banned-user {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.banned-user:not(:first-child) {
+    margin-top: 20px;
+}
+
+.banned-user .btn {
+    font-size: 1rem;
 }

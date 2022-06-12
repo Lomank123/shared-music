@@ -63,9 +63,6 @@ function showModal() {
         permsModalUser.show();
     }
 }
-function closeModal(modal) {
-    modal.hide();
-}
 function savePerms() {
     if (username != hostUsername) {
         return;
