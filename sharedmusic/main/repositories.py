@@ -7,19 +7,12 @@ class RoomRepository():
 
     @staticmethod
     @database_sync_to_async
-    def get_room_by_id_or_none(room_id):
-        """
-        Returns room by it's id or None.
-        """
-        room = Room.objects.filter(id=room_id).first()
-        return room
+    def get_room_by_id(room_id):
+        return Room.objects.get(id=room_id)
 
     @staticmethod
     @database_sync_to_async
-    def save_room(room):
-        """
-        Saves room.
-        """
+    def save(room):
         room.save()
 
     @staticmethod
@@ -208,8 +201,8 @@ class CustomUserRepository():
 
     @staticmethod
     @database_sync_to_async
-    def get_by_username_or_none(username):
-        return CustomUser.objects.filter(username=username).first()
+    def get_by_username(username):
+        return CustomUser.objects.get(username=username)
 
 
 class ChatMessageRepository():

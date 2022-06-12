@@ -53,7 +53,7 @@ class MusicRoomConsumerService:
         Returns True if event is not in permissions list or if permission is lower or equal to allow any.
         Otherwise returns whether user is host.
         """
-        room = await RoomRepository.get_room_by_id_or_none(self.room_id)
+        room = await RoomRepository.get_room_by_id(self.room_id)
         if event in room.permissions.keys():
             if int(room.permissions[event]) > consts.ROOM_ALLOW_ANY:
                 return self.user.id == room.host_id
@@ -76,7 +76,7 @@ class MusicRoomConsumerService:
         Return True if the number or online listeners >= room's max_connections number.
         Otherwise return False.
         """
-        room = await RoomRepository.get_room_by_id_or_none(self.room_id)
+        room = await RoomRepository.get_room_by_id(self.room_id)
         listeners_info = await RoomRepository.get_listeners_info(self.room_id)
         return listeners_info["count"] >= room.max_connections
 
@@ -220,7 +220,7 @@ class MusicRoomConsumerService:
         message = response.get("message", None)
         listeners_data = await RoomRepository.get_listeners_info(self.room_id)
         playlist_tracks = await RoomPlaylistRepository.get_playlist_tracks(self.room_id)
-        room = await RoomRepository.get_room_by_id_or_none(self.room_id)
+        room = await RoomRepository.get_room_by_id(self.room_id)
         recent_messages = await self._get_recent_chat_messages()
         data = self._build_context_data(consts.CONNECT_EVENT, message, {
             "user": self.user.username,
@@ -372,7 +372,7 @@ class MusicRoomConsumerService:
         Changes host to new one by it's username.
         """
         new_host_username = response.get("new_host", None)
-        new_host = await CustomUserRepository.get_by_username_or_none(new_host_username)
+        new_host = await CustomUserRepository.get_by_username(new_host_username)
         await RoomRepository.change_host(self.room_id, new_host.id)
         # Unmute new host automatically
         await RoomRepository.unmute_user(self.room_id, new_host.id)
@@ -395,12 +395,12 @@ class MusicRoomConsumerService:
         """
         Updates permissions and sends them to all listeners.
         """
-        room = await RoomRepository.get_room_by_id_or_none(self.room_id)
+        room = await RoomRepository.get_room_by_id(self.room_id)
         new_permissions = response.get("permissions", None)
         # new_max_connections = response.get("max_connections", None)
         room.permissions = new_permissions
         # room.max_connections = new_max_connections
-        await RoomRepository.save_room(room)
+        await RoomRepository.save(room)
         data = self._build_context_data(consts.CHANGE_PERMISSIONS_EVENT, consts.PERMISSIONS_CHANGED_MSG, {
             "permissions": room.permissions,
             # "max_connections": room.max_connections,
@@ -429,7 +429,7 @@ class MusicRoomConsumerService:
         Mutes user by updating room's mute list.
         """
         username = response.get("username")
-        chosen_user = await CustomUserRepository.get_by_username_or_none(username)
+        chosen_user = await CustomUserRepository.get_by_username(username)
         await RoomRepository.mute_user(self.room_id, chosen_user.id)
         # Send message to affected user
         message = "You are currently muted."
@@ -448,7 +448,7 @@ class MusicRoomConsumerService:
         Unmutes user by updating room's mute list.
         """
         username = response.get("username")
-        chosen_user = await CustomUserRepository.get_by_username_or_none(username)
+        chosen_user = await CustomUserRepository.get_by_username(username)
         await RoomRepository.unmute_user(self.room_id, chosen_user.id)
         # Send message to affected user
         message = "You are no longer muted!"
@@ -472,7 +472,7 @@ class MusicRoomConsumerService:
         Bans user by updating room's ban list and sending related event to close connection.
         """
         username = response.get("username")
-        chosen_user = await CustomUserRepository.get_by_username_or_none(username)
+        chosen_user = await CustomUserRepository.get_by_username(username)
         await RoomRepository.ban_user(self.room_id, chosen_user.id)
         # Send message to affected user
         message = "You have been banned."
@@ -489,7 +489,7 @@ class MusicRoomConsumerService:
         """
         username = response.get("username")
         message = f"User {username} has been unbanned."
-        chosen_user = await CustomUserRepository.get_by_username_or_none(username)
+        chosen_user = await CustomUserRepository.get_by_username(username)
         await RoomRepository.unban_user(self.room_id, chosen_user.id)
         data = self._build_context_data(consts.UNBAN_USER_EVENT, message)
         await self.channel_layer.group_send(self.room_group_name, data)
