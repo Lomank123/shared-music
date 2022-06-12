@@ -24,27 +24,27 @@ class RoomRepository():
 
     @staticmethod
     @database_sync_to_async
-    def is_user_muted(room_id, user):
+    def is_user_muted(room_id, user_id):
         """
         Returns True if room's mute_list contains user.
         """
-        room = Room.objects.get(id=room_id)
-        return user in room.mute_list.all()
+        mute_list = Room.objects.filter(id=room_id).values_list('mute_list', flat=True)
+        return user_id in mute_list
 
     @staticmethod
     @database_sync_to_async
-    def is_user_banned(room_id, user):
+    def is_user_banned(room_id, user_id):
         """
         Returns True if room's ban_list contains user.
         """
-        room = Room.objects.get(id=room_id)
-        return user in room.ban_list.all()
+        ban_list = Room.objects.filter(id=room_id).values_list('ban_list', flat=True)
+        return user_id in ban_list
 
     @staticmethod
     @database_sync_to_async
     def add_listener(room_id, user_id):
         """
-        Attaches user to room.
+        Attaches user to room as listener.
         """
         room = Room.objects.get(id=room_id)
         room.listeners.add(user_id)
@@ -64,10 +64,14 @@ class RoomRepository():
         """
         Get all usernames and their count from room.
         """
-        room = Room.objects.get(id=room_id)
+        listeners = (
+            Room.objects.filter(id=room_id)
+            .annotate(username=F("listeners__username"))
+            .values("username")
+        )
         data = {
-            'count': room.listeners.count(),
-            'users': list(room.listeners.values("username")),
+            'count': listeners.count(),
+            'users': list(listeners),
         }
         return data
 
@@ -123,8 +127,12 @@ class RoomRepository():
         """
         Returns room's mute list.
         """
-        room = Room.objects.get(id=room_id)
-        return list(room.mute_list.values("username"))
+        mute_list = list(
+            Room.objects.filter(id=room_id)
+            .annotate(username=F("mute_list__username"))
+            .values("username")
+        )
+        return mute_list
 
     @staticmethod
     @database_sync_to_async
@@ -132,8 +140,12 @@ class RoomRepository():
         """
         Returns room's ban list.
         """
-        room = Room.objects.get(id=room_id)
-        return list(room.ban_list.values("username"))
+        ban_list = list(
+            Room.objects.filter(id=room_id)
+            .annotate(username=F("ban_list__username"))
+            .values("username")
+        )
+        return ban_list
 
 
 class RoomPlaylistRepository():
@@ -144,6 +156,7 @@ class RoomPlaylistRepository():
         """
         Returns list of urls and names of tracks which are in given playlist.
         """
+        # IMHO this query can be optimized
         soundtracks = RoomPlaylist.objects.get(room_id=room_id).tracks.annotate(
             name=F('track__name'),
             url=F('track__url')
@@ -162,8 +175,7 @@ class SoundtrackRepository():
     @staticmethod
     @database_sync_to_async
     def get_by_url_and_name(url, name):
-        track = Soundtrack.objects.get(url=url, name=name)
-        return track
+        return Soundtrack.objects.get(url=url, name=name)
 
 
 class RoomPlaylistTrackRepository():
@@ -180,8 +192,7 @@ class RoomPlaylistTrackRepository():
     @staticmethod
     @database_sync_to_async
     def get_by_track_and_playlist(track_id, playlist_id):
-        playlist_track = RoomPlaylistTrack.objects.get(track_id=track_id, playlist_id=playlist_id)
-        return playlist_track
+        return RoomPlaylistTrack.objects.get(track_id=track_id, playlist_id=playlist_id)
 
     @staticmethod
     @database_sync_to_async
@@ -194,11 +205,7 @@ class CustomUserRepository():
     @staticmethod
     @database_sync_to_async
     def get_by_username_or_none(username):
-        """
-        Returns user by it's username or None.
-        """
-        user = CustomUser.objects.filter(username=username).first()
-        return user
+        return CustomUser.objects.filter(username=username).first()
 
 
 class ChatMessageRepository():
@@ -206,10 +213,7 @@ class ChatMessageRepository():
     @staticmethod
     @database_sync_to_async
     def create(room_id, user_id, message):
-        """
-        Create method for chat messages.
-        """
-        chat_message, _ = ChatMessage.objects.get_or_create(room_id=room_id, sender_id=user_id, message=message)
+        chat_message = ChatMessage.objects.create(room_id=room_id, sender_id=user_id, message=message)
         return chat_message
 
     @staticmethod
@@ -218,7 +222,11 @@ class ChatMessageRepository():
         """
         Returns the list of recent messages. The number depends on amount arg.
         """
-        chat_messages = ChatMessage.objects \
-            .filter(room_id=room_id).order_by("timestamp")[:amount] \
-            .annotate(username=F('sender__username')).values("username", "message", "timestamp")
-        return list(chat_messages)
+        chat_messages = list(
+            ChatMessage.objects
+            .filter(room_id=room_id)
+            .order_by("timestamp")[:amount]
+            .annotate(username=F('sender__username'))
+            .values("username", "message", "timestamp")
+        )
+        return chat_messages

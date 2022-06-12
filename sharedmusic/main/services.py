@@ -63,13 +63,13 @@ class MusicRoomConsumerService:
         """
         Returns True if user is muted, otherwise False.
         """
-        return await RoomRepository.is_user_muted(self.room_id, self.user)
+        return await RoomRepository.is_user_muted(self.room_id, self.user.id)
 
     async def _is_user_banned(self):
         """
         Returns True if user is banned, otherwise False.
         """
-        return await RoomRepository.is_user_banned(self.room_id, self.user)
+        return await RoomRepository.is_user_banned(self.room_id, self.user.id)
 
     async def _is_room_full(self):
         """
