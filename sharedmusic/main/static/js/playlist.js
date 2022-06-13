@@ -46,7 +46,6 @@ function updatePlaylist(newPlaylist, url = "") {
             chosenUrl = youtube_parser(url);
             let trackUrl = youtube_parser(track.url);
             if (chosenUrl === trackUrl) {
-                //playButton.addClass("track__playButton_active");
                 playButton = $(`
                 <div title="Play/Pause track" class="box">
                     <div class="line-1"></div>
@@ -129,6 +128,8 @@ function addTrack() {
         });
 }
 
+// Tooltip for track titles
+// Text should appear on mouse position
 const playlistTooltip = $("#playlist-tooltip");
 
 function playlistTooltipHover(e, text) {
