@@ -28,10 +28,14 @@ Live version can be visited at: [sharedmusic.live](https://sharedmusic.live/)
   - [Features](#features)
     - [Main features](#main-features)
     - [Tech features](#tech-features)
-    - [Room host features:](#room-host-features)
+    - [Room host features](#room-host-features)
   - [Usage](#usage)
     - [Run project](#run-project)
+      - [Locally](#locally)
+      - [Using Docker](#using-docker)
     - [Fixtures](#fixtures)
+      - [`dev.json` fixtures contain](#devjson-fixtures-contain)
+      - [Users credentials](#users-credentials)
     - [Backup](#backup)
     - [Restore](#restore)
   - [Tests](#tests)
@@ -46,6 +50,7 @@ Live version can be visited at: [sharedmusic.live](https://sharedmusic.live/)
 - Python v3.9 [Install](https://www.python.org/downloads/release/python-390/)
 - Docker [Install](https://www.docker.com/products/docker-desktop)
 - Git [Install](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- Redis [Install](https://redis.io/docs/getting-started/)
 
 
 ## Installation
@@ -70,6 +75,15 @@ mkdir backups
 
 ### Docker setup
 
+- Open `/sharedmusic/sharedmusic/settings/settings.py` and find `CHANNEL_LAYERS` variable. Replace
+```
+"hosts": [(REDIS_HOST, 6379)],
+```
+with
+```
+"hosts": [('redis', 6379)],
+```
+
 - Build everything:
 ```
 docker-compose build
@@ -80,16 +94,21 @@ For the first time it may take 5-20 minutes to build everything (depends on your
 
 ### Local setup (without Docker containers)
 
-- First of all you have to install Redis server. [Here](https://redis.io/docs/getting-started/) you can find related information.
+- First, set appropriate channel layer. In `/sharedmusic/sharedmusic/settings/settings.py` you can find `CHANNEL_LAYERS`:
+```
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'main.channel_layers.CustomChannelLayer',
+        'CONFIG': {
+            "hosts": [(REDIS_HOST, 6379)],
+        },
+    },
+}
+```
 
-- After that, open `settings.py` and find `CHANNEL_LAYERS` variable. Use method 2 as described in the comments and replace
-```
-"hosts": [('redis', 6379)],
-```
-with
-```
-"hosts": [('127.0.0.1', 6379)], OR "hosts": [(REDIS_HOST, 6379)],
-```
+- There are 2 supported ones:
+  - `channels.layers.InMemoryChannelLayer`
+  - `main.channel_layers.CustomChannelLayer` - custom implementation of `channels_redis.pubsub.RedisPubSubChannelLayer`
 
 - Next is `venv` setup:
 ```
@@ -151,7 +170,7 @@ Insert some screenshots
 - Celery tasks
   -  To remove abandoned rooms (periodically)
 
-### Room host features:
+### Room host features
 - Change permissions
   - change/add/delete track
   - pause/play track
@@ -165,13 +184,19 @@ Insert some screenshots
 
 ### Run project
 
-- Locally:
+#### Locally
+
+- Run `Redis` if you use `CustomChannelLayer`
+
+- Run these commands:
 ```
 cd sharedmusic
 py manage.py runserver
 ```
 
-- Using Docker:
+#### Using Docker
+
+- Run:
 ```
 docker-compose up
 ```
@@ -182,7 +207,7 @@ docker-compose up
 docker-compose up filldb
 ```
 
-**`dev.json` fixtures contain:**
+#### `dev.json` fixtures contain
   - Superuser
   - Regular user
   - Room
@@ -191,11 +216,11 @@ docker-compose up filldb
   - Room playlist track
   - Chat messages
 
-**Users credentials**
+#### Users credentials
   - Superuser:
     - username: `admin`
     - password: `12345`
-  - User 1:
+  - User:
     - username: `test1`
     - password: `123123123Aa`
 
