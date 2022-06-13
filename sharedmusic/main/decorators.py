@@ -9,6 +9,6 @@ def update_room_expiration_time(func):
     async def wrapper(self, *args, **kwargs):
         await func(self, *args, **kwargs)
         # Update room's last_visited field
-        room = await RoomRepository.get_room_by_id_or_none(self.room_id)
+        room = await RoomRepository.get_room_by_id(self.room_id)
         await RoomRepository.save_room(room)
     return wrapper
