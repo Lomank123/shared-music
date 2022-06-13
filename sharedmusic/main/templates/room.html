@@ -27,7 +27,7 @@
             <div id="room" room_code="{{ room.id }}"></div>
             <div id="host" host_username="{{ room.host.username }}"></div>
             <div id="user" username="{{ user.username }}"></div>
-            <h6>Greetings, {{ user.username }}</h6>
+            <h4>Greetings, {{ user.username }}</h4>
             <div id="chat" class="chat__messages"></div>
             <div class="chat__input">
                 <input id="chat-field" type="text" placeholder="Enter message"/>
@@ -36,7 +36,7 @@
             <div id="muted-message" class="chat__muted-message hidden">You are muted</div>
         </div>
         <div class="playlist">
-            <h6>Playlist:</h6>
+            <h4>Playlist:</h4>
             <div id="playlist" class="playlist__tracks"></div>
             <div class="playlist__input">
                 <input id="url-field" type="text" placeholder="Enter youtube url"/>

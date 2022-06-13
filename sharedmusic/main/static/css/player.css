@@ -225,4 +225,7 @@ input[type="range"]::-ms-track {
     .name .thumb {
         display: none;
     }
+    .repeat-btn {
+        margin-left: 10px;
+    }
 }

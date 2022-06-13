@@ -2,7 +2,7 @@
 .chat__messages {
     height: 50vh;
     overflow-y: auto;
-    max-width: 400px;
+    max-width: 100%;
     margin-top: 5px;
 }
 
@@ -11,6 +11,10 @@
     align-items: center;
     gap: 10px;
     margin-top: 20px;
+}
+
+.chat__input input {
+    flex-grow: 2;
 }
 
 .chat__muted-message {

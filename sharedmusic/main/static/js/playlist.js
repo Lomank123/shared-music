@@ -134,7 +134,7 @@ const playlistTooltip = $("#playlist-tooltip");
 function playlistTooltipHover(e, text) {
     playlistTooltip.text(text);
     playlistTooltip.css("opacity", 1);
-    playlistTooltip.css("top", e.clientY - 50);
+    playlistTooltip.css("top", e.clientY - 30 - playlistTooltip.height());
     playlistTooltip.css("left", document.body.clientWidth / 2 - 150);
 }
 
