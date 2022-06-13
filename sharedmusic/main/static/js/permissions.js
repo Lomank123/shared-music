@@ -51,6 +51,8 @@ function showModal() {
     if (username == hostUsername) {
         permsModalHost.show();
         let settings = $(".perms-menu").children();
+        // Read the value of each setting before showing it to the host
+        // And set the radio buttons "checked" property
         settings.each((idx, setting) => {
             setting = $(setting);
             if (setting.attr("data") == "title") {
@@ -68,6 +70,7 @@ function savePerms() {
         return;
     }
     let settings = $(".perms-menu").children();
+    // Read the values of radio buttons and update permissions object
     settings.each((idx, setting) => {
         setting = $(setting);
         if (setting.attr("data") == "title") {
@@ -104,8 +107,8 @@ function setPermissions(permsList) {
     permsBlock.text("");
     for (perm in permsList) {
         let sign = '<i class="fa-solid fa-xmark"></i>';
-        // if allowed
         if (permsList[perm] <= allow) {
+            // if allowed
             sign = '<i class="fa-solid fa-check"></i>';
         }
         let node = `<div>${dict[perm]}: ${sign}</div>`;

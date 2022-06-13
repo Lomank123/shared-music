@@ -1,0 +1,115 @@
+/* Mobile version */
+@media screen and (max-width: 1400px) {
+    .track__title {
+        width: 25vw;
+    }
+}
+
+@media screen and (max-width: 1250px) {
+    .container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    .lobby {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 20px;
+    }
+    .playlist {
+        order: 2;
+        grid-column: 1 / -1;
+        margin-bottom: 100px;
+    }
+    .playlist h4 {
+        text-align: center;
+    }
+    .playlist__tracks {
+        height: 30vh;
+        text-align: center;
+    }
+    .track__title {
+        width: 90vw;
+    }
+    .playlist__input {
+        text-align: center;
+    }
+    .users {
+        margin-right: 0;
+    }
+    .users__list li .username {
+        max-width: 20vw;
+    }
+    .sign-form {
+        width: 100%;
+        margin: 100px auto;
+    }
+}
+
+@media screen and (max-width: 750px) {
+    * {
+        font-size: 1rem;
+    }
+    .home__message {
+        font-size: 1.2rem;
+    }
+    .home__button {
+        font-size: 1.4rem;
+    }
+    .lobby {
+        display: flex;
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 200px;
+        left: -250px;
+    }
+    .container {
+        max-width: 100%;
+        margin: 0 auto;
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+    .dropdown-content a {
+        padding: 4px;
+        font-size: 12px;
+    }
+    .openbtn {
+        max-width: 20px;
+        top: 40px;
+        left: 20px;
+    }
+    .playlist__tracks {
+        height: 40vh;
+    }
+    .playlist {
+        margin-bottom: 100px;
+    }
+    .room-name h1 {
+        font-size: 1.2rem;
+    }
+    #toast-container > div {
+        width: 280px;
+    }
+    .users__list li .username {
+        max-width: 65vw;
+    }
+    .users__list {
+        height: 30vh;
+    }
+    .chat__messages {
+        height: 40vh;
+    }
+    .line-1,
+    .line-2,
+    .line-3,
+    .line-4,
+    .line-5 {
+        width: 3px;
+    }
+    .track__playButton {
+        padding: 10px;
+    }
+    .box {
+        width: 31px;
+    }
+}

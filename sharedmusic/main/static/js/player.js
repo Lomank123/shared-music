@@ -51,7 +51,6 @@ function onPlayerReady(event) {
     timeline.addEventListener("click", (e) => {
         const timelineWidth = window.getComputedStyle(timeline).width;
         const timeToSeek = (e.offsetX / parseInt(timelineWidth)) * player.getDuration();
-        //player.seekTo(timeToSeek);
         roomSocket.send(
             JSON.stringify({
                 event: "CHANGE_TIME",
@@ -162,7 +161,6 @@ function getCurrentTrackData() {
 function mutePlayer() {
     player.mute();
     // Change the volume percentage to zero
-    //audioPlayer.querySelector(".controls .volume-percentage").style.width = 0;
     volumeSlider.value = 0;
     renderVolumeSlider();
     volumeEl.classList.remove("icono-volumeMedium");

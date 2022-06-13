@@ -1,5 +1,4 @@
 const username = $("#user").attr("username");
-const usersList = document.getElementById("users-list");
 let hostUsername = $("#host").attr("host_username");
 let users = [];
 let muteList = [];
@@ -7,9 +6,7 @@ let banList = [];
 
 function updateUserList(users) {
     $("#room-title").text(`${hostUsername}'s room`);
-    while (usersList.hasChildNodes()) {
-        usersList.removeChild(usersList.firstChild);
-    }
+    $("#usersList").text("");
     users.forEach((user) => {
         let node = $(
             `<li>` + `<div class="online"></div>` + `<div class="username">${user.username}</div>` + `</li>`

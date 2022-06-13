@@ -51,6 +51,8 @@ function handleChatMessages(messages, reset = false) {
     if (messages.length === 0) {
         chat.text("No messages :(");
         flag = true;
+    // I need to remove "no messages :(" when first message arrives
+    // Kinda bad implementation, maybe i should find a better way (someday)
     } else if (flag) {
         chat.text("");
         flag = false;

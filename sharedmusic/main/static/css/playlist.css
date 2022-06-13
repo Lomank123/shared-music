@@ -14,7 +14,6 @@
     display: flex;
     align-items: center;
     margin-top: 10px;
-    padding-right: 20px;
 }
 
 .track__title {
@@ -22,7 +21,8 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    width: 20vw;
+    /* width: 20vw; */
+    width: 400px;
 }
 
 .track__playButton {
@@ -95,6 +95,7 @@
     width: 41px;
     height: 45px;
     cursor: pointer;
+    flex-shrink: 0;
 }
 
 @keyframes go-up-down {
