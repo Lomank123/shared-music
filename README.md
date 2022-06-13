@@ -148,7 +148,16 @@ py manage.py createsuperuser
 
 ## Screenshots
 
-Insert some screenshots
+- Home page:
+![Home page](./sharedmusic/main/static/images/readme/home_page.png)
+- Navbar:
+![Navbar](./sharedmusic/main/static/images/readme/navbar.png)
+- Authorization:
+![Authorization](./sharedmusic/main/static/images/readme/auth.png)
+- Room page:
+![Room page](./sharedmusic/main/static/images/readme/room_page.png)
+- Mobile version
+![Mobile version](./sharedmusic/main/static/images/readme/mobile.png)
 
 
 ## Features
