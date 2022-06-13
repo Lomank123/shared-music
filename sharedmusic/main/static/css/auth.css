@@ -1,0 +1,69 @@
+/* Sign In / Register */
+.switch-buttons {
+    display: flex;
+}
+
+.switch-buttons__button {
+    width: 50%;
+    padding: 20px 0;
+    border: none;
+    background-color: var(--main-bg-color);
+    text-align: center;
+    text-decoration: none;
+}
+
+.switch-buttons__button_chosen {
+    border-bottom: 4px solid var(--primary-color);
+}
+
+.sign-form {
+    width: 50%;
+    border: 1px solid white;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+.login,
+.signup {
+    display: flex;
+    flex-direction: column;
+}
+
+.login__btn,
+.signup__btn {
+    margin-bottom: 10px;
+    margin-top: 50px;
+}
+
+.login .control-group,
+.signup .control-group {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.login .control-group .controls input,
+.signup .control-group .controls input {
+    width: 100%;
+}
+
+.already-logged-message {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.help-block,
+.help-block + ul li {
+    font-size: 1rem;
+    color: lightgray;
+    margin-top: 5px;
+}
+
+.help-block strong {
+    color: red;
+}
+
+.alert ul li {
+    color: red;
+    margin-top: 10px;
+}

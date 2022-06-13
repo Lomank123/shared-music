@@ -10,7 +10,7 @@
 </div>
 {% else %}
 <div class="loading">
-    <div class="lds-ripple"><div></div><div></div></div>
+    <div class="loading__animation"><div></div><div></div></div>
     <div class="loading__error"></div>
     <div class="loading__message">If loading takes too long, try refreshing the page.</div>
 </div>
@@ -18,38 +18,38 @@
     <div id="mute-msg">
         <p>Player is currently muted. Click anywhere to unmute it.</p>
     </div>
-    <div class="room-name">
-        <h1 class="room-title"></h1>
+    <div class="room-title">
+        <h1 id="room-title" class="room-title__name"></h1>
         <button title="Copy link to clipboard" onclick="copyLinkToClipboard(this)" class="btn btn-image"><i class="fa-solid fa-copy"></i></button>
     </div>
     <div class="lobby">
-        <div class="chat-container">
+        <div class="chat">
             <div id="room" room_code="{{ room.id }}"></div>
             <div id="host" host_username="{{ room.host.username }}"></div>
             <div id="user" username="{{ user.username }}"></div>
             <h6>Greetings, {{ user.username }}</h6>
-            <div class="chat"></div>
-            <div class="chat-input">
+            <div id="chat" class="chat__messages"></div>
+            <div class="chat__input">
                 <input id="chat-field" type="text" placeholder="Enter message"/>
                 <button title="Send message to chat" class="btn btn-image" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
-            <div class="muted-message hidden">You are muted</div>
+            <div id="muted-message" class="chat__muted-message hidden">You are muted</div>
         </div>
-        <div class="playlist-container">
+        <div class="playlist">
             <h6>Playlist:</h6>
-            <div class="playlist"></div>
-            <div class="playlist-input">
+            <div id="playlist" class="playlist__tracks"></div>
+            <div class="playlist__input">
                 <input id="url-field" type="text" placeholder="Enter youtube url"/>
                 <button title="Add track to playlist" class="btn btn-image" onclick="addTrack()"><i class="fa-solid fa-plus"></i></button>
             </div>
-            <div class="playlist-error"></div>
-            <div class="playlist-tooltip">test</div>
+            <div id="playlist-error" class="playlist__error"></div>
+            <div id="playlist-tooltip" class="playlist__tooltip"></div>
         </div>
-        <div class="users-container">
+        <div class="users">
             <h4>Online users:</h4>
-            <ul id="users-list">
+            <ul id="users-list" class="users__list">
             </ul>
-            <div class="user-buttons">
+            <div class="users__buttons">
                 <button title="View permissions" class="btn btn-image" onclick="showModal()"><i class="fa-solid fa-list-check"></i></button>
                 <button title="View banlist" class="btn btn-image hidden" onclick="showBanlistModal()" host-only><i class="fa-solid fa-user-slash"></i></button>
             </div>

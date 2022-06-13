@@ -1,4 +1,4 @@
-const chat = $(".chat");
+const chat = $("#chat");
 const chatField = $("#chat-field");
 let flag = false;
 

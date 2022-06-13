@@ -6,7 +6,7 @@ let muteList = [];
 let banList = [];
 
 function updateUserList(users) {
-    $(".room-title").text(`${hostUsername}'s room`);
+    $("#room-title").text(`${hostUsername}'s room`);
     while (usersList.hasChildNodes()) {
         usersList.removeChild(usersList.firstChild);
     }
@@ -77,7 +77,7 @@ function unbanUser(username) {
 function handleUserBan() {
     $(".content").addClass("hidden");
     $(".loading").removeClass("hidden");
-    $(".lds-ripple").text("");
+    $(".loading__animation").text("");
     $(".loading__error").text("You have been banned from the room");
     let time = 10;
     $(".loading__message").text(`You will be redirected to home page in ${time} seconds`);

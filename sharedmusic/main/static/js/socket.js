@@ -149,7 +149,7 @@ function connect() {
         if (data.event == "HOST_CHANGED") {
             $("#host").attr("host_username", data.new_host);
             hostUsername = $("#host").attr("host_username");
-            $(".muted-message").addClass("hidden");
+            $("#muted-message").addClass("hidden");
             updateUserList(users);
             setPermissions(permissions);
         }
@@ -171,13 +171,13 @@ function connect() {
             roomSocket.close();
         }
         if (data.event == "MUTE_LISTENER") {
-            $(".muted-message").removeClass("hidden");
+            $("#muted-message").removeClass("hidden");
         }
         if (data.event == "UNMUTE_LISTENER") {
-            $(".muted-message").addClass("hidden");
+            $("#muted-message").addClass("hidden");
         }
         if (data.event == "LISTENER_MUTED") {
-            $(".muted-message").removeClass("hidden");
+            $("#muted-message").removeClass("hidden");
         }
     };
 

@@ -1,0 +1,74 @@
+/* Sidebar */
+.sidebar {
+    background-color: var(--sidebar-bg-color);
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding-top: 70px;
+    z-index: 10;
+    transition: 0.3s;
+    position: fixed;
+    top: 0;
+    left: -250px;
+    overflow-x: hidden;
+}
+
+.sidebar__logo {
+    margin-top: auto;
+}
+
+.sidebar__link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    text-decoration: none;
+    text-align: center;
+}
+
+.sidebar__link p {
+    margin-left: 15px;
+}
+
+.sidebar__link:hover {
+    background-color: var(--primary-color-hover);
+}
+
+.sidebar__link_logout {
+    margin-top: 20px;
+    background-color: var(--primary-color);
+}
+
+.sidebar__closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    text-decoration: none;
+}
+
+.sidebar__openbtn {
+    border: none;
+    max-width: 30px;
+    background-color: var(--main-bg-color);
+    position: fixed;
+    top: 40px;
+    left: 30px;
+    cursor: pointer;
+}
+
+.sidebar__user {
+    margin-bottom: 50px;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.sidebar__issues {
+    margin-bottom: 20px;
+}
+
+.sidebar__issues p {
+    font-size: 0.8rem;
+    text-align: center;
+}

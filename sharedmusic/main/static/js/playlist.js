@@ -23,7 +23,7 @@ function changeTrack(event, trackData) {
 
 function updatePlaylist(newPlaylist, url = "") {
     clearPlaylist();
-    let playlist = $(".playlist");
+    let playlist = $("#playlist");
     if (newPlaylist.length === 0) {
         playlist.text("No tracks in playlist :(");
     }
@@ -94,8 +94,7 @@ function updatePlaylist(newPlaylist, url = "") {
 }
 
 function clearPlaylist() {
-    let playlist = document.querySelector(".playlist");
-    playlist.innerHTML = "";
+    $("#playlist").text("");
 }
 
 function addTrack() {
@@ -130,7 +129,7 @@ function addTrack() {
         });
 }
 
-const playlistTooltip = $(".playlist-tooltip");
+const playlistTooltip = $("#playlist-tooltip");
 
 function playlistTooltipHover(e, text) {
     playlistTooltip.text(text);
@@ -145,8 +144,8 @@ function playlistTooltipUnhover(e) {
 }
 
 function setPlaylistError(error) {
-    $(".playlist-error").text(error);
+    $("#playlist-error").text(error);
     setTimeout(() => {
-        $(".playlist-error").text("");
+        $("#playlist-error").text("");
     }, 5000);
 }

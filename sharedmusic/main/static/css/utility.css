@@ -1,0 +1,224 @@
+:root {
+    --main-bg-color: #1b252f;
+    --sidebar-bg-color: rgba(17, 24, 39);
+    --primary-color: rgb(173, 33, 33);
+    --primary-color-hover: rgb(109, 20, 20);
+    --block-bg-color: rgb(43, 47, 58);
+    /* Scrollbar variables */
+    --scrollbarBG: rgba(255, 255, 255, 0.8);
+    --scrollbarThumb: rgb(173, 33, 33);
+    --scrollbarWidth: 10px;
+    --scrollbarBorder: 3px solid var(--scrollbarThumb);
+    --scrollbarBorderRadius: calc(var(--scrollbarWidth) / 2);
+}
+
+* {
+    scrollbar-width: var(--scrollbarWidth);
+    scrollbar-color: var(--scrollbarThumb) var(--scrollbarBG);
+}
+*::-webkit-scrollbar {
+    width: var(--scrollbarWidth);
+}
+*::-webkit-scrollbar-track {
+    background: var(--scrollbarBG);
+    border-radius: var(--scrollbarBorderRadius);
+}
+*::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbarThumb);
+    border-radius: var(--scrollbarBorderRadius);
+    border: var(--scrollbarBorder);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 300;
+    line-height: 1.6;
+    font-family: "open sans", sans-serif;
+}
+
+ul {
+    list-style-type: none;
+}
+
+body {
+    background-color: var(--main-bg-color);
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    color: black;
+    border-radius: 7px;
+    height: 50px;
+    padding: 0 15px;
+}
+
+.responsive-image {
+    width: 100%;
+    max-width: 700px;
+    height: auto;
+}
+
+.btn {
+    background-color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.btn-image {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.btn:hover {
+    background-color: var(--primary-color-hover);
+    border: 1px solid var(--primary-color-hover);
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.hidden {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+.overlay {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 5;
+    opacity: 0;
+    background-color: rgba(17, 24, 39, 0.2);
+    cursor: pointer;
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+    transition-duration: 0.3s;
+}
+
+.blur {
+    opacity: 1;
+    pointer-events: all;
+}
+
+#mute-msg {
+    position: fixed;
+    bottom: 60px;
+    right: 0;
+    padding: 0 5px;
+    background-color: var(--primary-color);
+}
+
+#toast-container > div {
+    width: 400px;
+}
+
+/* Mobile version */
+@media screen and (max-width: 1050px) {
+    .container {
+        max-width: 550px;
+        margin: 0 auto;
+    }
+    .lobby {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 20px;
+    }
+    .playlist-container {
+        order: 2;
+        grid-column: 1 / -1;
+    }
+    .playlist-container h6 {
+        text-align: center;
+    }
+    .playlist {
+        max-height: 20vh;
+        text-align: center;
+    }
+    .track__title {
+        width: 90vw;
+    }
+    .permissions {
+        max-height: 20vh;
+    }
+    .chat-container h6 {
+        display: none;
+    }
+    /* Playlist */
+    .playlist {
+        max-height: 20vh;
+        margin-left: 15px;
+        margin-right: 15px;
+    }
+    .playlist-input {
+        text-align: center;
+    }
+    .users-container {
+        margin-right: 0;
+    }
+    #users-list li .username {
+        max-width: 20vw;
+    }
+    .sign-form {
+        width: 100%;
+        margin: 100px auto;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    * {
+        font-size: 1rem;
+    }
+    .sidebar {
+        width: 200px;
+        left: -250px;
+    }
+    .container {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+    .dropdown-content a {
+        padding: 4px;
+        font-size: 12px;
+    }
+    .openbtn {
+        max-width: 20px;
+        top: 40px;
+        left: 20px;
+    }
+    .playlist {
+        max-height: 20vh;
+    }
+    .room-name h1 {
+        font-size: 1.2rem;
+    }
+    #toast-container > div {
+        width: 280px;
+    }
+}
+
+.chat__input,
+.playlist__input,
+.users__buttons {
+    border-top: 4px solid var(--primary-color);
+    padding-top: 20px;
+}
+
+.chat,
+.playlist,
+.users {
+    background-color: var(--block-bg-color);
+    padding: 20px;
+    border-radius: 10px;
+}
+

@@ -1,0 +1,132 @@
+.users__list {
+    height: 50vh;
+    overflow-y: auto;
+    margin-top: 5px;
+}
+
+.users__list li {
+    display: flex;
+    align-items: center;
+}
+
+.users__list li .username {
+    margin-right: 10px;
+    max-width: 15vw;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.online {
+    width: 10px;
+    height: 10px;
+    background: green;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.offline {
+    width: 10px;
+    height: 10px;
+    background: red;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.username {
+    margin-left: 8px;
+}
+
+.users__buttons {
+    margin-top: 20px;
+    text-align: center;
+    display: flex;
+    gap: 10px;
+}
+
+.users__buttons .btn {
+    flex-grow: 1;
+}
+
+.permissions {
+    overflow: auto;
+    max-height: 50vh;
+}
+
+.perms-menu {
+    max-width: 600px;
+}
+
+.grid-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    place-items: center;
+}
+
+.grid-wrapper:first-child {
+    margin-bottom: 10px;
+}
+
+.banlist {
+    overflow-y: auto;
+    max-height: 50vh;
+    padding-right: 20px;
+}
+
+.banned-user {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.banned-user:not(:first-child) {
+    margin-top: 20px;
+}
+
+/* Dropdown  */
+.dropbtn {
+    background-color: inherit;
+    color: white;
+    border: none;
+    padding: 0 5px;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+    display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    max-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: black;
+    padding: 6px;
+    text-decoration: none;
+    display: block;
+    font-size: 16px;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {
+    background-color: #ddd;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn i {
+    color: var(--primary-color);
+}

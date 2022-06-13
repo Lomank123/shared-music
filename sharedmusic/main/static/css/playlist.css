@@ -1,0 +1,138 @@
+/* Playlist */
+.playlist__tracks {
+    height: 50vh;
+    overflow-y: auto;
+    margin-top: 5px;
+}
+
+.playlist__error {
+    color: red;
+    margin-top: 5px;
+}
+
+.playlist__track {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    padding-right: 20px;
+}
+
+.track__title {
+    margin: 0 20px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 20vw;
+}
+
+.track__playButton {
+    order: -1;
+    transition: ease-in-out 0.2s;
+    display: flex;
+    place-items: center;
+    cursor: pointer;
+    padding: 15px;
+    background: #efeeee;
+    border-radius: 50%;
+    border: none;
+}
+.track__playButton .fas {
+    display: flex;
+    place-items: center;
+    font-size: 15px;
+    color: gray;
+}
+
+.track__playButton_active .fas {
+    color: var(--primary-color);
+}
+
+.track__deleteButton {
+    order: 1;
+    background: var(--primary-color);
+    transition: ease-in-out 0.2s;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    display: flex;
+    place-items: center;
+    margin-left: auto;
+}
+
+.track__deleteButton:hover,
+.track__playButton:hover {
+    transform: scale(1.02);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2), inset 0 0 0 99999px rgba(0, 0, 0, 0.2);
+}
+
+.playlist__input {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    align-items: center;
+}
+
+.playlist__input input {
+    flex-grow: 2;
+}
+
+.playlist__tooltip {
+    position: fixed;
+    opacity: 0;
+    background: black;
+    border-radius: 8px 8px 8px 0px;
+    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 3px 7px;
+}
+
+/* Equalizer */
+.box {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 41px;
+    height: 45px;
+    cursor: pointer;
+}
+
+@keyframes go-up-down {
+    0% {
+        height: 0;
+    }
+    100% {
+        height: 35px;
+    }
+}
+
+.line-1,
+.line-2,
+.line-3,
+.line-4,
+.line-5 {
+    position: relative;
+    width: 4px;
+    height: 35px;
+    background-color: var(--primary-color);
+}
+
+.line-1 {
+    animation: go-up-down 0.7s infinite alternate;
+}
+
+.line-2 {
+    animation: go-up-down 0.6s infinite alternate;
+}
+
+.line-3 {
+    animation: go-up-down 0.9s infinite alternate;
+}
+
+.line-4 {
+    animation: go-up-down 0.3s infinite alternate;
+}
+
+.line-5 {
+    animation: go-up-down 0.4s infinite alternate;
+}

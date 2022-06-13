@@ -11,7 +11,14 @@
     <!-- Styles -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     <link rel="stylesheet" href="https://icono-49d6.kxcdn.com/icono.min.css"/>
-	<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/utility.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/auth.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/sidebar.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/room.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/playlist.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/chat.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/users.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/modal.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/player.css' %}">
 	<!-- Title -->
@@ -38,12 +45,12 @@
             <p>Log in</p>
         </a>
         <img class="sidebar__logo responsive-image" src="/static/images/sharedmusic.svg" alt="logo">
-        <div class="issues">
+        <div class="sidebar__issues">
             <p>If you found any bugs please contact us at lomank200222@gmail.com</p>
             <p>Or create an issue on <a target="_blank" href="https://github.com/Lomank123/shared-music/issues"><i class="fa-brands fa-github"></i></a></p>
         </div>
         {% if user.is_authenticated %}
-        <div class="user-data">
+        <div class="sidebar__user">
             <h6>Welcome, {{ user.username }}</h6>
             <a href="{% url 'logout' %}" class="sidebar__link sidebar__link_logout">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -52,7 +59,7 @@
         </div>
         {% endif %}
     </nav>
-    <button class="openbtn" onclick="openNav()">
+    <button class="sidebar__openbtn" onclick="openNav()">
         <svg
             xmlns="http://www.w3.org/2000/svg"
             width="100%"

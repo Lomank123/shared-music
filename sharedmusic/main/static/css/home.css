@@ -1,0 +1,18 @@
+/* Home */
+.home {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.home__message {
+    text-align: center;
+    font-size: 1.6rem;
+    margin-bottom: 50px;
+}
+
+.home__button {
+    font-size: 1.8rem;
+}
