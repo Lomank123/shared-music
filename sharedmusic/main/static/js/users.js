@@ -6,7 +6,7 @@ let banList = [];
 
 function updateUserList(users) {
     $("#room-title").text(`${hostUsername}'s room`);
-    $("#usersList").text("");
+    $("#users-list").text("");
     users.forEach((user) => {
         let node = $(
             `<li>` + `<div class="online"></div>` + `<div class="username">${user.username}</div>` + `</li>`
