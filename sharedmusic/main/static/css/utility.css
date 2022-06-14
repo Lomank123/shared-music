@@ -140,4 +140,5 @@ input[type="email"] {
 
 .playlist__input input, .chat__input input {
     min-width: 0;
+    width: 1px;
 }

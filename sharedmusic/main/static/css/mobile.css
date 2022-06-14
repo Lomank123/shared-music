@@ -1,11 +1,11 @@
 /* Mobile version */
-@media screen and (max-width: 1400px) {
+@media screen and (max-width: 1450px) {
     .track__title {
         width: 25vw;
     }
 }
 
-@media screen and (max-width: 1250px) {
+@media screen and (max-width: 1300px) {
     .container {
         max-width: 700px;
         margin: 0 auto;
@@ -48,6 +48,9 @@
 @media screen and (max-width: 750px) {
     * {
         font-size: 1rem;
+    }
+    .chat__messages {
+        max-width: 750px;
     }
     .home__message {
         font-size: 1.2rem;

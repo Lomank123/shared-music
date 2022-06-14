@@ -2,7 +2,7 @@
 .chat__messages {
     height: 50vh;
     overflow-y: auto;
-    max-width: 100%;
+    max-width: 340px;
     margin-top: 5px;
 }
 

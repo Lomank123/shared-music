@@ -105,6 +105,8 @@ function connect() {
             player.loadVideoById(id);
             playTrack();
             updatePlaylist(data.playlist, data.track.url);
+            // In case youtube locally changes starting time (especially on long videos)
+            player.seekTo(0);
         }
         if (data.event == "SET_CURRENT_TRACK") {
             const id = youtube_parser(data.track.url);

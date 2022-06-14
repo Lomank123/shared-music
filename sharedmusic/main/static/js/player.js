@@ -191,7 +191,7 @@ function getTimeCodeFromNum(num) {
     minutes -= hours * 60;
 
     if (hours === 0) return `${minutes}:${String(seconds % 60).padStart(2, 0)}`;
-    return `${String(hours).padStart(2, 0)}:${minutes}:${String(seconds % 60).padStart(2, 0)}`;
+    return `${hours}:${String(minutes).padStart(2, 0)}:${String(seconds % 60).padStart(2, 0)}`;
 }
 
 function renderVolumeSlider() {
