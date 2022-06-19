@@ -11,5 +11,5 @@ django-crispy-forms
 celery
 django-celery-beat
 daphne
-Redis
+redis
 coverage

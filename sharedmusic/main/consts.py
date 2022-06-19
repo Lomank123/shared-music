@@ -64,3 +64,7 @@ ROOM_ADMIN_ONLY = 5
 
 # Errors
 ROOM_NOT_ALLOWED_EVENT = "ROOM_NOT_ALLOWED"
+
+
+# Password validation errors
+SYMBOL_ERROR_MESSAGE = "Your password must contain only a-z, A-Z, 0-9 or '@$!%*#?&'."

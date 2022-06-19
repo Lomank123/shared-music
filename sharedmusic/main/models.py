@@ -1,12 +1,30 @@
 import uuid
-from django.db import models
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+
 from main import consts
 
 
+username_validator = UnicodeUsernameValidator()
+
+
 class CustomUser(AbstractUser):
+
+    username = models.CharField(
+        _('username'),
+        max_length=20,
+        unique=True,
+        help_text=_('Required. 20 characters or fewer. Letters, digits and @/./+/-/_ only.'),
+        validators=[username_validator],
+        error_messages={
+            'unique': _("A user with that username already exists."),
+        },
+    )
 
     def __str__(self):
         return self.username
